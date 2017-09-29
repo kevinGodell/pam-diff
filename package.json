@@ -1,0 +1,30 @@
+{
+  "name": "pam-diff",
+  "version": "0.0.1",
+  "description": "Measure differences between pixel arrays extracted from pam images",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kevinGodell/pam-diff.git"
+  },
+  "keywords": [
+    "ffmpeg",
+    "pam",
+    "pixels",
+    "pixel",
+    "difference"
+  ],
+  "author": "Kevin Godell <kevin.godell@gmail.com>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/kevinGodell/pam-diff/issues"
+  },
+  "homepage": "https://github.com/kevinGodell/pam-diff#readme",
+  "dependencies": {
+    "stream": "0.0.2",
+    "util": "^0.10.3"
+  }
+}

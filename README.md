@@ -1,2 +1,4 @@
 # pam-diff
-Measure pixel differences between pam image pixel arrays
+Measure differences between pixel arrays extracted from pam images
+
+example coming soon...
