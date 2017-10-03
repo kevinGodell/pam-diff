@@ -12,7 +12,7 @@ npm install pipe2pam --save
 ```
 ### usage:
 
-The following example uses ffmpeg's testsrc to simulate a video input and generate 1000 downscaled grayscale pam images at a rate of 1 per second. The pam images are piped from ffmpeg's stdout into pipe2pam to parse them into into pam objects. The pam objects are then piped into pam-diff to measure pixel differences. For each compared pixel that has a **difference** that exceeds the setting, it will be added to an array of x y coordinates. If the **percent** of changed pixels exceeds the setting, a **diff** event will be emitted which contains an array of pixel coordinates that have changed.
+The following [example](https://github.com/kevinGodell/pam-diff/tree/master/examples/example.js) uses ffmpeg's testsrc to simulate a video input and generate 1000 downscaled grayscale pam images at a rate of 1 per second. The pam images are piped from ffmpeg's stdout into pipe2pam to parse them into into pam objects. The pam objects are then piped into pam-diff to measure pixel differences. For each compared pixel that has a **difference** that exceeds the setting, it will be added to an array of x y coordinates. If the **percent** of changed pixels exceeds the setting, a **diff** event will be emitted which contains an array of pixel coordinates that have changed.
 
 ```
 const P2P = require('pipe2pam');
