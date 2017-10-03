@@ -41,7 +41,6 @@ PamDiff.prototype.setGrayscale = function (value) {
 
 PamDiff.prototype.setDifference = function (value) {
     this._difference = this._validateNumber(value, 5, 1, 255);
-    console.log(`difference ${value}`);
 };
 
 PamDiff.prototype.setPercent = function (value) {
