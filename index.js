@@ -106,7 +106,7 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
             y++;
         }
         if (this._oldPix[i] !== this._newPix[i]) {
-            diffPix.push({x: x, y: y});
+            diffPix.push([x, y]);
         }
     }
     let percent = Math.ceil(diffPix.length / this._length * 100);
@@ -125,7 +125,7 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
             y++;
         }
         if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._difference) {
-            diffPix.push({x: x, y: y});
+            diffPix.push([x, y]);
         }
     }
     let percent = Math.ceil(diffPix.length / this._length * 100);
@@ -144,7 +144,7 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
             y++;
         }
         if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
-            diffPix.push({x: x, y: y});
+            diffPix.push([x, y]);
         }
     }
     let percent = Math.ceil(diffPix.length / this._length * 100);
@@ -163,7 +163,7 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
             y++;
         }
         if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
-            diffPix.push({x: x, y: y});
+            diffPix.push([x, y]);
         }
     }
     let percent = Math.ceil(diffPix.length / this._length * 100);
