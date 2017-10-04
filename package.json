@@ -23,5 +23,8 @@
     "url": "https://github.com/kevinGodell/pam-diff/issues"
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
-  "dependencies": {}
+  "dependencies": {},
+  "devDependencies": {
+    "pipe2pam": "^0.2.1"
+  }
 }
