@@ -64,7 +64,7 @@ p2p.on('pam', function(data) {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 20, percent: 8, polygon: [[0, 0], [0, 225], [100, 225], [100, 0]]};
+const region1 = {name: 'region1', difference: 5, percent: 5, polygon: [[0, 0], [0, 225], [100, 225], [100, 0]]};
 
 const regions = [region1];
 
