@@ -15,7 +15,10 @@
     "pam",
     "pixels",
     "pixel",
-    "difference"
+    "difference",
+    "motion",
+    "detection",
+    "region"
   ],
   "author": "Kevin Godell <kevin.godell@gmail.com>",
   "license": "Apache-2.0",
@@ -23,7 +26,9 @@
     "url": "https://github.com/kevinGodell/pam-diff/issues"
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
-  "dependencies": {},
+  "dependencies": {
+    "polygon-points": "0.0.1"
+  },
   "devDependencies": {
     "pipe2pam": "^0.2.1"
   }
