@@ -340,4 +340,3 @@ PamDiff.prototype._flush = function (callback) {
 
 module.exports = PamDiff;
 //todo get bounding box of all regions combined to exclude some pixels before checking if they exist inside specific regions
-//todo add option for break on first region when coordinate is found
