@@ -30,6 +30,6 @@
     "polygon-points": "0.0.1"
   },
   "devDependencies": {
-    "pipe2pam": "^0.2.1"
+    "pipe2pam": "^0.3.0"
   }
 }
