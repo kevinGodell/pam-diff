@@ -229,7 +229,7 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
                     }
                 }
             } else {
-                if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._difference) {
+                if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
                     this._diffs++;
                 }
             }
@@ -271,7 +271,7 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
                     }
                 }
             } else {
-                if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._difference) {
+                if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
                     this._diffs++;
                 }
             }
