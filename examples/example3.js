@@ -43,15 +43,17 @@ const params = [
     'pipe:1'
 ];
 
-const ffmpeg = spawn('ffmpeg', params);
+const ffmpeg = spawn('ffmpeg', params, {
+    stdio: ['ignore', 'pipe', 'ignore']
+});
 
 console.log(ffmpeg.spawnargs.join(' '));
 
-ffmpeg.on('error', function(error) {
+ffmpeg.on('error', (error) => {
     console.log(error);
 });
 
-ffmpeg.on('exit', function(code, signal) {
+ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
 });
 
@@ -59,7 +61,7 @@ const p2p = new P2P();
 
 let counter = 0;
 
-p2p.on('pam', function(data) {
+p2p.on('pam', (data) => {
     //you do not have to listen to this event if you are just piping this data to pam-diff
     console.log(`received pam ${++counter}`);
 });
@@ -76,7 +78,7 @@ const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({grayscale: 'average', regions : regions});
 
-pamDiff.on('diff', function(data) {
+pamDiff.on('diff', (data) => {
     console.log(data);
 
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
@@ -90,7 +92,7 @@ pamDiff.on('diff', function(data) {
     const jpeg = `${name}.jpeg`;
     const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
-    ff.on('exit', function (data) {
+    ff.on('exit', (data) => {
         if (data === 0) {
             console.log(`FFMPEG clean exit after creating ${jpeg}`);
         } else {
