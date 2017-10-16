@@ -41,3 +41,4 @@ jspm_packages
 .idea/
 pam-diff.iml
 examples
+/index2.js

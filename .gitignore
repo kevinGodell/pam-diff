@@ -59,3 +59,4 @@ typings/
 
 .idea/
 pam-diff.iml
+/index2.js
