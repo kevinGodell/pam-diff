@@ -1,5 +1,5 @@
 # pam-diff
-Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported tupltypes are rgb24, rgb_alpha, grayscale, and monob. It is currently being used for a video motion detection project.
+Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, ***grayscale***, and ***blackandwhite***. It is currently being used for a video motion detection project.
 
 
 ### installation:
