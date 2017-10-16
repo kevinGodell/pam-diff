@@ -70,7 +70,7 @@ PamDiff.prototype.setRegions = function (regions) {
         this._regions.push(
             {
                 name: region.name,
-                polygon: polygonPoints,
+                containsPoint: polygonPoints.containsPoint.bind(polygonPoints),
                 pointsLength: polygonPoints.pointsLength(),
                 difference: this._validateNumber(parseInt(region.difference), this._difference, 1, 255),
                 percent: this._validateNumber(parseInt(region.percent), this._percent, 1, 100),
@@ -137,7 +137,7 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
         for (let x = 0; x < this._width; x++, i++) {
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint([x,y]) === true) {
+                    if (this._regions[j].containsPoint([x,y]) === true) {
                         if (this._oldPix[i] !== this._newPix[i]) {
                             this._regions[j].diffs++;
                         }
@@ -179,7 +179,7 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
         for (let x = 0; x < this._width; x++, i++) {
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint([x,y]) === true) {
+                    if (this._regions[j].containsPoint([x,y]) === true) {
                         if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
@@ -221,7 +221,7 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
         for (let x = 0; x < this._width; x++, i += 3) {
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint([x,y]) === true) {
+                    if (this._regions[j].containsPoint([x,y]) === true) {
                         if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
@@ -263,7 +263,7 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
         for (let x = 0; x < this._width; x++, i += 4) {
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint([x,y]) === true) {
+                    if (this._regions[j].containsPoint([x,y]) === true) {
                         if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
