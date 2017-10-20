@@ -27,9 +27,9 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
-    "polygon-points": "^0.1.5"
+    "polygon-points": "^0.1.7"
   },
   "devDependencies": {
-    "pipe2pam": "^0.4.6"
+    "pipe2pam": "^0.5.0"
   }
 }
