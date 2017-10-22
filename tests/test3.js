@@ -17,7 +17,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [13, 14, 12, 13, 13, 12, 14, 13, 12];
+const pamDiffResults = [17, 18, 16, 16, 16, 15, 18, 17, 15];
 
 const params = [
     /* log info to console */
@@ -41,7 +41,7 @@ const params = [
     '-f',
     'image2pipe',
     '-vf',
-    'fps=1,scale=320:180',
+    'fps=1,scale=400:225',
     '-frames',
     pamCount,
     'pipe:1'
@@ -53,21 +53,21 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [[0, 0], [0, 225], [100, 225], [100, 0]]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
 
-const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [[100, 0], [100, 225], [200, 225], [200, 0]]};
+const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
 
-const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [[200, 0], [200, 225], [300, 225], [300, 0]]};
+const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 200, y: 0}, {x: 200, y: 225}, {x: 300, y: 225}, {x: 300, y: 0}]};
 
-const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [[300, 0], [300, 225], [400, 225], [400, 0]]};
+const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, y: 0}, {x: 300, y: 225}, {x: 400, y: 225}, {x: 400, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({grayscale: 'average', regions : regions});
 
 pamDiff.on('diff', (data) => {
-    assert(data.trigger[2].name === 'region3', 'trigger name is not correct');
-    assert(data.trigger[2].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
+    assert(data.trigger[3].name === 'region4', 'trigger name is not correct');
+    assert(data.trigger[3].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn('ffmpeg', params, {stdio: ['ignore', 'pipe', 'inherit']});

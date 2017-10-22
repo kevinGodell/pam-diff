@@ -41,7 +41,7 @@ const params = [
     '-f',
     'image2pipe',
     '-vf',
-    'fps=1,scale=320:180',
+    'fps=1,scale=400:225',
     '-frames',
     pamCount,
     'pipe:1'

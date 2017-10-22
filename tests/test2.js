@@ -17,7 +17,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [11, 11, 11, 11, 11, 11, 11, 11, 11];
+const pamDiffResults = [14, 14, 14, 14, 14, 14, 14, 14, 14];
 
 const params = [
     /* log info to console */
@@ -41,7 +41,7 @@ const params = [
     '-f',
     'image2pipe',
     '-vf',
-    'fps=1,scale=320:180',
+    'fps=1,scale=400:225',
     '-frames',
     pamCount,
     'pipe:1'
@@ -53,7 +53,7 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [[0, 0], [0, 225], [100, 225], [100, 0]]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
 
 const regions = [region1];
 
