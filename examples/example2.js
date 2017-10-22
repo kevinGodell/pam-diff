@@ -15,28 +15,28 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use an artificial video input */
-    /*'-re',
+    '-re',
      '-f',
      'lavfi',
      '-i',
-     'testsrc=size=1920x1080:rate=15',*/
+     'testsrc=size=1920x1080:rate=15',
 
     /* use an rtsp ip cam video input */
-    '-rtsp_transport',
+    /*'-rtsp_transport',
     'tcp',
     '-i',
-    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
+    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',*/
 
     /* set output flags */
     '-an',
     '-c:v',
     'pam',
     '-pix_fmt',
-    'rgb24',//rgba, rgb24, gray, monob
+    'rgb24',//rgba, rgb24, gray
     '-f',
     'image2pipe',
     '-vf',
-    'fps=1,scale=320:180',//1920:1080 scaled down: 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
+    'fps=2,scale=640:360',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
     //'fps=1,scale=iw*1/6:ih*1/6',
     '-frames',
     '1000',
@@ -66,7 +66,7 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 5, percent: 5, polygon: [[0, 0], [0, 225], [100, 225], [100, 0]]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
 
 const regions = [region1];
 
