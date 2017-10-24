@@ -15,7 +15,6 @@ function PamDiff(options) {
     this.setPercent(this._parseOptions('percent', options));//global option, can be overridden per region
     this.setRegions(this._parseOptions('regions', options));//can be no regions or a single region or multiple regions. if no regions, all pixels will be compared.
     this._parseChunk = this._parseFirstChunk;//first parsing will be reading settings and configuring internal pixel reading
-    //todo add option for break on first region so that pixel is not measured in multiple overlapping regions
 }
 
 util.inherits(PamDiff, Transform);
@@ -333,3 +332,4 @@ PamDiff.prototype._flush = function (callback) {
 
 module.exports = PamDiff;
 //todo get bounding box of all regions combined to exclude some pixels before checking if they exist inside specific regions
+//todo add option for break on first region so that pixel is not measured in multiple overlapping regions
