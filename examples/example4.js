@@ -23,9 +23,9 @@ const params = [
 
     /* use an rtsp ip cam video input */
     /*'-rtsp_transport',
-     'tcp',
-     '-i',
-     'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',*/
+    'tcp',
+    '-i',
+    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',*/
 
     /* set output flags */
     '-an',
