@@ -1,5 +1,4 @@
 ffconcat version 1.0
 file 2017-10-24T13-02-00.mp4
-file 2017-10-24T13-03-00.mp4
 file 2017-10-24T13-14-00.mp4
 file 2017-10-24T13-15-00.mp4
