@@ -1,4 +1,4 @@
 .idea
 node_modules
-examples/out/gray/*
-examples/out/rgb24/*
+examples/out/gray/*.jpeg
+examples/out/rgb24/*.jpeg
