@@ -71,7 +71,7 @@ PamDiff.prototype.setRegions = function (regions) {
             {
                 name: region.name,
                 polygon: polygonPoints,
-                pointsLength: polygonPoints.pointsLength(),
+                pointsLength: polygonPoints.pointsLength,
                 difference: this._validateNumber(parseInt(region.difference), this._difference, 1, 255),
                 percent: this._validateNumber(parseInt(region.percent), this._percent, 1, 100),
                 diffs: 0
