@@ -17,7 +17,7 @@ const params = [
     /* use a list of mp4 videos as input */
     //'-re',//uncomment to have ffmpeg read videos at a slower realtime rate
     '-i',
-    'in/ffconcat.txt',
+    `${__dirname}/in/ffconcat.txt`,
     '-f',
     'concat',
 
@@ -88,7 +88,7 @@ pamDiff.on('diff', (data) => {
         name += `(${region.name}=${region.percent})`;
     }
     const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `out/gray/${jpeg}`;
+    const pathToJpeg = `${__dirname}/out/gray/${jpeg}`;
     const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
