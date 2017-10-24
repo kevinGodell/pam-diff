@@ -135,17 +135,15 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i++) {
+            const diff = this._oldPix[i] !== this._newPix[i];
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
-                        if (this._oldPix[i] !== this._newPix[i]) {
+                    if (diff === true && this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
                             this._regions[j].diffs++;
-                        }
-                        break;//todo add option for break on first region
                     }
                 }
             } else {
-                if (this._oldPix[i] !== this._newPix[i]) {
+                if (diff === true) {
                     this._diffs++;
                 }
             }
@@ -177,17 +175,15 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i++) {
+            const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
-                        if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._regions[j].difference) {
-                            this._regions[j].diffs++;
-                        }
-                        break;//todo add option for break on first region
+                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
+                        this._regions[j].diffs++;
                     }
                 }
             } else {
-                if (Math.abs(this._oldPix[i] - this._newPix[i]) >= this._difference) {
+                if (diff >= this._difference) {
                     this._diffs++;
                 }
             }
@@ -219,17 +215,16 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 3) {
+            const diff = Math.abs( this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]) );
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
-                        if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._regions[j].difference) {
-                            this._regions[j].diffs++;
-                        }
-                        break;//todo add option for break on first region
+                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
+                        this._regions[j].diffs++;
+                        //break;
                     }
                 }
             } else {
-                if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
+                if (diff >= this._difference) {
                     this._diffs++;
                 }
             }
@@ -261,17 +256,15 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 4) {
+            const diff = Math.abs( this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]) );
             if (this._regions) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
-                        if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._regions[j].difference) {
-                            this._regions[j].diffs++;
-                        }
-                        break;//todo add option for break on first region
+                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint({x: x, y: y}) === true) {
+                        this._regions[j].diffs++;
                     }
                 }
             } else {
-                if (Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2])) >= this._difference) {
+                if (diff >= this._difference) {
                     this._diffs++;
                 }
             }
