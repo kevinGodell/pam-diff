@@ -14,29 +14,21 @@ const params = [
     '-hwaccel',
     'auto',//vda, videotoolbox, none, auto
 
-    /* use a list of mp4 videos as input */
-    //'-re',//uncomment to have ffmpeg read videos at a slower realtime rate
+    /* use a pre-recorded mp4 video as input */
+    //'-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
-    `${__dirname}/in/ffconcat.txt`,
-    '-f',
-    'concat',
+    `${__dirname}/in/sample.mp4`,
 
     /* set output flags */
     '-an',
     '-c:v',
     'pam',
     '-pix_fmt',
-    //'gray',
-    //'rgba',
     'rgb24',
-    //'monob',
     '-f',
     'image2pipe',
     '-vf',
-    'fps=2,scale=640:360',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
-    //'fps=1,scale=iw*1/6:ih*1/6',
-    '-frames',
-    '2000',
+    'fps=2,scale=640:360',
     'pipe:1'
 ];
 
@@ -64,13 +56,13 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 10, percent: 11, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 8, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
 
-const region2 = {name: 'region2', difference: 10, percent: 10, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 9, percent: 10, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
 
-const region3 = {name: 'region3', difference: 10, percent: 10, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 9, percent: 10, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
 
-const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 8, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
