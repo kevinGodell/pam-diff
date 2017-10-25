@@ -74,7 +74,7 @@ const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480,
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({grayscale: 'average', regions : regions});
+const pamDiff = new PamDiff({/*grayscale: 'luminosity', rgb grayscale conversion does not need to be set if using grayscale pams*/regions : regions});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
