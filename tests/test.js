@@ -53,7 +53,7 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({grayscale: 'average', difference: 1, percent: 1});
+const pamDiff = new PamDiff({grayscale: 'luminosity', difference: 1, percent: 1});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[0].name === 'percent', 'trigger name is not correct');
