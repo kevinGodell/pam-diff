@@ -1,4 +1,4 @@
-// jshint esversion: 6, globalstrict: true, strict: true
+// jshint esversion: 6, globalstrict: true, strict: true, bitwise: false
 'use strict';
 
 const util = require('util');
@@ -33,11 +33,11 @@ PamDiff.prototype.setGrayscale = function (value) {
         case 'desaturation' :
             this._grayscale = this._desaturationToGray;
             break;
-        case 'luminosity' :
-            this._grayscale = this._luminosityToGray;
-            break;
-        default :
+        case 'average' :
             this._grayscale = this._averageToGray;
+            break;
+        default ://luminosity
+            this._grayscale = this._luminosityToGray;
     }
 };
 
@@ -111,8 +111,7 @@ PamDiff.prototype._desaturationToGray = function (r, g, b) {
 
 //convert rgb to gray
 PamDiff.prototype._luminosityToGray = function (r, g, b) {
-    //return 0.299 * r + 0.587 * g + 0.114 * b;
-    return 0.3 * r + 0.59 * g + 0.11 * b;
+    return ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
 };
 
 //convert rgb to gray
