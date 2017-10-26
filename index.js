@@ -61,18 +61,23 @@ PamDiff.prototype.setRegions = function (regions) {
         throw new Error(`Regions must be an array of at least 1 region object {name: 'region1', difference: 10, percent: 10, polygon: [[0, 0], [0, 50], [50, 50], [50, 0]]}`);
     }
     this._regions = [];
+    this._minDiff = 255;
     for (const region of regions) {
         if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
             throw new Error('Region must include a name and a polygon property');
         }
         const polygonPoints = new PP(region.polygon);
+        const pointsLength = polygonPoints.pointsLength;
+        const difference = this._validateNumber(parseInt(region.difference), this._difference, 1, 255);
+        const percent = this._validateNumber(parseInt(region.percent), this._percent, 1, 100);
+        this._minDiff = Math.min(this._minDiff, difference);
         this._regions.push(
             {
                 name: region.name,
                 polygon: polygonPoints,
-                pointsLength: polygonPoints.pointsLength,
-                difference: this._validateNumber(parseInt(region.difference), this._difference, 1, 255),
-                percent: this._validateNumber(parseInt(region.percent), this._percent, 1, 100),
+                pointsLength: pointsLength,
+                difference: difference,
+                percent: percent,
                 diffs: 0
             }
         );
@@ -134,9 +139,9 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i++) {
             const diff = this._oldPix[i] !== this._newPix[i];
-            if (this._regions) {
+            if (this._regions && diff === true) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (diff === true && this._regions[j].polygon.containsPoint(x, y) === true) {
+                    if (this._regions[j].polygon.containsPoint(x, y) === true) {
                             this._regions[j].diffs++;
                     }
                 }
@@ -174,7 +179,7 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i++) {
             const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
-            if (this._regions) {
+            if (this._regions && diff >= this._minDiff) {
                 for (let j = 0; j < this._regionsLength; j++) {
                     if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
                         this._regions[j].diffs++;
@@ -214,7 +219,7 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 3) {
             const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
-            if (this._regions) {
+            if (this._regions && diff >= this._minDiff) {
                 for (let j = 0; j < this._regionsLength; j++) {
                     if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
                         this._regions[j].diffs++;
@@ -254,7 +259,7 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 4) {
             const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
-            if (this._regions) {
+            if (this._regions && diff >= this._minDiff) {
                 for (let j = 0; j < this._regionsLength; j++) {
                     if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
                         this._regions[j].diffs++;
@@ -330,4 +335,3 @@ PamDiff.prototype._flush = function (callback) {
 
 module.exports = PamDiff;
 //todo get bounding box of all regions combined to exclude some pixels before checking if they exist inside specific regions
-//todo add option for break on first region so that pixel is not measured in multiple overlapping regions
