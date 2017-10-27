@@ -54,6 +54,7 @@ PamDiff.prototype.setRegions = function (regions) {
         if (this._regions) {
             delete this._regions;
             delete this._regionsLength;
+            delete this._minDiff;
         }
         this._diffs = 0;
         return;
