@@ -179,16 +179,18 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i++) {
-            const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
-            if (this._regions && diff >= this._minDiff) {
-                for (let j = 0; j < this._regionsLength; j++) {
-                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
-                        this._regions[j].diffs++;
+            if (this._oldPix[i] !== this._newPix[i]) {
+                const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
+                if (this._regions && diff >= this._minDiff) {
+                    for (let j = 0; j < this._regionsLength; j++) {
+                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                            this._regions[j].diffs++;
+                        }
                     }
-                }
-            } else {
-                if (diff >= this._difference) {
-                    this._diffs++;
+                } else {
+                    if (diff >= this._difference) {
+                        this._diffs++;
+                    }
                 }
             }
         }
@@ -219,16 +221,18 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 3) {
-            const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
-            if (this._regions && diff >= this._minDiff) {
-                for (let j = 0; j < this._regionsLength; j++) {
-                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
-                        this._regions[j].diffs++;
+            if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
+                const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
+                if (this._regions && diff >= this._minDiff) {
+                    for (let j = 0; j < this._regionsLength; j++) {
+                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                            this._regions[j].diffs++;
+                        }
                     }
-                }
-            } else {
-                if (diff >= this._difference) {
-                    this._diffs++;
+                } else {
+                    if (diff >= this._difference) {
+                        this._diffs++;
+                    }
                 }
             }
         }
@@ -259,16 +263,18 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
     for (let y = 0, i = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 4) {
-            const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
-            if (this._regions && diff >= this._minDiff) {
-                for (let j = 0; j < this._regionsLength; j++) {
-                    if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
-                        this._regions[j].diffs++;
+            if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
+                const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
+                if (this._regions && diff >= this._minDiff) {
+                    for (let j = 0; j < this._regionsLength; j++) {
+                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                            this._regions[j].diffs++;
+                        }
                     }
-                }
-            } else {
-                if (diff >= this._difference) {
-                    this._diffs++;
+                } else {
+                    if (diff >= this._difference) {
+                        this._diffs++;
+                    }
                 }
             }
         }
