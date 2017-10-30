@@ -84,6 +84,7 @@ PamDiff.prototype.setRegions = function (regions) {
         );
     }
     this._regionsLength = this._regions.length;
+    this._createPointsInPolygons(this._regions, this._width, this._height);
 };
 
 PamDiff.prototype._parseOptions = function (option, options) {
@@ -102,6 +103,21 @@ PamDiff.prototype._validateNumber = function (number, def, low, high) {
         return high;
     } else {
         return number;
+    }
+};
+
+PamDiff.prototype._createPointsInPolygons = function (regions, width, height) {
+    if (regions && width && height) {
+        this._pointsInPolygons = [];
+        for (const region of regions) {
+            const array = [];
+            for (let y = 0, i = 0; y < height; y++) {
+                for (let x = 0; x < width; x++, i++) {
+                    array.push(region.polygon.containsPoint(x, y));
+                }
+            }
+            this._pointsInPolygons.push(array);
+        }
     }
 };
 
@@ -142,8 +158,8 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
             const diff = this._oldPix[i] !== this._newPix[i];
             if (this._regions && diff === true) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._regions[j].polygon.containsPoint(x, y) === true) {
-                            this._regions[j].diffs++;
+                    if (this._pointsInPolygons[j][i] === true) {
+                        this._regions[j].diffs++;
                     }
                 }
             } else {
@@ -163,12 +179,24 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
             this._regions[i].diffs = 0;
         }
         if (regionDiffArray.length > 0) {
-            this.emit('diff', {trigger: regionDiffArray, pam: chunk.pam});
+            const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
     } else {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
-            this.emit('diff', {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam});
+            const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._diffs = 0;
     }
@@ -183,7 +211,7 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
                 const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                        if (this._pointsInPolygons[j][i] === true && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
@@ -205,12 +233,24 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
             this._regions[i].diffs = 0;
         }
         if (regionDiffArray.length > 0) {
-            this.emit('diff', {trigger: regionDiffArray, pam: chunk.pam});
+            const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
     } else {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
-            this.emit('diff', {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam});
+            const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._diffs = 0;
     }
@@ -219,13 +259,13 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
 
 PamDiff.prototype._rgbPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
-    for (let y = 0, i = 0; y < this._height; y++) {
-        for (let x = 0; x < this._width; x++, i += 3) {
+    for (let y = 0, i = 0, p = 0; y < this._height; y++) {
+        for (let x = 0; x < this._width; x++, i += 3, p++) {
             if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
                 const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                        if (this._pointsInPolygons[j][p] === true && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
@@ -247,12 +287,24 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
             this._regions[i].diffs = 0;
         }
         if (regionDiffArray.length > 0) {
-            this.emit('diff', {trigger: regionDiffArray, pam: chunk.pam});
+            const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
     } else {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
-            this.emit('diff', {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam});
+            const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._diffs = 0;
     }
@@ -261,13 +313,13 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
 
 PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
     this._newPix = chunk.pixels;
-    for (let y = 0, i = 0; y < this._height; y++) {
-        for (let x = 0; x < this._width; x++, i += 4) {
+    for (let y = 0, i = 0, p = 0; y < this._height; y++) {
+        for (let x = 0; x < this._width; x++, i += 4, p++) {
             if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
                 const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (diff >= this._regions[j].difference && this._regions[j].polygon.containsPoint(x, y) === true) {
+                        if (this._pointsInPolygons[j][p] === true && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
@@ -289,12 +341,24 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
             this._regions[i].diffs = 0;
         }
         if (regionDiffArray.length > 0) {
-            this.emit('diff', {trigger: regionDiffArray, pam: chunk.pam});
+            const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
     } else {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
-            this.emit('diff', {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam});
+            const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._diffs = 0;
     }
@@ -306,6 +370,7 @@ PamDiff.prototype._parseFirstChunk = function (chunk) {
     this._height = parseInt(chunk.height);
     this._oldPix = chunk.pixels;
     this._length = this._oldPix.length;
+    this._createPointsInPolygons(this._regions, this._width, this._height);
     switch (chunk.tupltype) {
         case 'blackandwhite' :
             this._parseChunk = this._blackAndWhitePixelDiff;
