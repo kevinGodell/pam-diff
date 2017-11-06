@@ -5,15 +5,16 @@ const util = require('util');
 const Transform = require('stream').Transform;
 const PP = require('polygon-points');
 
-function PamDiff(options) {
+function PamDiff(options, callback) {
     if (!(this instanceof PamDiff)) {
-        return new PamDiff(options);
+        return new PamDiff(options, callback);
     }
     Transform.call(this, {objectMode: true});
     this.setGrayscale(this._parseOptions('grayscale', options));//global option
     this.setDifference(this._parseOptions('difference', options));//global option, can be overridden per region
     this.setPercent(this._parseOptions('percent', options));//global option, can be overridden per region
     this.setRegions(this._parseOptions('regions', options));//can be no regions or a single region or multiple regions. if no regions, all pixels will be compared.
+    this._setCallback(callback);//callback function to be called when pixel difference is detected
     this._parseChunk = this._parseFirstChunk;//first parsing will be reading settings and configuring internal pixel reading
 }
 
@@ -85,6 +86,14 @@ PamDiff.prototype.setRegions = function (regions) {
     }
     this._regionsLength = this._regions.length;
     this._createPointsInPolygons(this._regions, this._width, this._height);
+};
+
+PamDiff.prototype._setCallback = function (callback) {
+    if (typeof callback === 'function') {
+        this._callback = callback;
+    } else {
+        delete this._callback;
+    }
 };
 
 PamDiff.prototype._parseOptions = function (option, options) {
@@ -180,6 +189,9 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
         }
         if (regionDiffArray.length > 0) {
             const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -191,6 +203,9 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
             const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -234,6 +249,9 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
         }
         if (regionDiffArray.length > 0) {
             const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -245,6 +263,9 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
             const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -288,6 +309,9 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
         }
         if (regionDiffArray.length > 0) {
             const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -299,6 +323,9 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
             const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -342,6 +369,9 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
         }
         if (regionDiffArray.length > 0) {
             const data = {trigger: regionDiffArray, pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
@@ -353,6 +383,9 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
         const percent = Math.ceil(this._diffs / this._length * 100);
         if (percent >= this._percent) {
             const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
             if (this._readableState.pipesCount > 0) {
                 this.push(data);
             }
