@@ -14,7 +14,7 @@ function PamDiff(options, callback) {
     this.setDifference(this._parseOptions('difference', options));//global option, can be overridden per region
     this.setPercent(this._parseOptions('percent', options));//global option, can be overridden per region
     this.setRegions(this._parseOptions('regions', options));//can be no regions or a single region or multiple regions. if no regions, all pixels will be compared.
-    this._setCallback(callback);//callback function to be called when pixel difference is detected
+    this.setCallback(callback);//callback function to be called when pixel difference is detected
     this._parseChunk = this._parseFirstChunk;//first parsing will be reading settings and configuring internal pixel reading
 }
 
@@ -88,7 +88,7 @@ PamDiff.prototype.setRegions = function (regions) {
     this._createPointsInPolygons(this._regions, this._width, this._height);
 };
 
-PamDiff.prototype._setCallback = function (callback) {
+PamDiff.prototype.setCallback = function (callback) {
     if (typeof callback === 'function') {
         this._callback = callback;
     } else {
