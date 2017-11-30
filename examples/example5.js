@@ -86,7 +86,7 @@ pamDiff.on('diff', (data) => {
     console.log(data);
 
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    //if(true){return;}
+    if(true){return;}
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
