@@ -1,6 +1,6 @@
 {
   "name": "pam-diff",
-  "version": "0.9.2",
+  "version": "0.10.0",
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
