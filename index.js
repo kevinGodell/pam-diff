@@ -90,6 +90,9 @@ PamDiff.prototype.setRegions = function (regions) {
 
 PamDiff.prototype.setCallback = function (callback) {
     if (typeof callback === 'function') {
+        if (callback.length !== 1){
+            throw new Error('Callback function must only accept 1 argument');
+        }
         this._callback = callback;
     } else {
         delete this._callback;
