@@ -3,3 +3,4 @@ node_modules
 examples
 tests
 .travis.yml
+pam-diff.iml
