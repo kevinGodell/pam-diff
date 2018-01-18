@@ -1,4 +1,3 @@
-// jshint esversion: 6, globalstrict: true, strict: true, bitwise: false
 'use strict';
 
 const util = require('util');

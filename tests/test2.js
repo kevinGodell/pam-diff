@@ -1,4 +1,3 @@
-// jshint esversion: 6, globalstrict: true, strict: true
 'use strict';
 
 console.time('=====> testing pam diffs with a single region set');

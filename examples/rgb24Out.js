@@ -1,5 +1,5 @@
-// jshint esversion: 6, globalstrict: true, strict: true
 'use strict';
+
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
 const ChildProcess = require('child_process');
