@@ -6,3 +6,7 @@ tests/
 appveyor.yml
 .jshintrc
 pam-diff.iml
+build/
+libs/
+binding.gyp
+index2.js
