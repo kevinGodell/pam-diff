@@ -432,12 +432,16 @@ PamDiff.prototype._transform = function (chunk, encoding, callback) {
 };
 
 PamDiff.prototype._flush = function (callback) {
+    this.resetCache();
+    callback();
+};
+
+PamDiff.prototype.resetCache = function () {
     delete this._oldPix;
     delete this._newPix;
     delete this._width;
     delete this._length;
     this._parseChunk = this._parseFirstChunk;
-    callback();
 };
 
 module.exports = PamDiff;
