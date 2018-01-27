@@ -16,7 +16,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [5, 5, 5, 5, 5, 5, 5, 5, 5];
+const pamDiffResults = [15, 15, 14, 14, 14, 14, 15, 15, 14];
 
 const params = [
     /* log info to console */
