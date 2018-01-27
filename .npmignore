@@ -10,3 +10,4 @@ build/
 libs/
 binding.gyp
 index2.js
+indexTest.js
