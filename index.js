@@ -404,7 +404,7 @@ PamDiff.prototype._parseFirstChunk = function (chunk) {
     this._width = parseInt(chunk.width);
     this._height = parseInt(chunk.height);
     this._oldPix = chunk.pixels;
-    this._length = this._oldPix.length;
+    this._length = this._width * this._height;
     this._createPointsInPolygons(this._regions, this._width, this._height);
     switch (chunk.tupltype) {
         case 'blackandwhite' :
