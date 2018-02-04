@@ -9,7 +9,6 @@ function PamDiff(options, callback) {
         return new PamDiff(options, callback);
     }
     Transform.call(this, {objectMode: true});
-    this.setGrayscale(this._parseOptions('grayscale', options));//global option
     this.setDifference(this._parseOptions('difference', options));//global option, can be overridden per region
     this.setPercent(this._parseOptions('percent', options));//global option, can be overridden per region
     this.setRegions(this._parseOptions('regions', options));//can be no regions or a single region or multiple regions. if no regions, all pixels will be compared.
@@ -18,28 +17,6 @@ function PamDiff(options, callback) {
 }
 
 util.inherits(PamDiff, Transform);
-
-PamDiff.prototype.setGrayscale = function (value) {
-    switch (value) {
-        case 'red' :
-            this._grayscale = this._redToGray;
-            break;
-        case 'green' :
-            this._grayscale = this._greenToGray;
-            break;
-        case 'blue' :
-            this._grayscale = this._blueToGray;
-            break;
-        case 'desaturation' :
-            this._grayscale = this._desaturationToGray;
-            break;
-        case 'average' :
-            this._grayscale = this._averageToGray;
-            break;
-        default ://luminosity
-            this._grayscale = this._luminosityToGray;
-    }
-};
 
 PamDiff.prototype.setDifference = function (value) {
     this._difference = this._validateNumber(parseInt(value), 5, 1, 255);
@@ -68,7 +45,6 @@ PamDiff.prototype.setRegions = function (regions) {
             throw new Error('Region must include a name and a polygon property');
         }
         const polygonPoints = new PP(region.polygon);
-        const pointsLength = polygonPoints.pointsLength;
         const difference = this._validateNumber(parseInt(region.difference), this._difference, 1, 255);
         const percent = this._validateNumber(parseInt(region.percent), this._percent, 1, 100);
         this._minDiff = Math.min(this._minDiff, difference);
@@ -76,7 +52,6 @@ PamDiff.prototype.setRegions = function (regions) {
             {
                 name: region.name,
                 polygon: polygonPoints,
-                pointsLength: pointsLength,
                 difference: difference,
                 percent: percent,
                 diffs: 0
@@ -89,7 +64,7 @@ PamDiff.prototype.setRegions = function (regions) {
 
 PamDiff.prototype.setCallback = function (callback) {
     if (typeof callback === 'function') {
-        if (callback.length !== 1){
+        if (callback.length !== 1) {
             throw new Error('Callback function must only accept 1 argument');
         }
         this._callback = callback;
@@ -121,45 +96,11 @@ PamDiff.prototype._createPointsInPolygons = function (regions, width, height) {
     if (regions && width && height) {
         this._pointsInPolygons = [];
         for (const region of regions) {
-            const array = [];
-            for (let y = 0, i = 0; y < height; y++) {
-                for (let x = 0; x < width; x++, i++) {
-                    array.push(region.polygon.containsPoint(x, y));
-                }
-            }
-            this._pointsInPolygons.push(array);
+            const bitset = region.polygon.getBitset(this._width, this._height);
+            region.pointsLength = bitset.count;
+            this._pointsInPolygons.push(bitset.buffer);
         }
     }
-};
-
-//convert rgb to gray
-PamDiff.prototype._averageToGray = function (r, g, b) {
-    return (r + g + b) / 3;
-};
-
-//convert rgb to gray
-PamDiff.prototype._desaturationToGray = function (r, g, b) {
-    return (Math.max(r, g, b) + Math.min(r, g, b)) / 2;
-};
-
-//convert rgb to gray
-PamDiff.prototype._luminosityToGray = function (r, g, b) {
-    return ((66 * r + 129 * g + 25 * b + 128) >> 8) + 16;
-};
-
-//convert rgb to gray
-PamDiff.prototype._redToGray = function (r, g, b) {
-    return r;
-};
-
-//convert rgb to gray
-PamDiff.prototype._greenToGray = function (r, g, b) {
-    return g;
-};
-
-//convert rgb to gray
-PamDiff.prototype._blueToGray = function (r, g, b) {
-    return b;
 };
 
 PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
@@ -169,7 +110,7 @@ PamDiff.prototype._blackAndWhitePixelDiff = function (chunk) {
             const diff = this._oldPix[i] !== this._newPix[i];
             if (this._regions && diff === true) {
                 for (let j = 0; j < this._regionsLength; j++) {
-                    if (this._pointsInPolygons[j][i] === true) {
+                    if (this._pointsInPolygons[j][i]) {
                         this._regions[j].diffs++;
                     }
                 }
@@ -228,7 +169,7 @@ PamDiff.prototype._grayScalePixelDiff = function (chunk) {
                 const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (this._pointsInPolygons[j][i] === true && diff >= this._regions[j].difference) {
+                        if (this._pointsInPolygons[j][i] && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
@@ -285,10 +226,10 @@ PamDiff.prototype._rgbPixelDiff = function (chunk) {
     for (let y = 0, i = 0, p = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 3, p++) {
             if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
-                const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
+                const diff = Math.abs(this._oldPix[i] + this._oldPix[i + 1] + this._oldPix[i + 2] - this._newPix[i] - this._newPix[i + 1] - this._newPix[i + 2])/3;
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (this._pointsInPolygons[j][p] === true && diff >= this._regions[j].difference) {
+                        if (this._pointsInPolygons[j][p] && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
@@ -345,10 +286,10 @@ PamDiff.prototype._rgbAlphaPixelDiff = function (chunk) {
     for (let y = 0, i = 0, p = 0; y < this._height; y++) {
         for (let x = 0; x < this._width; x++, i += 4, p++) {
             if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
-                const diff = Math.abs(this._grayscale(this._oldPix[i], this._oldPix[i + 1], this._oldPix[i + 2]) - this._grayscale(this._newPix[i], this._newPix[i + 1], this._newPix[i + 2]));
+                const diff = Math.abs(this._oldPix[i] + this._oldPix[i + 1] + this._oldPix[i + 2] - this._newPix[i] - this._newPix[i + 1] - this._newPix[i + 2])/3;
                 if (this._regions && diff >= this._minDiff) {
                     for (let j = 0; j < this._regionsLength; j++) {
-                        if (this._pointsInPolygons[j][p] === true && diff >= this._regions[j].difference) {
+                        if (this._pointsInPolygons[j][p] && diff >= this._regions[j].difference) {
                             this._regions[j].diffs++;
                         }
                     }
