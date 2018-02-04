@@ -15,7 +15,7 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use a pre-recorded mp4 video as input */
-    //'-re',//comment out to have ffmpeg read video as fast as possible
+    '-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
     `${__dirname}/in/sample.mp4`,
 
@@ -66,7 +66,7 @@ const region4 = {name: 'region4', difference: 8, percent: 9, polygon: [{x: 480, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({grayscale: 'luminosity', regions : regions});
+const pamDiff = new PamDiff({regions : regions});
 
 pamDiff.on('diff', (data) => {
     console.log(data);

@@ -42,7 +42,7 @@ const params = [
     'fps=2,scale=640:360',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
     //'fps=1,scale=iw*1/6:ih*1/6',
     '-frames',
-    '1000',
+    '100',
     'pipe:1'
 ];
 
@@ -79,7 +79,7 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 480, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({grayscale: 'luminosity', regions : regions});
+const pamDiff = new PamDiff({regions : regions});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
