@@ -44,6 +44,7 @@ ffmpeg.on('error', (error) => {
 
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
+    console.log(diffCount);
     console.timeEnd('grayOut.js');
 });
 
@@ -56,23 +57,25 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 9, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 8, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
 
-const region2 = {name: 'region2', difference: 10, percent: 10, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 9, percent: 10, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
 
-const region3 = {name: 'region3', difference: 10, percent: 10, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 9, percent: 10, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
 
-const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 8, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({regions : regions});
 
+let diffCount = 0;
+
 pamDiff.on('diff', (data) => {
     console.log(data);
-
+    diffCount++;
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    //if(true){return;}
+    if(true){return;}
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;

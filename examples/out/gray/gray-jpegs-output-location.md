@@ -1,1 +1,1 @@
-gray jpegs output location
+gray jpegs output location (47)

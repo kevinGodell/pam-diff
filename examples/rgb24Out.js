@@ -44,6 +44,7 @@ ffmpeg.on('error', (error) => {
 
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
+    console.log(diffCount);
     console.timeEnd('rgb24Out.js');
 });
 
@@ -68,11 +69,13 @@ const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({regions : regions});
 
+let diffCount = 0;
+
 pamDiff.on('diff', (data) => {
     console.log(data);
-
+    diffCount++;
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    //if(true){return;}
+    if(true){return;}
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
