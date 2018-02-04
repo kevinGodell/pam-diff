@@ -62,7 +62,7 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({grayscale: 'luminosity', regions : regions});
+const pamDiff = new PamDiff({regions : regions});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[3].name === 'region4', 'trigger name is not correct');
