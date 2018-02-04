@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "node tests/test.js && node tests/test2.js && node tests/test3.js",
-    "preversion": "npm test"
+    "preversion": "npm test",
+    "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
+    "out": " node examples/grayOut && node examples/rgb24Out"
   },
   "repository": {
     "type": "git",
@@ -28,7 +30,7 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
-    "polygon-points": "^0.5.0"
+    "polygon-points": "^0.5.1"
   },
   "devDependencies": {
     "pipe2pam": "^0.6.2"
