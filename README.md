@@ -76,7 +76,7 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const pamDiff = new PamDiff({grayscale: 'average', difference: 5, percent: 5});
+const pamDiff = new PamDiff({difference: 5, percent: 5});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
