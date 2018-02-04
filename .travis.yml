@@ -13,4 +13,5 @@ before_install:
   - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew install ffmpeg; fi
   - ffmpeg -hwaccels
 after_success:
+  - npm run examples
   - npm run out

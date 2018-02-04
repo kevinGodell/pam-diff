@@ -42,6 +42,7 @@ test_script:
   - npm test
 
 on_success:
+  - npm run examples
   - npm run out
 
 build: off
