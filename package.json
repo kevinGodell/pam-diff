@@ -33,10 +33,12 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
+    "pixel-change": "0.0.7",
     "polygon-points": "^0.5.1"
   },
   "devDependencies": {
     "jsdoc": "^3.5.5",
     "pipe2pam": "^0.6.2"
-  }
+  },
+  "private": true
 }
