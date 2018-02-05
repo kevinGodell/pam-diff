@@ -8,7 +8,8 @@
     "preversion": "npm test",
     "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
     "out": " node examples/grayOut && node examples/rgb24Out",
-    "all": "npm test && npm run examples && npm run out"
+    "all": "npm test && npm run examples && npm run out",
+    "doc": "jsdoc index.js -d docs && git commit -m 'update docs' -- docs"
   },
   "repository": {
     "type": "git",
@@ -34,6 +35,7 @@
     "polygon-points": "^0.5.1"
   },
   "devDependencies": {
+    "jsdoc": "^3.5.5",
     "pipe2pam": "^0.6.2"
   }
 }
