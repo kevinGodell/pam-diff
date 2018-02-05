@@ -37,10 +37,10 @@ class PamDiff extends Transform {
 
     /**
      *
-     * @param number
-     * @param def
-     * @param low
-     * @param high
+     * @param number {Number}
+     * @param def {Number}
+     * @param low {Number}
+     * @param high {Number}
      * @return {Number}
      * @private
      */
@@ -62,7 +62,7 @@ class PamDiff extends Transform {
      * @param string {String}
      */
     setGrayscale(string) {
-        console.warn('grayscale option has been removed, "average" has proven to most accurate');
+        console.warn('grayscale option has been removed, "average" has proven to most accurate and is the default');
     }
 
     /**
@@ -212,10 +212,10 @@ class PamDiff extends Transform {
      * @return {PamDiff}
      */
     resetCache() {
-        delete this._oldPix;
-        delete this._newPix;
-        delete this._width;
-        delete this._length;
+        //delete this._oldPix;
+        //delete this._newPix;
+        //delete this._width;
+        //delete this._length;
         this._parseChunk = this._parseFirstChunk;
         return this;
     }
