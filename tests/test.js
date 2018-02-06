@@ -22,7 +22,7 @@ const params = [
     /* log info to console */
     '-loglevel',
     'quiet',
-    '-stats',
+    //'-stats',
     
     /* use an artificial video input */
     '-re',
