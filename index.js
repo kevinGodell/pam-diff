@@ -4,6 +4,8 @@ const { Transform } = require('stream');
 
 const PP = require('polygon-points');
 
+const PC = require('./lib/pixel-change');
+
 class PamDiff extends Transform {
 
     /**
@@ -123,37 +125,16 @@ class PamDiff extends Transform {
      */
     set regions(array) {
         if (!array) {
-            if (this._regions) {
-                delete this._regions;
-                delete this._regionsLength;
-                delete this._minDiff;
-            }
-            this._diffs = 0;
+            delete this._regions;
+            delete this._regionsArr;
+            delete this._regionsLen;
+            delete this._percentsArr;
+            delete this._minDiff;
         } else if (!Array.isArray(array) || array.length < 1) {
             throw new Error(`Regions must be an array of at least 1 region object {name: 'region1', difference: 10, percent: 10, polygon: [[0, 0], [0, 50], [50, 50], [50, 0]]}`);
         } else {
-            this._regions = [];
-            this._minDiff = 255;
-            for (const region of array) {
-                if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
-                    throw new Error('Region must include a name and a polygon property');
-                }
-                const polygonPoints = new PP(region.polygon);
-                const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
-                const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
-                this._minDiff = Math.min(this._minDiff, difference);
-                this._regions.push(
-                    {
-                        name: region.name,
-                        polygon: polygonPoints,
-                        difference: difference,
-                        percent: percent,
-                        diffs: 0
-                    }
-                );
-            }
-            this._regionsLength = this._regions.length;
-            this._createPointsInPolygons(this._regions, this._width, this._height);
+            this._regions = array;
+            this._processRegions();
         }
     }
 
@@ -212,30 +193,13 @@ class PamDiff extends Transform {
      * @return {PamDiff}
      */
     resetCache() {
-        //delete this._oldPix;
-        //delete this._newPix;
-        //delete this._width;
-        //delete this._length;
+        delete this._oldPix;
+        delete this._newPix;
+        delete this._width;
+        delete this._height;
+        delete this._wxh;
         this._parseChunk = this._parseFirstChunk;
         return this;
-    }
-
-    /**
-     *
-     * @param regions {Array}
-     * @param width {Number}
-     * @param height {Number}
-     * @private
-     */
-    _createPointsInPolygons(regions, width, height) {
-        if (regions && width && height) {
-            this._pointsInPolygons = [];
-            for (const region of regions) {
-                const bitset = region.polygon.getBitset(this._width, this._height);
-                region.pointsLength = bitset.count;
-                this._pointsInPolygons.push(bitset.buffer);
-            }
-        }
     }
 
     /**
@@ -244,61 +208,7 @@ class PamDiff extends Transform {
      * @private
      */
     _blackAndWhitePixelDiff(chunk) {
-        this._newPix = chunk.pixels;
-        for (let y = 0, i = 0; y < this._height; y++) {
-            for (let x = 0; x < this._width; x++, i++) {
-                const diff = this._oldPix[i] !== this._newPix[i];
-                if (this._regions && diff === true) {
-                    for (let j = 0; j < this._regionsLength; j++) {
-                        if (this._pointsInPolygons[j][i]) {
-                            this._regions[j].diffs++;
-                        }
-                    }
-                } else {
-                    if (diff === true) {
-                        this._diffs++;
-                    }
-                }
-            }
-        }
-        if (this._regions) {
-            const regionDiffArray = [];
-            for (let i = 0; i < this._regionsLength; i++) {
-                const percent = Math.floor(100 * this._regions[i].diffs / this._regions[i].pointsLength);
-                if (percent >= this._regions[i].percent) {
-                    regionDiffArray.push({name: this._regions[i].name, percent: percent});
-                }
-                this._regions[i].diffs = 0;
-            }
-            if (regionDiffArray.length > 0) {
-                const data = {trigger: regionDiffArray, pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
-                }
-            }
-        } else {
-            const percent = Math.floor(100 * this._diffs / this._length);
-            if (percent >= this._percent) {
-                const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
-                }
-            }
-            this._diffs = 0;
-        }
-        this._oldPix = this._newPix;
+        throw new Error("black and white pixel diff not available, yet");
     }
 
     /**
@@ -308,60 +218,31 @@ class PamDiff extends Transform {
      */
     _grayScalePixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        for (let y = 0, i = 0; y < this._height; y++) {
-            for (let x = 0; x < this._width; x++, i++) {
-                if (this._oldPix[i] !== this._newPix[i]) {
-                    const diff = Math.abs(this._oldPix[i] - this._newPix[i]);
-                    if (this._regions && diff >= this._minDiff) {
-                        for (let j = 0; j < this._regionsLength; j++) {
-                            if (this._pointsInPolygons[j][i] && diff >= this._regions[j].difference) {
-                                this._regions[j].diffs++;
-                            }
-                        }
-                    } else {
-                        if (diff >= this._difference) {
-                            this._diffs++;
-                        }
-                    }
-                }
-            }
-        }
-        if (this._regions) {
-            const regionDiffArray = [];
-            for (let i = 0; i < this._regionsLength; i++) {
-                const percent = Math.floor(100 * this._regions[i].diffs / this._regions[i].pointsLength);
-                if (percent >= this._regions[i].percent) {
-                    regionDiffArray.push({name: this._regions[i].name, percent: percent});
-                }
-                this._regions[i].diffs = 0;
-            }
-            if (regionDiffArray.length > 0) {
-                const data = {trigger: regionDiffArray, pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
+        const trigger = [];
+        if (this._regionsArr) {
+            const results = PC.compareGrayRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
+            for (let i = 0; i < this._regionsLen; i++) {
+                if (results[i].percent >= this._percentsArr[i]) {
+                    trigger.push({name: results[i].name, percent: results[i].percent});
                 }
             }
         } else {
-            const percent = Math.floor(100 * this._diffs / this._length);
-            if (percent >= this._percent) {
-                const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
-                }
+            const results = PC.compareGrayPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
+            if (results >= this._percent) {
+                trigger.push({name: 'percent', percent: results});
             }
-            this._diffs = 0;
+        }
+        if (trigger.length) {
+            const data = {trigger: trigger, pam:chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._oldPix = this._newPix;
     }
@@ -373,60 +254,31 @@ class PamDiff extends Transform {
      */
     _rgbPixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        for (let y = 0, i = 0, p = 0; y < this._height; y++) {
-            for (let x = 0; x < this._width; x++, i += 3, p++) {
-                if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
-                    const diff = Math.abs(this._oldPix[i] + this._oldPix[i + 1] + this._oldPix[i + 2] - this._newPix[i] - this._newPix[i + 1] - this._newPix[i + 2])/3;
-                    if (this._regions && diff >= this._minDiff) {
-                        for (let j = 0; j < this._regionsLength; j++) {
-                            if (this._pointsInPolygons[j][p] && diff >= this._regions[j].difference) {
-                                this._regions[j].diffs++;
-                            }
-                        }
-                    } else {
-                        if (diff >= this._difference) {
-                            this._diffs++;
-                        }
-                    }
-                }
-            }
-        }
-        if (this._regions) {
-            const regionDiffArray = [];
-            for (let i = 0; i < this._regionsLength; i++) {
-                const percent = Math.floor(100 * this._regions[i].diffs / this._regions[i].pointsLength);
-                if (percent >= this._regions[i].percent) {
-                    regionDiffArray.push({name: this._regions[i].name, percent: percent});
-                }
-                this._regions[i].diffs = 0;
-            }
-            if (regionDiffArray.length > 0) {
-                const data = {trigger: regionDiffArray, pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
+        const trigger = [];
+        if (this._regionsArr) {
+            const results = PC.compareRgbRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
+            for (let i = 0; i < this._regionsLen; i++) {
+                if (results[i].percent >= this._percentsArr[i]) {
+                    trigger.push({name: results[i].name, percent: results[i].percent});
                 }
             }
         } else {
-            const percent = Math.floor(100 * this._diffs / this._length);
-            if (percent >= this._percent) {
-                const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
-                }
+            const results = PC.compareRgbPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
+            if (results >= this._percent) {
+                trigger.push({name: 'percent', percent: results});
             }
-            this._diffs = 0;
+        }
+        if (trigger.length) {
+            const data = {trigger: trigger, pam:chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._oldPix = this._newPix;
     }
@@ -438,62 +290,61 @@ class PamDiff extends Transform {
      */
     _rgbAlphaPixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        for (let y = 0, i = 0, p = 0; y < this._height; y++) {
-            for (let x = 0; x < this._width; x++, i += 4, p++) {
-                if (this._oldPix[i] !== this._newPix[i] || this._oldPix[i + 1] !== this._newPix[i + 1] || this._oldPix[i + 2] !== this._newPix[i + 2]) {
-                    const diff = Math.abs(this._oldPix[i] + this._oldPix[i + 1] + this._oldPix[i + 2] - this._newPix[i] - this._newPix[i + 1] - this._newPix[i + 2])/3;
-                    if (this._regions && diff >= this._minDiff) {
-                        for (let j = 0; j < this._regionsLength; j++) {
-                            if (this._pointsInPolygons[j][p] && diff >= this._regions[j].difference) {
-                                this._regions[j].diffs++;
-                            }
-                        }
-                    } else {
-                        if (diff >= this._difference) {
-                            this._diffs++;
-                        }
-                    }
-                }
-            }
-        }
-        if (this._regions) {
-            const regionDiffArray = [];
-            for (let i = 0; i < this._regionsLength; i++) {
-                const percent = Math.floor(100 * this._regions[i].diffs / this._regions[i].pointsLength);
-                if (percent >= this._regions[i].percent) {
-                    regionDiffArray.push({name: this._regions[i].name, percent: percent});
-                }
-                this._regions[i].diffs = 0;
-            }
-            if (regionDiffArray.length > 0) {
-                const data = {trigger: regionDiffArray, pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
+        const trigger = [];
+        if (this._regionsArr) {
+            const results = PC.compareRgbaRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
+            for (let i = 0; i < this._regionsLen; i++) {
+                if (results[i].percent >= this._percentsArr[i]) {
+                    trigger.push({name: results[i].name, percent: results[i].percent});
                 }
             }
         } else {
-            const percent = Math.floor(100 * this._diffs / this._length);
-            if (percent >= this._percent) {
-                const data = {trigger: [{name: 'percent', percent: percent}], pam: chunk.pam};
-                if (this._callback) {
-                    this._callback(data);
-                }
-                if (this._readableState.pipesCount > 0) {
-                    this.push(data);
-                }
-                if (this.listenerCount('diff') > 0) {
-                    this.emit('diff', data);
-                }
+            const results = PC.compareRgbaPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
+            if (results >= this._percent) {
+                trigger.push({name: 'percent', percent: results});
             }
-            this._diffs = 0;
+        }
+        if (trigger.length) {
+            const data = {trigger: trigger, pam:chunk.pam};
+            if (this._callback) {
+                this._callback(data);
+            }
+            if (this._readableState.pipesCount > 0) {
+                this.push(data);
+            }
+            if (this.listenerCount('diff') > 0) {
+                this.emit('diff', data);
+            }
         }
         this._oldPix = this._newPix;
+    }
+
+    _processRegions() {
+        if (this._regions && this._width && this._height) {
+            this._regionsArr = [];//will be an array of objects {name, diff, count, bitset}
+            this._percentsArr = [];
+            this._minDiff = 255;
+            for (const region of this._regions) {
+                if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
+                    throw new Error('Region must include a name and a polygon property');
+                }
+                const polygonPoints = new PP(region.polygon);
+                const bitset = polygonPoints.getBitset(this._width, this._height);
+                const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
+                const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
+                this._minDiff = Math.min(this._minDiff, difference);
+                this._regionsArr.push(
+                    {
+                        name: region.name,
+                        diff: difference,
+                        count: bitset.count,
+                        bitset: bitset.buffer
+                    }
+                );
+                this._percentsArr.push(percent);
+            }
+            this._regionsLen = this._regions.length;
+        }
     }
 
     /**
@@ -505,22 +356,36 @@ class PamDiff extends Transform {
         this._width = parseInt(chunk.width);
         this._height = parseInt(chunk.height);
         this._oldPix = chunk.pixels;
-        this._length = this._width * this._height;
-        this._createPointsInPolygons(this._regions, this._width, this._height);
+        this._wxh = this._width * this._height;
+        this._processRegions();
         switch (chunk.tupltype) {
             case 'blackandwhite' :
+                this._bufLen = this._wxh;
+                if (this._bufLen !== this._oldPix.length) {
+                    throw new Error("Pixel count does not match width * height");
+                }
                 this._parseChunk = this._blackAndWhitePixelDiff;
                 break;
             case 'grayscale' :
+                this._bufLen = this._wxh;
+                if (this._bufLen !== this._oldPix.length) {
+                    throw new Error("Pixel count does not match width * height");
+                }
                 this._parseChunk = this._grayScalePixelDiff;
                 break;
             case 'rgb' :
+                this._bufLen = this._wxh * 3;
+                if (this._bufLen !== this._oldPix.length) {
+                    throw new Error("Pixel count does not match width * height * 3");
+                }
                 this._parseChunk = this._rgbPixelDiff;
-                //this._increment = 3;//future use
                 break;
             case 'rgb_alpha' :
+                this._bufLen = this._wxh * 4;
+                if (this._bufLen !== this._oldPix.length) {
+                    throw new Error("Pixel count does not match width * height * 4");
+                }
                 this._parseChunk = this._rgbAlphaPixelDiff;
-                //this._increment = 4;//future use
                 break;
             default :
                 throw Error(`Unsupported tupltype: ${chunk.tupltype}. Supported tupltypes include grayscale(gray), blackandwhite(monob), rgb(rgb24), and rgb_alpha(rgba).`);
@@ -555,4 +420,4 @@ class PamDiff extends Transform {
  * @type {PamDiff}
  */
 module.exports = PamDiff;
-//todo get bounding box of all regions combined to exclude some pixels before checking if they exist inside specific regions
+//todo - move more calculations to static classes for optimization
