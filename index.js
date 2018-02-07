@@ -198,6 +198,10 @@ class PamDiff extends Transform {
         delete this._width;
         delete this._height;
         delete this._wxh;
+        delete this._regionsArr;
+        delete this._regionsLen;
+        delete this._percentsArr;
+        delete this._minDiff;
         this._parseChunk = this._parseFirstChunk;
         return this;
     }
