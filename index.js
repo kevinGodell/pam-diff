@@ -8,8 +8,6 @@ const PP = require('polygon-points');
 
 const PC = require('./build/Release/pixel_change');
 
-const PC2 = require('./lib/pixel-change');
-
 class PamDiff extends Transform {
 
     /**
@@ -377,9 +375,7 @@ class PamDiff extends Transform {
      * @private
      */
     _transform(chunk, encoding, callback) {
-        console.time('parse');
         this._parseChunk(chunk);
-        console.timeEnd('parse');
         callback();
     }
 
