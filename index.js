@@ -8,6 +8,8 @@ const PP = require('polygon-points');
 
 const PC = require('./build/Release/pixel_change');
 
+const PC2 = require('./lib/pixel-change');
+
 class PamDiff extends Transform {
 
     /**
