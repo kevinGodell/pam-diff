@@ -198,6 +198,7 @@ class PamDiff extends Transform {
         delete this._width;
         delete this._height;
         delete this._wxh;
+        delete this._bufLen;
         delete this._regionsArr;
         delete this._regionsLen;
         delete this._percentsArr;
@@ -211,7 +212,7 @@ class PamDiff extends Transform {
      * @param chunk
      * @private
      */
-    _blackAndWhitePixelDiff(chunk) {
+    _bwPixelDiff(chunk) {
         throw new Error("black and white pixel diff not available, yet");
     }
 
@@ -220,24 +221,16 @@ class PamDiff extends Transform {
      * @param chunk
      * @private
      */
-    _grayScalePixelDiff(chunk) {
+    _grayPixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        const trigger = [];
-        if (this._regionsArr) {
-            const results = PC.compareGrayRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
-            for (let i = 0; i < this._regionsLen; i++) {
-                if (results[i].percent >= this._percentsArr[i]) {
-                    trigger.push({name: results[i].name, percent: results[i].percent});
-                }
-            }
+        let results = [];
+        if (this._regions) {
+            results = PC.compareGrayRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
         } else {
-            const results = PC.compareGrayPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
-            if (results >= this._percent) {
-                trigger.push({name: 'percent', percent: results});
-            }
+            results = PC.compareGrayPixels(this._difference, this._percent, this._wxh, this._bufLen, this._oldPix, this._newPix);
         }
-        if (trigger.length) {
-            const data = {trigger: trigger, pam:chunk.pam};
+        if (results.length) {
+            const data = {trigger: results, pam:chunk.pam};
             if (this._callback) {
                 this._callback(data);
             }
@@ -251,29 +244,16 @@ class PamDiff extends Transform {
         this._oldPix = this._newPix;
     }
 
-    /**
-     *
-     * @param chunk
-     * @private
-     */
     _rgbPixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        const trigger = [];
-        if (this._regionsArr) {
-            const results = PC.compareRgbRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
-            for (let i = 0; i < this._regionsLen; i++) {
-                if (results[i].percent >= this._percentsArr[i]) {
-                    trigger.push({name: results[i].name, percent: results[i].percent});
-                }
-            }
+        let results = [];
+        if (this._regions) {
+            results = PC.compareRgbRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
         } else {
-            const results = PC.compareRgbPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
-            if (results >= this._percent) {
-                trigger.push({name: 'percent', percent: results});
-            }
+            results = PC.compareRgbPixels(this._difference, this._percent, this._wxh, this._bufLen, this._oldPix, this._newPix);
         }
-        if (trigger.length) {
-            const data = {trigger: trigger, pam:chunk.pam};
+        if (results.length) {
+            const data = {trigger: results, pam:chunk.pam};
             if (this._callback) {
                 this._callback(data);
             }
@@ -292,24 +272,16 @@ class PamDiff extends Transform {
      * @param chunk
      * @private
      */
-    _rgbAlphaPixelDiff(chunk) {
+    _rgbaPixelDiff(chunk) {
         this._newPix = chunk.pixels;
-        const trigger = [];
-        if (this._regionsArr) {
-            const results = PC.compareRgbaRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
-            for (let i = 0; i < this._regionsLen; i++) {
-                if (results[i].percent >= this._percentsArr[i]) {
-                    trigger.push({name: results[i].name, percent: results[i].percent});
-                }
-            }
+        let results;
+        if (this._regions) {
+            results = PC.compareRgbaRegions(this._minDiff, this._regionsLen, this._regionsArr, this._bufLen, this._oldPix, this._newPix);
         } else {
-            const results = PC.compareRgbaPixels(this._difference, this._wxh, this._bufLen, this._oldPix, this._newPix);
-            if (results >= this._percent) {
-                trigger.push({name: 'percent', percent: results});
-            }
+            results = PC.compareRgbaPixels(this._difference, this._percent, this._wxh, this._bufLen, this._oldPix, this._newPix);
         }
-        if (trigger.length) {
-            const data = {trigger: trigger, pam:chunk.pam};
+        if (results.length) {
+            const data = {trigger: results, pam:chunk.pam};
             if (this._callback) {
                 this._callback(data);
             }
@@ -325,8 +297,7 @@ class PamDiff extends Transform {
 
     _processRegions() {
         if (this._regions && this._width && this._height) {
-            this._regionsArr = [];//will be an array of objects {name, diff, count, bitset}
-            this._percentsArr = [];
+            this._regionsArr = [];
             this._minDiff = 255;
             for (const region of this._regions) {
                 if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
@@ -341,11 +312,11 @@ class PamDiff extends Transform {
                     {
                         name: region.name,
                         diff: difference,
+                        percent: percent,
                         count: bitset.count,
                         bitset: bitset.buffer
                     }
                 );
-                this._percentsArr.push(percent);
             }
             this._regionsLen = this._regions.length;
         }
@@ -368,14 +339,14 @@ class PamDiff extends Transform {
                 if (this._bufLen !== this._oldPix.length) {
                     throw new Error("Pixel count does not match width * height");
                 }
-                this._parseChunk = this._blackAndWhitePixelDiff;
+                this._parseChunk = this._bwPixelDiff;
                 break;
             case 'grayscale' :
                 this._bufLen = this._wxh;
                 if (this._bufLen !== this._oldPix.length) {
                     throw new Error("Pixel count does not match width * height");
                 }
-                this._parseChunk = this._grayScalePixelDiff;
+                this._parseChunk = this._grayPixelDiff;
                 break;
             case 'rgb' :
                 this._bufLen = this._wxh * 3;
@@ -389,7 +360,7 @@ class PamDiff extends Transform {
                 if (this._bufLen !== this._oldPix.length) {
                     throw new Error("Pixel count does not match width * height * 4");
                 }
-                this._parseChunk = this._rgbAlphaPixelDiff;
+                this._parseChunk = this._rgbaPixelDiff;
                 break;
             default :
                 throw Error(`Unsupported tupltype: ${chunk.tupltype}. Supported tupltypes include grayscale(gray), blackandwhite(monob), rgb(rgb24), and rgb_alpha(rgba).`);
