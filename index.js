@@ -4,8 +4,6 @@ const { Transform } = require('stream');
 
 const PP = require('polygon-points');
 
-//const PC = require('./lib/pixel-change');
-
 const PC = require('./build/Release/pixel_change');
 
 class PamDiff extends Transform {
