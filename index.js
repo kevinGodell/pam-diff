@@ -375,9 +375,7 @@ class PamDiff extends Transform {
      * @private
      */
     _transform(chunk, encoding, callback) {
-        console.time('parse');
         this._parseChunk(chunk);
-        console.timeEnd('parse');
         callback();
     }
 
