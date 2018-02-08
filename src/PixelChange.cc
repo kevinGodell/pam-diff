@@ -76,7 +76,6 @@ Napi::Array CompareRgbaPixels(const Napi::CallbackInfo& info) {
 
 ////////////////////////////////////////////////////////////////////////
 
-//minDiff, regLen, regions, bufLen, buf0, buf1
 Napi::Array CompareGrayRegions(const Napi::CallbackInfo& info) {
     Napi::Env env = info.Env();
     const uint_fast8_t minDiff = info[0].As<Napi::Number>().Uint32Value();
