@@ -15,7 +15,7 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use an artificial video input */
-    '-re',
+    //'-re',
      '-f',
      'lavfi',
      '-i',
