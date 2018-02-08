@@ -13,6 +13,13 @@ class PamDiff extends Transform {
     /**
      *
      * @param [options] {Object}
+     * @param [options.difference] {Number}
+     * @param [options.percent] {Number}
+     * @param [options.regions] {Array}
+     * @param [options.regions[i].name] {String}
+     * @param [options.regions[i].difference] {Number}
+     * @param [options.regions[i].percent] {Number}
+     * @param [options.regions[i].polygon] {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
      * @param [callback] {Function}
      */
     constructor(options, callback) {
