@@ -400,4 +400,3 @@ class PamDiff extends Transform {
  * @type {PamDiff}
  */
 module.exports = PamDiff;
-//todo - move more calculations to static classes for optimization
