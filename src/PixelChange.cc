@@ -23,7 +23,7 @@ Napi::Array CompareGrayPixels(const Napi::CallbackInfo& info) {
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", "percent");
         obj.Set("percent", perc);
-        results[(uint_fast32_t)0] = obj;
+        results["0"] = obj;
     }
     return results;
 }
@@ -46,7 +46,7 @@ Napi::Array CompareRgbPixels(const Napi::CallbackInfo& info) {
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", "percent");
         obj.Set("percent", perc);
-        results[(uint_fast32_t)0] = obj;
+        results["0"] = obj;
     }
     return results;
 }
@@ -69,7 +69,7 @@ Napi::Array CompareRgbaPixels(const Napi::CallbackInfo& info) {
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", "percent");
         obj.Set("percent", perc);
-        results[(uint_fast32_t)0] = obj;
+        results["0"] = obj;
     }
     return results;
 }
