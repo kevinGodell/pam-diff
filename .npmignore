@@ -7,6 +7,3 @@ docs/
 appveyor.yml
 .jshintrc
 pam-diff.iml
-build/
-libs/
-binding.gyp
