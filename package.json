@@ -4,6 +4,7 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
+    "install": "node-gyp rebuild",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm test",
     "postversion": "npm run doc",
@@ -36,11 +37,12 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
+    "node-addon-api": "^1.2.0",
     "polygon-points": "^0.5.1"
   },
   "devDependencies": {
     "jsdoc": "^3.5.5",
     "pipe2pam": "^0.6.2"
   },
-  "private": false
+  "private": true
 }
