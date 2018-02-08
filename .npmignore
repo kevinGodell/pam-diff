@@ -3,6 +3,7 @@ node_modules/
 examples/
 tests/
 docs/
+build/
 .travis.yml
 appveyor.yml
 .jshintrc

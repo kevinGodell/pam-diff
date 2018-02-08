@@ -1,5 +1,6 @@
 .idea/
 node_modules/
+build/
 examples/out/gray/*.jpeg
 examples/out/rgb24/*.jpeg
 pam-diff.iml
