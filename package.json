@@ -15,7 +15,8 @@
     "doc": "jsdoc index.js -d docs && git commit -m 'update docs' -- docs",
     "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3",
     "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3",
-    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3"
+    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3",
+    "pub": "npm publish -tag n-api"
   },
   "repository": {
     "type": "git",
