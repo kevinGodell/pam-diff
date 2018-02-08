@@ -4,7 +4,9 @@ const { Transform } = require('stream');
 
 const PP = require('polygon-points');
 
-const PC = require('./lib/pixel-change');
+//const PC = require('./lib/pixel-change');
+
+const PC = require('./build/Release/pixel_change');
 
 class PamDiff extends Transform {
 
@@ -128,7 +130,6 @@ class PamDiff extends Transform {
             delete this._regions;
             delete this._regionsArr;
             delete this._regionsLen;
-            delete this._percentsArr;
             delete this._minDiff;
         } else if (!Array.isArray(array) || array.length < 1) {
             throw new Error(`Regions must be an array of at least 1 region object {name: 'region1', difference: 10, percent: 10, polygon: [[0, 0], [0, 50], [50, 50], [50, 0]]}`);
@@ -201,7 +202,6 @@ class PamDiff extends Transform {
         delete this._bufLen;
         delete this._regionsArr;
         delete this._regionsLen;
-        delete this._percentsArr;
         delete this._minDiff;
         this._parseChunk = this._parseFirstChunk;
         return this;
@@ -395,4 +395,3 @@ class PamDiff extends Transform {
  * @type {PamDiff}
  */
 module.exports = PamDiff;
-//todo - move more calculations to static classes for optimization
