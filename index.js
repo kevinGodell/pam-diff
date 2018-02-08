@@ -11,6 +11,13 @@ class PamDiff extends Transform {
     /**
      *
      * @param [options] {Object}
+     * @param [options.difference] {Number}
+     * @param [options.percent] {Number}
+     * @param [options.regions] {Array}
+     * @param [options.regions[i].name] {String}
+     * @param [options.regions[i].difference] {Number}
+     * @param [options.regions[i].percent] {Number}
+     * @param [options.regions[i].polygon] {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
      * @param [callback] {Function}
      */
     constructor(options, callback) {
@@ -128,7 +135,6 @@ class PamDiff extends Transform {
             delete this._regions;
             delete this._regionsArr;
             delete this._regionsLen;
-            delete this._percentsArr;
             delete this._minDiff;
         } else if (!Array.isArray(array) || array.length < 1) {
             throw new Error(`Regions must be an array of at least 1 region object {name: 'region1', difference: 10, percent: 10, polygon: [[0, 0], [0, 50], [50, 50], [50, 0]]}`);
@@ -201,7 +207,6 @@ class PamDiff extends Transform {
         delete this._bufLen;
         delete this._regionsArr;
         delete this._regionsLen;
-        delete this._percentsArr;
         delete this._minDiff;
         this._parseChunk = this._parseFirstChunk;
         return this;
