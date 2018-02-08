@@ -1,6 +1,6 @@
 'use strict';
 
-console.time('=====> testing pam diffs with a single region set');
+console.time('=====> testing rgba pam diffs with a single region set');
 
 const assert = require('assert');
 
@@ -25,7 +25,7 @@ const params = [
     //'-stats',
     
     /* use an artificial video input */
-    '-re',
+    //'-re',
     '-f',
     'lavfi',
     '-i',
@@ -36,7 +36,7 @@ const params = [
     '-c:v',
     'pam',
     '-pix_fmt',
-    'rgb24',
+    'rgba',
     '-f',
     'image2pipe',
     '-vf',
@@ -72,7 +72,7 @@ ffmpeg.on('error', (error) => {
 ffmpeg.on('exit', (code, signal) => {
     assert(code === 0, `FFMPEG exited with code ${code} and signal ${signal}`);
     assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
-    console.timeEnd('=====> testing pam diffs with a single region set');
+    console.timeEnd('=====> testing rgba pam diffs with a single region set');
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

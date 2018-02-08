@@ -1,6 +1,6 @@
 'use strict';
 
-console.time('=====> testing pam diffs with no region set');
+console.time('=====> testing gray pam diffs with a single region set');
 
 const assert = require('assert');
 
@@ -16,7 +16,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [14, 14, 13, 13, 13, 13, 14, 14, 13];
+const pamDiffResults = [13, 13, 13, 13, 13, 13, 13, 13, 13];
 
 const params = [
     /* log info to console */
@@ -25,7 +25,7 @@ const params = [
     //'-stats',
     
     /* use an artificial video input */
-    '-re',
+    //'-re',
     '-f',
     'lavfi',
     '-i',
@@ -36,7 +36,7 @@ const params = [
     '-c:v',
     'pam',
     '-pix_fmt',
-    'rgb24',
+    'gray',
     '-f',
     'image2pipe',
     '-vf',
@@ -52,10 +52,14 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1});
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+
+const regions = [region1];
+
+const pamDiff = new PamDiff({regions : regions});
 
 pamDiff.on('diff', (data) => {
-    assert(data.trigger[0].name === 'percent', 'trigger name is not correct');
+    assert(data.trigger[0].name === 'region1', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
@@ -68,7 +72,7 @@ ffmpeg.on('error', (error) => {
 ffmpeg.on('exit', (code, signal) => {
     assert(code === 0, `FFMPEG exited with code ${code} and signal ${signal}`);
     assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
-    console.timeEnd('=====> testing pam diffs with no region set');
+    console.timeEnd('=====> testing gray pam diffs with a single region set');
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
