@@ -329,7 +329,7 @@ class PamDiff extends Transform {
             default:
                 throw new Error('Did not find a matching tupltype');
         }
-        if (process.env.DEBUG) {
+        if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
         } else {
             this._parseChunk = this._parsePixels;
@@ -365,7 +365,7 @@ class PamDiff extends Transform {
      * @private
      */
     _parsePixelsDebug(chunk) {
-        console.time('parse pixels');
+        console.time(this._pixelDiffEngine.name);
         this._newPix = chunk.pixels;
         const results = this._pixelDiffEngine(this._oldPix, this._newPix);
         if (results.length) {
@@ -381,7 +381,7 @@ class PamDiff extends Transform {
             }
         }
         this._oldPix = this._newPix;
-        console.timeEnd('parse pixels');
+        console.timeEnd(this._pixelDiffEngine.name);
     }
 
     /**

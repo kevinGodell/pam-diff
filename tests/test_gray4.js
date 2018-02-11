@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.NODE_ENV = 'development';
+
 console.time('=====> testing gray pam diffs with 2 region masks set');
 
 const assert = require('assert');
