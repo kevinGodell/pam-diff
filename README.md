@@ -3,7 +3,11 @@
 Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, ***grayscale***, and ***blackandwhite***. It is currently being used for a video motion detection project.
 ### installation:
 ``` 
-npm install pam-diff --save
+npm install pam-diff@latest --save
+```
+### installation of experimental n-api version:
+```
+npm install pam-diff@n-api --save
 ```
 **To run the example below, also install pipe2pam:**
 ```
@@ -103,3 +107,5 @@ pamDiff.on('diff', (data) => {
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
 ```
+
+See [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests) or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
