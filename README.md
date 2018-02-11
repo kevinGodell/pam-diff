@@ -1,9 +1,13 @@
 # pam-diff
 ###### [![Build Status](https://travis-ci.org/kevinGodell/pam-diff.svg?branch=master)](https://travis-ci.org/kevinGodell/pam-diff) [![Build status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/master?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/master) [![GitHub issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/master/LICENSE)
-Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, ***grayscale***, and ***blackandwhite***. It is currently being used for a video motion detection project.
+Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, and ***grayscale***. It is currently being used for a video motion detection project.
 ### installation:
 ``` 
-npm install pam-diff --save
+npm install pam-diff@latest --save
+```
+### installation of experimental n-api version:
+```
+npm install pam-diff@n-api --save
 ```
 **To run the example below, also install pipe2pam:**
 ```
@@ -103,3 +107,5 @@ pamDiff.on('diff', (data) => {
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
 ```
+
+See [tests](https://github.com/kevinGodell/pam-diff/tree/n-api/tests) or [examples](https://github.com/kevinGodell/pam-diff/tree/n-api/examples) for more implementations.
