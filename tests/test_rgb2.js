@@ -1,5 +1,7 @@
 'use strict';
 
+process.env.NODE_ENV = 'development';
+
 console.time('=====> testing rgb pam diffs with a single region set');
 
 const assert = require('assert');
