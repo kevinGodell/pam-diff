@@ -16,7 +16,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [13, 14, 13, 13, 13, 12, 14, 14, 12];
+const pamDiffResults = [15, 16, 14, 15, 15, 14, 16, 15, 14];
 
 const params = [
     /* log info to console */
@@ -52,13 +52,13 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+const region1 = {polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
 
-const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
+const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({mask: true, regions : regions});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[0].name === 'mask', 'trigger name is not correct');
