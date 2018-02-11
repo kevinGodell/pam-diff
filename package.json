@@ -13,9 +13,9 @@
     "out": " node examples/grayOut && node examples/rgb24Out",
     "all": "npm test && npm run examples && npm run out",
     "doc": "jsdoc index.js -d docs && git commit -m 'update docs' -- docs",
-    "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3",
-    "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3",
-    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3",
+    "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3 && node tests/test_gray4",
+    "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3 && node tests/test_rgb4",
+    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3 && node tests/test_rgba4",
     "pub": "npm publish -tag n-api"
   },
   "repository": {
