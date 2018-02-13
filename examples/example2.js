@@ -1,7 +1,10 @@
 'use strict';
 
+process.env.NODE_ENV = 'development';
+
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
+const ffmpegPath = require('ffmpeg-static').path;
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;
@@ -16,10 +19,10 @@ const params = [
 
     /* use an artificial video input */
     //'-re',
-     '-f',
-     'lavfi',
-     '-i',
-     'testsrc=size=1920x1080:rate=15',
+    '-f',
+    'lavfi',
+    '-i',
+    'testsrc=size=1920x1080:rate=15',
 
     /* use an rtsp ip cam video input */
     /*'-rtsp_transport',
@@ -45,7 +48,7 @@ const params = [
     'pipe:1'
 ];
 
-const ffmpeg = spawn('ffmpeg', params, {
+const ffmpeg = spawn(ffmpegPath, params, {
     stdio: ['ignore', 'pipe', 'ignore']
 });
 
@@ -57,7 +60,6 @@ ffmpeg.on('error', (error) => {
 
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
-    console.log(diffCount);
 });
 
 const p2p = new P2P();
@@ -75,12 +77,8 @@ const regions = [region1];
 
 const pamDiff = new PamDiff({regions : regions});
 
-let diffCount = 0;
-
 pamDiff.on('diff', (data) => {
-    //console.log(data);
-
-    diffCount++;
+    console.log(data);
 
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
     if(true){return;}
