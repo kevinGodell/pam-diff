@@ -1,7 +1,10 @@
 'use strict';
 
+process.env.NODE_ENV = 'development';
+
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
+const ffmpegPath = require('ffmpeg-static').path;
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;
@@ -46,7 +49,7 @@ const params = [
     'pipe:1'
 ];
 
-const ffmpeg = spawn('ffmpeg', params, {
+const ffmpeg = spawn(ffmpegPath, params, {
     stdio: ['ignore', 'pipe', 'ignore']
 });
 

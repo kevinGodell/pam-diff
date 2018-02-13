@@ -10,6 +10,8 @@ const P2P = require('pipe2pam');
 
 const PamDiff = require('../index');
 
+const ffmpegPath = require('ffmpeg-static').path;
+
 const spawn = require('child_process').spawn;
 
 const pamCount = 10;
@@ -61,7 +63,7 @@ pamDiff.on('diff', (data) => {
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
-const ffmpeg = spawn('ffmpeg', params, {stdio: ['ignore', 'pipe', 'inherit']});
+const ffmpeg = spawn(ffmpegPath, params, {stdio: ['ignore', 'pipe', 'inherit']});
 
 ffmpeg.on('error', (error) => {
     console.log(error);
