@@ -276,6 +276,46 @@ struct Blob {
     uint_fast16_t maxY;
 };
 
+inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32_t vectorSize, uint_fast16_t width, uint_fast16_t height) {
+    //create vector
+    std::vector<Blob> blobs(vectorSize);
+
+    //track index of pixel
+    uint_fast32_t index = 0;
+
+    //iterate labeled pixels and group into blobs
+    for (uint_fast16_t y = 0; y < height; y++) {
+         for (uint_fast16_t x = 0; x < width; x++, index++) {
+
+              //use label value as index
+              uint_fast32_t label = pixelLabels[index];
+
+              //skip label 0
+              if (label == 0) continue;
+
+              //get access to blob data
+              Blob &blob = blobs[label];
+
+              //count will be 0 if this is first contact
+              if (blob.label == 0) {
+                   blob.label = label;
+                   blob.size = 1;
+                   blob.minX = x;
+                   blob.maxX = x;
+                   blob.minY = y;
+                   blob.maxY = y;
+              } else {
+                   blob.size++;
+                   blob.minX = std::min(blob.minX, x);
+                   blob.maxX = std::max(blob.maxX, x);
+                   blob.minY = std::min(blob.minY, y);
+                   blob.maxY = std::max(blob.maxY, y);
+              }
+         }
+    }
+    return blobs;
+}
+
 Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
 
@@ -296,14 +336,14 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     //todo will switch to bitset if possible, much smaller in size
     //set empty unsigned char array, remember to delete
     //uint_fast8_t *input = new uint_fast8_t[wxh]();
-    bool *input = new bool[wxh]();
+    bool *pixelBitset = new bool[wxh]();
 
     //iterate pixels, count diffs, and set 1's and 0's of bitset (binary) array
     for (uint_fast32_t i = 0; i < bufLen; i++) {
         if (diff > absv(buf0[i] - buf1[i])) continue;
         diffs++;
         //input[i] = 1;
-        input[i] = true;
+        pixelBitset[i] = true;
     }
 
     //create new array that can be returned to JS
@@ -318,52 +358,23 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
         //std::cout<<"percent "<<perc<<std::endl;
 
         //create unsigned int array to hold labels
-        uint_fast32_t *output = new uint_fast32_t[wxh]();
+        uint_fast32_t *pixelLabels = new uint_fast32_t[wxh]();
 
         //variable to hold maxLabel, will be used to determine vector length
         uint_fast32_t maxLabel;
 
-        //label pixels and set maxLabel
-        LabelImage(width, height, input, output, maxLabel);
+        //label pixels and set maxLabel (from C lib ccl.c)
+        LabelImage(width, height, pixelBitset, pixelLabels, maxLabel);
 
         //std::cout<<"max label "<<maxLabel<<std::endl;
 
         //length of Blob vector
         const uint_fast32_t blobsLength = maxLabel + 1;
 
-        //create vector of blobs
-        std::vector<Blob> blobs(blobsLength);
-
-        //track index of output labels
-        uint_fast32_t index = 0;
-
-        //iterate labeled pixels and group into blobs
-        for (uint_fast16_t y = 0; y < height; y++) {
-            for (uint_fast16_t x = 0; x < width; x++, index++) {
-                uint_fast32_t label = output[index];
-                if (label == 0) continue;
-                Blob &blob = blobs[label];
-
-                //count will be 0 if this is first contact
-                if (blob.label == 0) {
-                    blob.label = label;
-                    blob.size = 1;
-                    blob.minX = x;
-                    blob.maxX = x;
-                    blob.minY = y;
-                    blob.maxY = y;
-                } else {
-                    blob.size++;
-                    blob.minX = std::min(blob.minX, x);
-                    blob.maxX = std::max(blob.maxX, x);
-                    blob.minY = std::min(blob.minY, y);
-                    blob.maxY = std::max(blob.maxY, y);
-                }
-            }
-        }
+        std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
 
         //delete output array
-        delete[] output;
+        delete[] pixelLabels;
 
         //create JS array to return blob objects
         Napi::Array blobsArray = Napi::Array::New(env);
@@ -383,6 +394,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
             blobsArray[j++] = obj;
         }
 
+        //create JS object to hold values and put into JS array
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", "all");
         obj.Set("percent", perc);
@@ -391,7 +403,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     }
 
     //delete input array
-    delete[] input;
+    delete[] pixelBitset;
 
     //return results array to JS
     return results;
