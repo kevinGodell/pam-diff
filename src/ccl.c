@@ -13,7 +13,7 @@
 #define Y (STACK[SP-2])
 
 
-void LabelComponent(unsigned short* STACK, unsigned short width, unsigned short height, unsigned char* input, unsigned int* output, int labelNo, unsigned short x, unsigned short y)
+void LabelComponent(uint_fast16_t* STACK, uint_fast16_t width, uint_fast16_t height, uint_fast8_t* input, uint_fast32_t* output, uint_fast32_t labelNo, uint_fast16_t x, uint_fast16_t y)
 {
   STACK[0] = x;
   STACK[1] = y;
@@ -44,22 +44,21 @@ RETURN4:
 }
 
 
-void LabelImage(unsigned short width, unsigned short height, unsigned char* input, unsigned int* output, unsigned int& maxLabel)
+void LabelImage(uint_fast16_t width, uint_fast16_t height, uint_fast8_t* input, uint_fast32_t* output, uint_fast32_t& maxLabel)
 {
 
 //std::cout<<"passed max label "<<maxLabel<<std::endl;
 
 
-  unsigned short* STACK = (unsigned short*) malloc(3*sizeof(unsigned short)*(width*height + 1));
+  uint_fast16_t* STACK = (uint_fast16_t*) malloc(3*sizeof(uint_fast16_t)*(width*height + 1));
   
-  unsigned int labelNo = 0;
-  int index   = -1;
-  //unsigned int index = 0;
-  for (unsigned short y = 0; y < height; y++)
+  uint_fast32_t labelNo = 0;
+  //int_fast32_t index   = -1;
+  uint_fast32_t index = 0;
+  for (uint_fast16_t y = 0; y < height; y++)
   {
-    for (unsigned short x = 0; x < width; x++/*, index++, ind++*/)
+    for (uint_fast16_t x = 0; x < width; x++, index++)
     {
-      index++;
       if (input [index] == 0) continue;   /* This pixel is not part of a component */
       if (output[index] != 0) continue;   /* This pixel has already been labelled  */
       /* New component found */
