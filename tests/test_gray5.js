@@ -62,6 +62,15 @@ p2p.on('pam', (data) => {
 const pamDiff = new PamDiff({difference: 1, percent: 1, blobSize: 1000});
 
 pamDiff.on('diff', (data) => {
+    console.log(data.trigger[0].blobs);
+    if (pamDiffCounter === 1) {
+        assert(data.trigger[0].blobs[0].label === 3);
+        assert(data.trigger[0].blobs[0].size === 10342);
+        assert(data.trigger[0].blobs[0].minX === 0);
+        assert(data.trigger[0].blobs[0].maxX === 332);
+        assert(data.trigger[0].blobs[0].minY === 167);
+        assert(data.trigger[0].blobs[0].maxY === 198);
+    }
     assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
