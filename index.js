@@ -18,7 +18,8 @@ class PamDiff extends Transform {
      * @param [options.regions[i].difference] {Number} - Difference value for region.
      * @param [options.regions[i].percent] {Number} - Percent value for region.
      * @param [options.regions[i].polygon] {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
-     * @param [mask] {Boolean} - Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.
+     * @param [options.mask] {Boolean} - Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.
+     * @param [options.blob] {Number} - Number of pixels connected at top, right, bottom, left to be considered a blob.
      * @param [callback] {Function} - Function to be called when diff event occurs.
      */
     constructor(options, callback) {
@@ -27,6 +28,7 @@ class PamDiff extends Transform {
         this.difference = PamDiff._parseOptions('difference', options);//global option, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);//global option, can be overridden per region
         this.mask = PamDiff._parseOptions('mask', options);//should be processed before regions
+        this.blobSize = PamDiff._parseOptions('blobSize', options);//should be processed before regions
         this.regions = PamDiff._parseOptions('regions', options);//can be no regions or a single region or multiple regions. if no regions, all pixels will be compared.
         this.callback = callback;//callback function to be called when pixel difference is detected
         this._parseChunk = this._parseFirstChunk;//first parsing will be reading settings and configuring internal pixel reading
@@ -167,18 +169,58 @@ class PamDiff extends Transform {
         return this;
     }
 
+    /**
+     *
+     * @param bool {Boolean}
+     */
     set mask(bool) {
         this._mask = PamDiff._validateBoolean(bool);
         this._processRegions();
         this._configurePixelDiffEngine();
     }
 
+    /**
+     *
+     * @return {Boolean}
+     */
     get mask() {
-        return this._mask;
+        return this._mask || false;
     }
 
+    /**
+     *
+     * @param bool {Boolean}
+     * @return {PamDiff}
+     */
     setMask(bool) {
         this.mask = bool;
+        return this;
+    }
+
+    /**
+     *
+     * @param number {Number}
+     */
+    set blobSize(number) {
+        this._blobSize = PamDiff._validateNumber(parseInt(number), 0, 0, 100000);
+        this._configurePixelDiffEngine();
+    }
+
+    /**
+     *
+     * @return {Number}
+     */
+    get blobSize() {
+        return this._blobSize || 0;
+    }
+
+    /**
+     *
+     * @param number
+     * @return {PamDiff}
+     */
+    setBlobSize(number) {
+        this.blobSize = number;
         return this;
     }
 
@@ -297,38 +339,80 @@ class PamDiff extends Transform {
         if (!this._tupltype || !this._width || ! this._height) {
             return;
         }
+
         const wxh = this._width * this._height;
-        switch (this._tupltype) {
-            case 'grayscale':
-                if (this._regionObj) {
-                    this._pixelDiffEngine = PC.compareGrayRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh);
-                } else if (this._maskObj) {
-                    this._pixelDiffEngine = PC.compareGrayMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh);
-                } else {
-                    this._pixelDiffEngine = PC.compareGrayPixels.bind(this, this._difference, this._percent, wxh, wxh);
-                }
-                break;
-            case 'rgb':
-                if (this._regionObj) {
-                    this._pixelDiffEngine = PC.compareRgbRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3);
-                } else if (this._maskObj) {
-                    this._pixelDiffEngine = PC.compareRgbMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3);
-                } else {
-                    this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
-                }
-                break;
-            case 'rgb_alpha':
-                if (this._regionObj) {
-                    this._pixelDiffEngine = PC.compareRgbaRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4);
-                } else if (this._maskObj) {
-                    this._pixelDiffEngine = PC.compareRgbaMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4);
-                } else {
-                    this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
-                }
-                break;
-            default:
-                throw new Error('Did not find a matching tupltype');
+
+        let engine = this._tupltype;
+
+        if (this._regionObj) {
+            engine += '_regions';
+        } else if (this._maskObj) {
+            engine += '_mask';
         }
+
+        if (this._blobSize) {
+            engine += '_blob';
+        }
+
+        switch (engine) {
+            case 'grayscale' :
+                this._pixelDiffEngine = PC.compareGrayPixels.bind(this, this._difference, this._percent, wxh, wxh);
+                break;
+            case 'grayscale_regions' :
+                this._pixelDiffEngine = PC.compareGrayRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh);
+                break;
+            case 'grayscale_mask' :
+                this._pixelDiffEngine = PC.compareGrayMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh);
+                break;
+            case 'grayscale_blob' :
+                this._pixelDiffEngine = PC.compareGrayPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh, this._width, this._height, this._blobSize);
+                break;
+            /*case 'grayscale_regions_blob' :
+                this._pixelDiffEngine = PC.compareGrayRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh, this._width, this._height);
+                break;
+            case 'grayscale_mask_blob' :
+                this._pixelDiffEngine = PC.compareGrayMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh, this._width, this._height);
+                break;*/
+            case 'rgb' :
+                this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
+                break;
+            case 'rgb_regions' :
+                this._pixelDiffEngine = PC.compareRgbRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3);
+                break;
+            case 'rgb_mask' :
+                this._pixelDiffEngine = PC.compareRgbMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3);
+                break;
+            /*case 'rgb_blob' :
+                this._pixelDiffEngine = PC.compareRgbPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh * 3, this._width, this._height);
+                break;
+            case 'rgb_regions_blob' :
+                this._pixelDiffEngine = PC.compareRgbRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3, this._width, this._height);
+                break;
+            case 'rgb_mask_blob' :
+                this._pixelDiffEngine = PC.compareRgbMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3, this._width, this._height);
+                break;*/
+            case 'rgb_alpha' :
+                this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
+                break;
+            case 'rgb_alpha_regions' :
+                this._pixelDiffEngine = PC.compareRgbaRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4);
+                break;
+            case 'rgb_alpha_mask' :
+                this._pixelDiffEngine = PC.compareRgbaMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4);
+                break;
+            /*case 'rgb_alpha_blob' :
+                this._pixelDiffEngine = PC.compareRgbaPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh * 4, this._width, this._height);
+                break;
+            case 'rgb_alpha_regions_blob' :
+                this._pixelDiffEngine = PC.compareRgbaRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4, this._width, this._height);
+                break;
+            case 'rgb_alpha_mask_blob' :
+                this._pixelDiffEngine = PC.compareRgbaMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4, this._width, this._height);
+                break;*/
+            default:
+                throw new Error(`Did not find a matching engine for ${engine}`);
+        }
+
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
         } else {
