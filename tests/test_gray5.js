@@ -14,7 +14,7 @@ const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
 
-const pamCount = 1000;
+const pamCount = 10;
 
 let pamCounter = 0;
 
@@ -29,14 +29,14 @@ const params = [
     //'-stats',
     
     /* use an artificial video input */
-    /*'-re',
+    '-re',
     '-f',
     'lavfi',
     '-i',
-    'testsrc=size=1920x1080:rate=15',*/
+    'testsrc=size=1920x1080:rate=15',
 
-    '-rtsp_transport', 'tcp',
-    '-i', 'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
+    //'-rtsp_transport', 'tcp',
+    //'-i', 'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
 
     /* set output flags */
     '-an',
@@ -47,7 +47,7 @@ const params = [
     '-f',
     'image2pipe',
     '-vf',
-    'fps=2,scale=640:360',
+    'fps=1,scale=400:225',
     '-frames',
     pamCount,
     'pipe:1'
@@ -59,11 +59,11 @@ p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 7, percent: 5, blobSize: 500});
+const pamDiff = new PamDiff({difference: 1, percent: 1, blobSize: 1000});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[0].name === 'all', 'trigger name is not correct');
-    //assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
+    assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, {stdio: ['ignore', 'pipe', 'inherit']});
