@@ -16,8 +16,8 @@ void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t hei
     STACK[0] = x;
     STACK[1] = y;
     STACK[2] = 0;  /* return - component is labelled */
-    int SP = 3;
-    int index;
+    uint_fast32_t SP = 3;
+    uint_fast32_t index;
     START: /* Recursive routine starts here */
     index = X + width * Y;
     if (input[index] == false) RETURN;   /* This pixel is not part of a component */
@@ -34,7 +34,7 @@ void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t hei
     RETURN;
 }
 
-void LabelImage(uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output, uint_fast32_t &maxLabel) {
+uint_fast32_t LabelImage(uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output) {
 //std::cout<<"passed max label "<<maxLabel<<std::endl;
 uint_fast16_t *STACK = (uint_fast16_t *) malloc(3 * sizeof(uint_fast16_t) * (width * height + 1));
 uint_fast32_t labelNo = 0;
@@ -48,6 +48,6 @@ for (uint_fast16_t y = 0; y < height; y++) {
         LabelComponent(STACK, width, height, input, output, labelNo, x, y);
     }
 }
-maxLabel = labelNo;
 free(STACK);
+return labelNo + 1;
 }

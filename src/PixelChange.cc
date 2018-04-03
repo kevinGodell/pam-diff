@@ -361,15 +361,15 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
         uint_fast32_t *pixelLabels = new uint_fast32_t[wxh]();
 
         //variable to hold maxLabel, will be used to determine vector length
-        uint_fast32_t maxLabel;
+        //uint_fast32_t maxLabel;
 
         //label pixels and set maxLabel (from C lib ccl.c)
-        LabelImage(width, height, pixelBitset, pixelLabels, maxLabel);
+        const uint_fast32_t blobsLength = LabelImage(width, height, pixelBitset, pixelLabels);
 
         //std::cout<<"max label "<<maxLabel<<std::endl;
 
         //length of Blob vector
-        const uint_fast32_t blobsLength = maxLabel + 1;
+        //const uint_fast32_t blobsLength = maxLabel + 1;
 
         std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
 
