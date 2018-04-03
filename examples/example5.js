@@ -18,18 +18,18 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use an artificial video input */
-    /*'-re',
+    '-re',
     '-f',
     'lavfi',
     '-i',
-    'testsrc=size=1920x1080:rate=15',*/
+    'testsrc=size=1920x1080:rate=15',
 
     /* use an rtsp ip cam video input */
-    '-rtsp_transport',
+    /*'-rtsp_transport',
     'tcp',
     '-i',
     //'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
-    'rtsp://131.95.3.162/axis-media/media.3gp',
+    'rtsp://131.95.3.162/axis-media/media.3gp',*/
 
     /* set output flags */
     '-an',
