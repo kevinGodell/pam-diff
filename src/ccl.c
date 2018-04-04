@@ -35,19 +35,19 @@ void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t hei
 }
 
 uint_fast32_t LabelImage(uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output) {
-//std::cout<<"passed max label "<<maxLabel<<std::endl;
-uint_fast16_t *STACK = (uint_fast16_t *) malloc(3 * sizeof(uint_fast16_t) * (width * height + 1));
-uint_fast32_t labelNo = 0;
-uint_fast32_t index = 0;
-for (uint_fast16_t y = 0; y < height; y++) {
-    for (uint_fast16_t x = 0; x < width; x++, index++) {
-        if (input[index] == false) continue;   /* This pixel is not part of a component */
-        if (output[index] != 0) continue;   /* This pixel has already been labelled  */
-        /* New component found */
-        labelNo++;
-        LabelComponent(STACK, width, height, input, output, labelNo, x, y);
+    //std::cout<<"passed max label "<<maxLabel<<std::endl;
+    uint_fast16_t *STACK = (uint_fast16_t *) malloc(3 * sizeof(uint_fast16_t) * (width * height + 1));
+    uint_fast32_t labelNo = 0;
+    uint_fast32_t index = 0;
+    for (uint_fast16_t y = 0; y < height; y++) {
+        for (uint_fast16_t x = 0; x < width; x++, index++) {
+            if (input[index] == false) continue;   /* This pixel is not part of a component */
+            if (output[index] != 0) continue;   /* This pixel has already been labeled  */
+            /* New component found */
+            labelNo++;
+            LabelComponent(STACK, width, height, input, output, labelNo, x, y);
+        }
     }
-}
-free(STACK);
-return labelNo + 1;
+    free(STACK);
+    return labelNo + 1;
 }

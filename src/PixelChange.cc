@@ -333,16 +333,13 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     //set diffs counter to 0
     uint_fast32_t diffs = 0;
 
-    //todo will switch to bitset if possible, much smaller in size
-    //set empty unsigned char array, remember to delete
-    //uint_fast8_t *input = new uint_fast8_t[wxh]();
+    //set empty bool array, remember to delete
     bool *pixelBitset = new bool[wxh]();
 
-    //iterate pixels, count diffs, and set 1's and 0's of bitset (binary) array
+    //iterate pixels, count diffs, and set true and false of bool array
     for (uint_fast32_t i = 0; i < bufLen; i++) {
         if (diff > absv(buf0[i] - buf1[i])) continue;
         diffs++;
-        //input[i] = 1;
         pixelBitset[i] = true;
     }
 
@@ -355,23 +352,14 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     //if percent meets/exceeds setting, check for blobs
     if (perc >= percent) {
 
-        //std::cout<<"percent "<<perc<<std::endl;
-
         //create unsigned int array to hold labels
         uint_fast32_t *pixelLabels = new uint_fast32_t[wxh]();
-
-        //variable to hold maxLabel, will be used to determine vector length
-        //uint_fast32_t maxLabel;
 
         //label pixels and set maxLabel (from C lib ccl.c)
         const uint_fast32_t blobsLength = LabelImage(width, height, pixelBitset, pixelLabels);
 
-        //std::cout<<"max label "<<maxLabel<<std::endl;
-
-        //length of Blob vector
-        //const uint_fast32_t blobsLength = maxLabel + 1;
-
-        std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
+        //extract blobs from labels
+        const std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
 
         //delete output array
         delete[] pixelLabels;
@@ -381,9 +369,8 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
 
         //filter blobs by size
         for (uint_fast32_t i = 1, j = 0; i < blobsLength; i++) {
-            Blob &blob = blobs[i];
+            Blob blob = blobs[i];
             if (blob.size < blobSize) continue;
-            //std::cout<<"label: "<<blob.label<<" size: "<<blob.size<<" minX: "<<blob.minX<<" maxX: "<<blob.maxX<<" minY: "<<blob.minY<<" maxY: "<<blob.maxY<<std::endl;
             Napi::Object obj = Napi::Object::New(env);
             obj.Set("label", blob.label);
             obj.Set("size", blob.size);
