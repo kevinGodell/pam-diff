@@ -265,25 +265,25 @@ Napi::Array CompareRgbaMask(const Napi::CallbackInfo &info) {
     return results;
 }
 
-//using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast16_t, uint_fast16_t, uint_fast16_t, uint_fast16_t>;
+//using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
 
 struct Blob {
     uint_fast32_t label;
     uint_fast32_t size;
-    uint_fast16_t minX;
-    uint_fast16_t maxX;
-    uint_fast16_t minY;
-    uint_fast16_t maxY;
+    uint_fast32_t minX;
+    uint_fast32_t maxX;
+    uint_fast32_t minY;
+    uint_fast32_t maxY;
 };
 
-inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32_t vectorSize, uint_fast16_t width, uint_fast16_t height) {
+inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
     //create vector
     std::vector<Blob> blobs(vectorSize);
     //track index of pixel
     uint_fast32_t index = 0;
     //iterate labeled pixels and group into blobs
-    for (uint_fast16_t y = 0; y < height; y++) {
-         for (uint_fast16_t x = 0; x < width; x++, index++) {
+    for (uint_fast32_t y = 0; y < height; y++) {
+         for (uint_fast32_t x = 0; x < width; x++, index++) {
               //use label value as index
               uint_fast32_t label = pixelLabels[index];
               //skip label 0
@@ -314,11 +314,11 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     //get all params
     const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
-    const uint_fast16_t percent = info[1].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast32_t wxh = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
-    const uint_fast16_t width = info[4].As<Napi::Number>().Uint32Value();
-    const uint_fast16_t height = info[5].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t width = info[4].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = info[5].As<Napi::Number>().Uint32Value();
     const uint_fast32_t blobSize = info[6].As<Napi::Number>().Uint32Value();
     const Napi::Buffer<uint_fast8_t> buf0 = info[7].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> buf1 = info[8].As<Napi::Buffer<uint_fast8_t>>();
@@ -335,7 +335,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     //create new array that can be returned to JS
     Napi::Array results = Napi::Array::New(env);
     //calculate percent of difference
-    const uint_fast16_t perc = 100 * diffs / wxh;
+    const uint_fast32_t perc = 100 * diffs / wxh;
     //if percent meets/exceeds setting, check for blobs
     if (perc >= percent) {
         //create unsigned int array to hold labels
