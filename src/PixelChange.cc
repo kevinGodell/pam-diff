@@ -5,8 +5,45 @@
 #include "ccl.c"
 //}
 
+//region = (name, diff, percent, count, bitset, diffs)
+using Region = std::tuple<std::string, uint_fast8_t, uint_fast32_t, uint_fast32_t, Napi::Buffer < uint_fast8_t>, uint_fast32_t>;
+
+//blob = (label number, count of pixels, min X, max X, min Y, max Y)
+using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
+
+//absolute value
 inline uint_fast32_t absv(int_fast32_t x) {
     return (x > 0) ? x : -x;
+}
+
+//create vector of blobs
+inline std::vector<Blob> blobsFromLabels(uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
+    //create vector
+    std::vector<Blob> blobs(vectorSize);
+    //track index of pixel
+    uint_fast32_t index = 0;
+    //iterate labeled pixels and group into blobs
+    for (uint_fast32_t y = 0; y < height; y++) {
+         for (uint_fast32_t x = 0; x < width; x++, index++) {
+              //use label value as index
+              uint_fast32_t label = labels[index];
+              //skip label 0
+              if (label == 0) continue;
+              //get blob
+              Blob &blob = blobs[label];
+              //count will be 0 if this is first contact
+              if (std::get<0>(blob) == 0) {
+                   blob = std::make_tuple(label, 1, x, x, y, y);
+              } else {
+                   std::get<1>(blob)++;
+                   std::get<2>(blob) = std::min(std::get<2>(blob), x);
+                   std::get<3>(blob) = std::max(std::get<3>(blob), x);
+                   std::get<4>(blob) = std::min(std::get<4>(blob), y);
+                   std::get<5>(blob) = std::max(std::get<5>(blob), y);
+              }
+         }
+    }
+    return blobs;
 }
 
 Napi::Array CompareGrayPixels(const Napi::CallbackInfo &info) {
@@ -88,7 +125,7 @@ Napi::Array CompareGrayRegions(const Napi::CallbackInfo &info) {
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
     const Napi::Buffer<uint_fast8_t> buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    std::vector<std::tuple<std::string, uint_fast8_t, uint_fast32_t, uint_fast32_t, Napi::Buffer < uint_fast8_t>, uint_fast32_t>> regionsVec(regLen);
+    std::vector<Region> regionsVec(regLen);
     for (uint_fast32_t i = 0; i < regLen; i++) {
         const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
         const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
@@ -125,7 +162,7 @@ Napi::Array CompareRgbRegions(const Napi::CallbackInfo &info) {
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
     const Napi::Buffer<uint_fast8_t> buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    std::vector<std::tuple<std::string, uint_fast8_t, uint_fast32_t, uint_fast32_t, Napi::Buffer<uint_fast8_t>, uint_fast32_t>> regionsVec(regLen);
+    std::vector<Region> regionsVec(regLen);
     for (uint_fast32_t i = 0; i < regLen; i++) {
         const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
         const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
@@ -162,7 +199,7 @@ Napi::Array CompareRgbaRegions(const Napi::CallbackInfo &info) {
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
     const Napi::Buffer<uint_fast8_t> buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    std::vector<std::tuple<std::string, uint_fast8_t, uint_fast32_t, uint_fast32_t, Napi::Buffer<uint_fast8_t>, uint_fast32_t>> regionsVec(regLen);
+    std::vector<Region> regionsVec(regLen);
     for (uint_fast32_t i = 0; i < regLen; i++) {
         const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
         const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
@@ -265,51 +302,6 @@ Napi::Array CompareRgbaMask(const Napi::CallbackInfo &info) {
     return results;
 }
 
-//using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
-
-struct Blob {
-    uint_fast32_t label;
-    uint_fast32_t size;
-    uint_fast32_t minX;
-    uint_fast32_t maxX;
-    uint_fast32_t minY;
-    uint_fast32_t maxY;
-};
-
-inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
-    //create vector
-    std::vector<Blob> blobs(vectorSize);
-    //track index of pixel
-    uint_fast32_t index = 0;
-    //iterate labeled pixels and group into blobs
-    for (uint_fast32_t y = 0; y < height; y++) {
-         for (uint_fast32_t x = 0; x < width; x++, index++) {
-              //use label value as index
-              uint_fast32_t label = pixelLabels[index];
-              //skip label 0
-              if (label == 0) continue;
-              //get access to blob data
-              Blob &blob = blobs[label];
-              //count will be 0 if this is first contact
-              if (blob.label == 0) {
-                   blob.label = label;
-                   blob.size = 1;
-                   blob.minX = x;
-                   blob.maxX = x;
-                   blob.minY = y;
-                   blob.maxY = y;
-              } else {
-                   blob.size++;
-                   blob.minX = std::min(blob.minX, x);
-                   blob.maxX = std::max(blob.maxX, x);
-                   blob.minY = std::min(blob.minY, y);
-                   blob.maxY = std::max(blob.maxY, y);
-              }
-         }
-    }
-    return blobs;
-}
-
 Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     //get all params
@@ -350,15 +342,15 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
         Napi::Array blobsArray = Napi::Array::New(env);
         //filter blobs by size
         for (uint_fast32_t i = 1, j = 0; i < blobsLength; i++) {
-            Blob blob = blobs[i];
-            if (blob.size < blobSize) continue;
+            const Blob blob = blobs[i];
+            if (std::get<1>(blob) < blobSize) continue;
             Napi::Object obj = Napi::Object::New(env);
-            obj.Set("label", blob.label);
-            obj.Set("size", blob.size);
-            obj.Set("minX", blob.minX);
-            obj.Set("maxX", blob.maxX);
-            obj.Set("minY", blob.minY);
-            obj.Set("maxY", blob.maxY);
+            obj.Set("label", std::get<0>(blob));
+            obj.Set("size", std::get<1>(blob));
+            obj.Set("minX", std::get<2>(blob));
+            obj.Set("maxX", std::get<3>(blob));
+            obj.Set("minY", std::get<4>(blob));
+            obj.Set("maxY", std::get<5>(blob));
             blobsArray[j++] = obj;
         }
         //create JS object to hold values and put into JS array
