@@ -12,7 +12,7 @@
 #define X (STACK[SP-3])
 #define Y (STACK[SP-2])
 
-void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output, uint_fast32_t labelNo, uint_fast16_t x, uint_fast16_t y) {
+inline void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output, uint_fast32_t labelNo, uint_fast16_t x, uint_fast16_t y) {
     STACK[0] = x;
     STACK[1] = y;
     STACK[2] = 0;  /* return - component is labelled */
@@ -34,7 +34,7 @@ void LabelComponent(uint_fast16_t *STACK, uint_fast16_t width, uint_fast16_t hei
     RETURN;
 }
 
-uint_fast32_t LabelImage(uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output) {
+inline uint_fast32_t LabelImage(uint_fast16_t width, uint_fast16_t height, bool *input, uint_fast32_t *output) {
     //std::cout<<"passed max label "<<maxLabel<<std::endl;
     uint_fast16_t *STACK = (uint_fast16_t *) malloc(3 * sizeof(uint_fast16_t) * (width * height + 1));
     uint_fast32_t labelNo = 0;
