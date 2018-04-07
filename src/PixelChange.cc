@@ -279,23 +279,17 @@ struct Blob {
 inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32_t vectorSize, uint_fast16_t width, uint_fast16_t height) {
     //create vector
     std::vector<Blob> blobs(vectorSize);
-
     //track index of pixel
     uint_fast32_t index = 0;
-
     //iterate labeled pixels and group into blobs
     for (uint_fast16_t y = 0; y < height; y++) {
          for (uint_fast16_t x = 0; x < width; x++, index++) {
-
               //use label value as index
               uint_fast32_t label = pixelLabels[index];
-
               //skip label 0
               if (label == 0) continue;
-
               //get access to blob data
               Blob &blob = blobs[label];
-
               //count will be 0 if this is first contact
               if (blob.label == 0) {
                    blob.label = label;
@@ -318,7 +312,6 @@ inline std::vector<Blob> blobsFromLabels(uint_fast32_t *pixelLabels, uint_fast32
 
 Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-
     //get all params
     const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast16_t percent = info[1].As<Napi::Number>().Uint32Value();
@@ -329,44 +322,32 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     const uint_fast32_t blobSize = info[6].As<Napi::Number>().Uint32Value();
     const Napi::Buffer<uint_fast8_t> buf0 = info[7].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> buf1 = info[8].As<Napi::Buffer<uint_fast8_t>>();
-
     //set diffs counter to 0
     uint_fast32_t diffs = 0;
-
     //set empty bool array, remember to delete
     bool *pixelBitset = new bool[wxh]();
-
     //iterate pixels, count diffs, and set true and false of bool array
     for (uint_fast32_t i = 0; i < bufLen; i++) {
         if (diff > absv(buf0[i] - buf1[i])) continue;
         diffs++;
         pixelBitset[i] = true;
     }
-
     //create new array that can be returned to JS
     Napi::Array results = Napi::Array::New(env);
-
     //calculate percent of difference
     const uint_fast16_t perc = 100 * diffs / wxh;
-
     //if percent meets/exceeds setting, check for blobs
     if (perc >= percent) {
-
         //create unsigned int array to hold labels
         uint_fast32_t *pixelLabels = new uint_fast32_t[wxh]();
-
         //label pixels and set maxLabel (from C lib ccl.c)
         const uint_fast32_t blobsLength = LabelImage(width, height, pixelBitset, pixelLabels);
-
         //extract blobs from labels
         const std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
-
         //delete output array
         delete[] pixelLabels;
-
         //create JS array to return blob objects
         Napi::Array blobsArray = Napi::Array::New(env);
-
         //filter blobs by size
         for (uint_fast32_t i = 1, j = 0; i < blobsLength; i++) {
             Blob blob = blobs[i];
@@ -380,7 +361,6 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
             obj.Set("maxY", blob.maxY);
             blobsArray[j++] = obj;
         }
-
         //create JS object to hold values and put into JS array
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", "all");
@@ -388,10 +368,8 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
         obj.Set("blobs", blobsArray);
         results["0"] = obj;
     }
-
     //delete input array
     delete[] pixelBitset;
-
     //return results array to JS
     return results;
 }
