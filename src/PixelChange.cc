@@ -1,14 +1,12 @@
 #include <napi.h>
 #include <algorithm>
-//#include <iostream>
-//extern "C" {
+//#include <iostream> /* needed for std::cout */
 #include "ccl.c"
-//}
 
-//region = (name, diff, percent, count, bitset, diffs)
-using Region = std::tuple<std::string, uint_fast8_t, uint_fast32_t, uint_fast32_t, Napi::Buffer < uint_fast8_t>, uint_fast32_t>;
+//region     =            name,        diff,          percent,       count,         bitset,                       diffs
+using Region = std::tuple<std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, Napi::Buffer < uint_fast8_t>, uint_fast32_t>;
 
-//blob = (label number, count of pixels, min X, max X, min Y, max Y)
+//blob     =            label,         count,         minX,          maxX,          minY,          maxY
 using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
 
 //absolute value
@@ -16,17 +14,25 @@ inline uint_fast32_t absv(int_fast32_t x) {
     return (x > 0) ? x : -x;
 }
 
+//gray pixel diff
+inline uint_fast32_t grayDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
+    return absv(buf0[i] - buf1[i]);
+}
+
+//rgb pixel diff
+inline uint_fast32_t rgbDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
+    return absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
+}
+
 //create vector of blobs
 inline std::vector<Blob> blobsFromLabels(uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
     //create vector
     std::vector<Blob> blobs(vectorSize);
-    //track index of pixel
-    uint_fast32_t index = 0;
     //iterate labeled pixels and group into blobs
-    for (uint_fast32_t y = 0; y < height; y++) {
-         for (uint_fast32_t x = 0; x < width; x++, index++) {
+    for (uint_fast32_t y = 0, x = 0, i = 0, label = 0; y < height; y++) {
+         for (x = 0; x < width; x++, i++) {
               //use label value as index
-              uint_fast32_t label = labels[index];
+              label = labels[i];
               //skip label 0
               if (label == 0) continue;
               //get blob
@@ -46,9 +52,11 @@ inline std::vector<Blob> blobsFromLabels(uint_fast32_t *labels, uint_fast32_t ve
     return blobs;
 }
 
+////////////////////////////////////////////////////////////////////////
+
 Napi::Array CompareGrayPixels(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast32_t wxh = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
@@ -56,7 +64,7 @@ Napi::Array CompareGrayPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (absv(buf0[i] - buf1[i]) >= diff) diffs++;
+        if (grayDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -71,7 +79,7 @@ Napi::Array CompareGrayPixels(const Napi::CallbackInfo &info) {
 
 Napi::Array CompareRgbPixels(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast32_t wxh = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
@@ -79,7 +87,7 @@ Napi::Array CompareRgbPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += 3) {
-        if (absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3 >= diff) diffs++;
+        if (rgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -94,7 +102,7 @@ Napi::Array CompareRgbPixels(const Napi::CallbackInfo &info) {
 
 Napi::Array CompareRgbaPixels(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast32_t wxh = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
@@ -102,7 +110,7 @@ Napi::Array CompareRgbaPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += 4) {
-        if (absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3 >= diff) diffs++;
+        if (rgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -117,9 +125,83 @@ Napi::Array CompareRgbaPixels(const Napi::CallbackInfo &info) {
 
 ////////////////////////////////////////////////////////////////////////
 
+Napi::Array CompareGrayMask(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
+    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0; i < bufLen; i++) {
+        if (bitset[i] && grayDiff(buf0, buf1, i) >= diff) diffs++;
+    }
+    Napi::Array results = Napi::Array::New(env);
+    const uint_fast32_t perc = 100 * diffs / count;
+    if (perc >= percent) {
+        Napi::Object obj = Napi::Object::New(env);
+        obj.Set("name", "mask");
+        obj.Set("percent", perc);
+        results["0"] = obj;
+    }
+    return results;
+}
+
+Napi::Array CompareRgbMask(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
+    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 3, p++) {
+        if (bitset[p] && rgbDiff(buf0, buf1, i) >= diff) diffs++;
+    }
+    Napi::Array results = Napi::Array::New(env);
+    const uint_fast32_t perc = 100 * diffs / count;
+    if (perc >= percent) {
+        Napi::Object obj = Napi::Object::New(env);
+        obj.Set("name", "mask");
+        obj.Set("percent", perc);
+        results["0"] = obj;
+    }
+    return results;
+}
+
+Napi::Array CompareRgbaMask(const Napi::CallbackInfo &info) {
+    Napi::Env env = info.Env();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
+    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 4, p++) {
+        if (bitset[p] && rgbDiff(buf0, buf1, i) >= diff) diffs++;
+    }
+    Napi::Array results = Napi::Array::New(env);
+    const uint_fast32_t perc = 100 * diffs / count;
+    if (perc >= percent) {
+        Napi::Object obj = Napi::Object::New(env);
+        obj.Set("name", "mask");
+        obj.Set("percent", perc);
+        results["0"] = obj;
+    }
+    return results;
+}
+
+////////////////////////////////////////////////////////////////////////
+
 Napi::Array CompareGrayRegions(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    const uint_fast8_t minDiff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minDiff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast32_t regLen = info[1].As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = info[2].As<Napi::Array>();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
@@ -128,23 +210,22 @@ Napi::Array CompareGrayRegions(const Napi::CallbackInfo &info) {
     std::vector<Region> regionsVec(regLen);
     for (uint_fast32_t i = 0; i < regLen; i++) {
         const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
-        const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
         const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
         const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
         const Napi::Buffer<uint_fast8_t> bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>();
         regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
     }
-    for (uint_fast32_t p = 0; p < bufLen; p++) {
-        const auto diff = absv(buf0[p] - buf1[p]);
+    for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i++) {
+        diff = grayDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
-        for (uint_fast32_t i = 0; i < regLen; i++) {
-            if (!std::get<4>(regionsVec[i])[p] || diff < std::get<1>(regionsVec[i])) continue;
-            std::get<5>(regionsVec[i])++;
+        for (j = 0; j < regLen; j++) {
+            if (std::get<4>(regionsVec[j])[i] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
         }
     }
     Napi::Array results = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0; i < regLen; i++) {
-        uint_fast32_t percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
+    for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
+        percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
         if (std::get<2>(regionsVec[i]) > percent) continue;
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", std::get<0>(regionsVec[i]));
@@ -171,17 +252,16 @@ Napi::Array CompareRgbRegions(const Napi::CallbackInfo &info) {
         const Napi::Buffer<uint_fast8_t> bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>();
         regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
     }
-    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 3, p++) {
-        const auto diff = absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
+    for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i += 3) {
+        diff = rgbDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
-        for (uint_fast32_t i = 0; i < regLen; i++) {
-            if (!std::get<4>(regionsVec[i])[p] || diff < std::get<1>(regionsVec[i])) continue;
-            std::get<5>(regionsVec[i])++;
+        for (j = 0; j < regLen; j++) {
+            if (std::get<4>(regionsVec[j])[i / 3] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
         }
     }
     Napi::Array results = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0; i < regLen; i++) {
-        uint_fast32_t percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
+    for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
+        percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
         if (std::get<2>(regionsVec[i]) > percent) continue;
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", std::get<0>(regionsVec[i]));
@@ -193,119 +273,46 @@ Napi::Array CompareRgbRegions(const Napi::CallbackInfo &info) {
 
 Napi::Array CompareRgbaRegions(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
-    const uint_fast8_t minDiff = info[0].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t regLen = info[1].As<Napi::Number>().Uint32Value();
-    const Napi::Array regionsArr = info[2].As<Napi::Array>();
-    const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    std::vector<Region> regionsVec(regLen);
-    for (uint_fast32_t i = 0; i < regLen; i++) {
-        const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
-        const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-        const Napi::Buffer<uint_fast8_t> bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>();
-        regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
-    }
-    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 4, p++) {
-        const auto diff = absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
-        if (minDiff > diff) continue;
+        const uint_fast8_t minDiff = info[0].As<Napi::Number>().Uint32Value();
+        const uint_fast32_t regLen = info[1].As<Napi::Number>().Uint32Value();
+        const Napi::Array regionsArr = info[2].As<Napi::Array>();
+        const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
+        const Napi::Buffer<uint_fast8_t> buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>();
+        const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
+        std::vector<Region> regionsVec(regLen);
         for (uint_fast32_t i = 0; i < regLen; i++) {
-            if (!std::get<4>(regionsVec[i])[p] || diff < std::get<1>(regionsVec[i])) continue;
-            std::get<5>(regionsVec[i])++;
+            const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
+            const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
+            const Napi::Buffer<uint_fast8_t> bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>();
+            regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
         }
-    }
-    Napi::Array results = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0; i < regLen; i++) {
-        uint_fast32_t percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
-        if (std::get<2>(regionsVec[i]) > percent) continue;
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", std::get<0>(regionsVec[i]));
-        obj.Set("percent", percent);
-        results[j++] = obj;
-    }
-    return results;
+        for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i += 4) {
+            diff = rgbDiff(buf0, buf1, i);
+            if (minDiff > diff) continue;
+            for (j = 0; j < regLen; j++) {
+                if (std::get<4>(regionsVec[j])[i / 4] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
+            }
+        }
+        Napi::Array results = Napi::Array::New(env);
+        for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
+            percent = 100 * std::get<5>(regionsVec[i]) / std::get<3>(regionsVec[i]);
+            if (std::get<2>(regionsVec[i]) > percent) continue;
+            Napi::Object obj = Napi::Object::New(env);
+            obj.Set("name", std::get<0>(regionsVec[i]));
+            obj.Set("percent", percent);
+            results[j++] = obj;
+        }
+        return results;
 }
 
 ////////////////////////////////////////////////////////////////////////
 
-Napi::Array CompareGrayMask(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
-    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
-    uint_fast32_t diffs = 0;
-    for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (bitset[i] && absv(buf0[i] - buf1[i]) >= diff) diffs++;
-    }
-    Napi::Array results = Napi::Array::New(env);
-    const uint_fast32_t perc = 100 * diffs / count;
-    if (perc >= percent) {
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", "mask");
-        obj.Set("percent", perc);
-        results["0"] = obj;
-    }
-    return results;
-}
-
-Napi::Array CompareRgbMask(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
-    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
-    uint_fast32_t diffs = 0;
-    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 3, p++) {
-        if (bitset[p] && absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3 >= diff) diffs++;
-    }
-    Napi::Array results = Napi::Array::New(env);
-    const uint_fast32_t perc = 100 * diffs / count;
-    if (perc >= percent) {
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", "mask");
-        obj.Set("percent", perc);
-        results["0"] = obj;
-    }
-    return results;
-}
-
-Napi::Array CompareRgbaMask(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
-    const uint_fast32_t count = info[2].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> bitset = info[3].As<Napi::Buffer<uint_fast8_t>>();
-    const uint_fast32_t bufLen = info[4].As<Napi::Number>().Uint32Value();
-    const Napi::Buffer<uint_fast8_t> buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
-    uint_fast32_t diffs = 0;
-    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 4, p++) {
-        if (bitset[p] && absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3 >= diff) diffs++;
-    }
-    Napi::Array results = Napi::Array::New(env);
-    const uint_fast32_t perc = 100 * diffs / count;
-    if (perc >= percent) {
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", "mask");
-        obj.Set("percent", perc);
-        results["0"] = obj;
-    }
-    return results;
-}
-
 Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     //get all params
-    const uint_fast8_t diff = info[0].As<Napi::Number>().Uint32Value();
+    const uint_fast32_t diff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast32_t percent = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast32_t wxh = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast32_t bufLen = info[3].As<Napi::Number>().Uint32Value();
@@ -320,7 +327,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     bool *pixelBitset = new bool[wxh]();
     //iterate pixels, count diffs, and set true and false of bool array
     for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (diff > absv(buf0[i] - buf1[i])) continue;
+        if (diff > grayDiff(buf0, buf1, i)) continue;
         diffs++;
         pixelBitset[i] = true;
     }
@@ -365,6 +372,8 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     //return results array to JS
     return results;
 }
+
+////////////////////////////////////////////////////////////////////////
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "compareGrayPixels"), Napi::Function::New(env, CompareGrayPixels));
