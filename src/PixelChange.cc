@@ -10,22 +10,22 @@ using Region = std::tuple<std::string, uint_fast32_t, uint_fast32_t, uint_fast32
 using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
 
 //absolute value
-inline uint_fast32_t absv(int_fast32_t x) {
+inline uint_fast32_t Absv(int_fast32_t x) {
     return (x > 0) ? x : -x;
 }
 
 //gray pixel diff
-inline uint_fast32_t grayDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
-    return absv(buf0[i] - buf1[i]);
+inline uint_fast32_t GrayDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
+    return Absv(buf0[i] - buf1[i]);
 }
 
 //rgb pixel diff
-inline uint_fast32_t rgbDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
-    return absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
+inline uint_fast32_t RgbDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
+    return Absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
 }
 
 //create vector of blobs
-inline std::vector<Blob> blobsFromLabels(uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
+inline std::vector<Blob> BlobsFromLabels(uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
     //create vector
     std::vector<Blob> blobs(vectorSize);
     //iterate labeled pixels and group into blobs
@@ -64,7 +64,7 @@ Napi::Array CompareGrayPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (grayDiff(buf0, buf1, i) >= diff) diffs++;
+        if (GrayDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -87,7 +87,7 @@ Napi::Array CompareRgbPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += 3) {
-        if (rgbDiff(buf0, buf1, i) >= diff) diffs++;
+        if (RgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -110,7 +110,7 @@ Napi::Array CompareRgbaPixels(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += 4) {
-        if (rgbDiff(buf0, buf1, i) >= diff) diffs++;
+        if (RgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / wxh;
@@ -136,7 +136,7 @@ Napi::Array CompareGrayMask(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (bitset[i] && grayDiff(buf0, buf1, i) >= diff) diffs++;
+        if (bitset[i] && GrayDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / count;
@@ -160,7 +160,7 @@ Napi::Array CompareRgbMask(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 3, p++) {
-        if (bitset[p] && rgbDiff(buf0, buf1, i) >= diff) diffs++;
+        if (bitset[p] && RgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / count;
@@ -184,7 +184,7 @@ Napi::Array CompareRgbaMask(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>();
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += 4, p++) {
-        if (bitset[p] && rgbDiff(buf0, buf1, i) >= diff) diffs++;
+        if (bitset[p] && RgbDiff(buf0, buf1, i) >= diff) diffs++;
     }
     Napi::Array results = Napi::Array::New(env);
     const uint_fast32_t perc = 100 * diffs / count;
@@ -217,7 +217,7 @@ Napi::Array CompareGrayRegions(const Napi::CallbackInfo &info) {
         regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
     }
     for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i++) {
-        diff = grayDiff(buf0, buf1, i);
+        diff = GrayDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
         for (j = 0; j < regLen; j++) {
             if (std::get<4>(regionsVec[j])[i] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
@@ -253,7 +253,7 @@ Napi::Array CompareRgbRegions(const Napi::CallbackInfo &info) {
         regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
     }
     for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i += 3) {
-        diff = rgbDiff(buf0, buf1, i);
+        diff = RgbDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
         for (j = 0; j < regLen; j++) {
             if (std::get<4>(regionsVec[j])[i / 3] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
@@ -289,7 +289,7 @@ Napi::Array CompareRgbaRegions(const Napi::CallbackInfo &info) {
             regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
         }
         for (uint_fast32_t i = 0, j = 0, diff = 0; i < bufLen; i += 4) {
-            diff = rgbDiff(buf0, buf1, i);
+            diff = RgbDiff(buf0, buf1, i);
             if (minDiff > diff) continue;
             for (j = 0; j < regLen; j++) {
                 if (std::get<4>(regionsVec[j])[i / 4] && diff >= std::get<1>(regionsVec[j])) std::get<5>(regionsVec[j])++;
@@ -327,7 +327,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     bool *pixelBitset = new bool[wxh]();
     //iterate pixels, count diffs, and set true and false of bool array
     for (uint_fast32_t i = 0; i < bufLen; i++) {
-        if (diff > grayDiff(buf0, buf1, i)) continue;
+        if (diff > GrayDiff(buf0, buf1, i)) continue;
         diffs++;
         pixelBitset[i] = true;
     }
@@ -342,7 +342,7 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
         //label pixels and set maxLabel (from C lib ccl.c)
         const uint_fast32_t blobsLength = LabelImage(width, height, pixelBitset, pixelLabels);
         //extract blobs from labels
-        const std::vector<Blob> blobs = blobsFromLabels(pixelLabels, blobsLength, width, height);
+        const std::vector<Blob> blobs = BlobsFromLabels(pixelLabels, blobsLength, width, height);
         //delete output array
         delete[] pixelLabels;
         //create JS array to return blob objects
