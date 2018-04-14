@@ -29,7 +29,7 @@ const params = [
     //'-stats',
     
     /* use an artificial video input */
-    '-re',
+    //'-re',
     '-f',
     'lavfi',
     '-i',
