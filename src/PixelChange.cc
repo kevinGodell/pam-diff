@@ -1,5 +1,5 @@
 #include <napi.h>
-#include <algorithm>
+//#include <algorithm>
 //#include <iostream> /* needed for std::cout */
 #include "ccl.c"
 
@@ -10,18 +10,28 @@ using Region = std::tuple<std::string, uint_fast32_t, uint_fast32_t, uint_fast32
 using Blob = std::tuple<uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t, uint_fast32_t>;
 
 //absolute value
-inline uint_fast32_t Absv(int_fast32_t x) {
-    return (x > 0) ? x : -x;
+inline uint_fast32_t AbsUint(int_fast32_t n) {
+    return (n > 0) ? n : -n;
+}
+
+//math min
+inline uint_fast32_t MinUint(uint_fast32_t a, uint_fast32_t b) {
+    return (a < b) ? a : b;
+}
+
+//math max
+inline uint_fast32_t MaxUint(uint_fast32_t a, uint_fast32_t b) {
+    return (a > b) ? a : b;
 }
 
 //gray pixel diff
 inline uint_fast32_t GrayDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
-    return Absv(buf0[i] - buf1[i]);
+    return AbsUint(buf0[i] - buf1[i]);
 }
 
 //rgb pixel diff
 inline uint_fast32_t RgbDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_fast8_t> buf1, uint_fast32_t i) {
-    return Absv(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
+    return AbsUint(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
 }
 
 //create vector of blobs
@@ -42,10 +52,10 @@ inline std::vector<Blob> BlobsFromLabels(uint_fast32_t *labels, uint_fast32_t ve
                    blob = std::make_tuple(label, 1, x, x, y, y);
               } else {
                    std::get<1>(blob)++;
-                   std::get<2>(blob) = std::min(std::get<2>(blob), x);
-                   std::get<3>(blob) = std::max(std::get<3>(blob), x);
-                   std::get<4>(blob) = std::min(std::get<4>(blob), y);
-                   std::get<5>(blob) = std::max(std::get<5>(blob), y);
+                   std::get<2>(blob) = MinUint(std::get<2>(blob), x);
+                   std::get<3>(blob) = MaxUint(std::get<3>(blob), x);
+                   std::get<4>(blob) = MinUint(std::get<4>(blob), y);
+                   std::get<5>(blob) = MaxUint(std::get<5>(blob), y);
               }
          }
     }
