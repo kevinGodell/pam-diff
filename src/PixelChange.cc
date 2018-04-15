@@ -35,7 +35,7 @@ inline uint_fast32_t RgbDiff(Napi::Buffer<uint_fast8_t> buf0, Napi::Buffer<uint_
 }
 
 //create vector of blobs
-inline std::vector<Blob> BlobsFromLabels(uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
+inline std::vector<Blob> BlobsFromLabels(const uint_fast32_t *labels, uint_fast32_t vectorSize, uint_fast32_t width, uint_fast32_t height) {
     //create vector
     std::vector<Blob> blobs(vectorSize);
     //iterate labeled pixels and group into blobs
