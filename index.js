@@ -18,7 +18,7 @@ class PamDiff extends Transform {
      * @param [options.regions[i].difference] {Number} - Difference value for region.
      * @param [options.regions[i].percent] {Number} - Percent value for region.
      * @param [options.regions[i].polygon] {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
-     * @param [mask] {Boolean} - Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.
+     * @param [options.mask] {Boolean} - Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.
      * @param [callback] {Function} - Function to be called when diff event occurs.
      */
     constructor(options, callback) {
