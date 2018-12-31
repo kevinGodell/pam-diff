@@ -6,7 +6,8 @@
   "scripts": {
     "install": "node-gyp rebuild",
     "pretest": "npm install",
-    "test": "npm run gray && npm run rgb && npm run rgba",
+    "__test": "npm run gray && npm run rgb && npm run rgba",
+    "test": "node tests/test_gray && node tests/test_rgb && node tests/test_rgba",
     "preversion": "npm test",
     "postversion": "npm run doc",
     "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
