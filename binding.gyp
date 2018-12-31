@@ -8,8 +8,8 @@
         "src/sync.cc",
         "src/async.cc"
       ],
-      "cflags!": [ "-fno-exceptions -Weverything -Wall -Werror -Wno-unused -Wconversion" ],
-      "cflags_cc!": [ "-fno-exceptions -Weverything -Werror -Wno-unused -Wall -Wextra -Q --help=warning -Wconversion" ],
+      "cflags!": [ "-fno-exceptions" ],
+      "cflags_cc!": [ "-fno-exceptions" ],
       "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
       "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
       "defines": [ "NAPI_CPP_EXCEPTIONS" ],
