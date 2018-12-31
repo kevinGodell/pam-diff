@@ -4,7 +4,7 @@ const { Transform } = require('stream');
 
 const PP = require('polygon-points');
 
-const PC = require('bindings')('pixel_change');
+const PC = require('bindings')('addon');
 
 class PamDiff extends Transform {
 
@@ -265,6 +265,7 @@ class PamDiff extends Transform {
         delete this._newPix;
         delete this._width;
         delete this._height;
+        delete this._depth;
         delete this._tupltype;
         delete this._regionObj;
         delete this._maskObj;
@@ -356,7 +357,7 @@ class PamDiff extends Transform {
 
         switch (engine) {
             case 'grayscale' :
-                this._pixelDiffEngine = PC.compareGrayPixels.bind(this, this._difference, this._percent, wxh, wxh);
+                this._pixelDiffEngine = PC.pixelsDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
                 break;
             case 'grayscale_regions' :
                 this._pixelDiffEngine = PC.compareGrayRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh);
@@ -374,7 +375,9 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.compareGrayMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh, this._width, this._height);
                 break;*/
             case 'rgb' :
-                this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
+                this._pixelDiffEngine = PC.pixelsDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
+
+                //this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
                 break;
             case 'rgb_regions' :
                 this._pixelDiffEngine = PC.compareRgbRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3);
@@ -392,7 +395,9 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.compareRgbMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3, this._width, this._height);
                 break;*/
             case 'rgb_alpha' :
-                this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
+                this._pixelDiffEngine = PC.pixelsDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
+
+                //this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
                 break;
             case 'rgb_alpha_regions' :
                 this._pixelDiffEngine = PC.compareRgbaRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4);
@@ -414,7 +419,7 @@ class PamDiff extends Transform {
         }
 
         if (process.env.NODE_ENV === 'development') {
-            this._parseChunk = this._parsePixelsDebug;
+            this._parseChunk = this._parsePixelsAsyncDebug;
         } else {
             this._parseChunk = this._parsePixels;
         }
@@ -468,6 +473,29 @@ class PamDiff extends Transform {
         console.timeEnd(this._pixelDiffEngine.name);
     }
 
+    _parsePixelsAsyncDebug(chunk) {
+        console.time(this._pixelDiffEngine.name);
+        this._newPix = chunk.pixels;
+        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results)=> {
+            if (results.length) {
+                const data = {trigger: results, pam:chunk.pam};
+                if (this._callback) {
+                    this._callback(data);
+                }
+                if (this._readableState.pipesCount > 0) {
+                    this.push(data);
+                }
+                if (this.listenerCount('diff') > 0) {
+                    this.emit('diff', data);
+                }
+            }
+            this._oldPix = this._newPix;
+            console.timeEnd(this._pixelDiffEngine.name);
+        });
+    }
+
+
+
     /**
      *
      * @param chunk
@@ -476,6 +504,7 @@ class PamDiff extends Transform {
     _parseFirstChunk(chunk) {
         this._width = parseInt(chunk.width);
         this._height = parseInt(chunk.height);
+        this._depth = parseInt(chunk.depth);
         this._oldPix = chunk.pixels;
         this._tupltype = chunk.tupltype;
         this._processRegions();
