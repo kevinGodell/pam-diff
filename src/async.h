@@ -3,6 +3,6 @@
 
 #include <napi.h>
 
-Napi::Value PixelsDiffAsync(const Napi::CallbackInfo& info);
+Napi::Value PixelsDiffAsync(const Napi::CallbackInfo &info);
 
 #endif

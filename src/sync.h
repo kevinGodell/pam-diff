@@ -3,6 +3,6 @@
 
 #include <napi.h>
 
-Napi::Array PixelsDiffSync(const Napi::CallbackInfo& info);
+Napi::Array PixelsDiffSync(const Napi::CallbackInfo &info);
 
 #endif
