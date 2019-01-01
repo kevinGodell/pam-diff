@@ -357,13 +357,13 @@ class PamDiff extends Transform {
 
         switch (engine) {
             case 'grayscale' :
-                this._pixelDiffEngine = PC.allDiffSync.bind(this, this._difference, this._percent, wxh, this._depth);
+                this._pixelDiffEngine = PC.allDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
                 break;
             //case 'grayscale_regions' :
                 //this._pixelDiffEngine = PC.compareGrayRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh);
                 //break;
             case 'grayscale_mask' :
-                this._pixelDiffEngine = PC.maskDiffSync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
+                this._pixelDiffEngine = PC.maskDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
                 //this._pixelDiffEngine = PC.compareGrayMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh);
                 break;
             //case 'grayscale_blob' :
@@ -376,14 +376,14 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.compareGrayMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh, this._width, this._height);
                 break;*/
             case 'rgb' :
-                this._pixelDiffEngine = PC.allDiffSync.bind(this, this._difference, this._percent, wxh, this._depth);
+                this._pixelDiffEngine = PC.allDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
                 //this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
                 break;
             //case 'rgb_regions' :
                 //this._pixelDiffEngine = PC.compareRgbRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3);
                 //break;
             case 'rgb_mask' :
-                this._pixelDiffEngine = PC.maskDiffSync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
+                this._pixelDiffEngine = PC.maskDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
                 //this._pixelDiffEngine = PC.compareRgbMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3);
                 break;
             /*case 'rgb_blob' :
@@ -396,14 +396,14 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.compareRgbMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3, this._width, this._height);
                 break;*/
             case 'rgb_alpha' :
-                this._pixelDiffEngine = PC.allDiffSync.bind(this, this._difference, this._percent, wxh, this._depth);
+                this._pixelDiffEngine = PC.allDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth);
                 //this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
                 break;
             //case 'rgb_alpha_regions' :
                 //this._pixelDiffEngine = PC.compareRgbaRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4);
                 //break;
             case 'rgb_alpha_mask' :
-                this._pixelDiffEngine = PC.maskDiffSync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
+                this._pixelDiffEngine = PC.maskDiffAsync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
                 //this._pixelDiffEngine = PC.compareRgbaMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4);
                 break;
             /*case 'rgb_alpha_blob' :
@@ -420,7 +420,7 @@ class PamDiff extends Transform {
         }
 
         if (process.env.NODE_ENV === 'development') {
-            this._parseChunk = this._parsePixelsDebug;
+            this._parseChunk = this._parsePixelsAsyncDebug;
             this._debugEngine = engine;
             this._debugCount = 0;
         } else {
@@ -457,7 +457,7 @@ class PamDiff extends Transform {
      * @private
      */
     _parsePixelsDebug(chunk) {
-        const debugCount = ++this._debugCount;
+        const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
         const results = this._pixelDiffEngine(this._oldPix, this._newPix);
@@ -479,8 +479,12 @@ class PamDiff extends Transform {
     }
 
     _parsePixelsAsyncDebug(chunk) {
+
+        const debugCount = this._debugCount++;
+        console.time(`${this._debugEngine}-${debugCount}`);
+
         //console.log('parse pixels')
-        const name = Math.random();
+        //const name = Math.random();
         //console.time(name)
         //console.time(this._pixelDiffEngine.name);
         //console.time(this._pixelDiffEngine.name);
@@ -511,6 +515,7 @@ class PamDiff extends Transform {
 
                 //console.timeEnd(this._pixelDiffEngine.name);
                 //console.timeEnd(name);
+                console.timeEnd(`${this._debugEngine}-${debugCount}`);
             });
 
         //})();
