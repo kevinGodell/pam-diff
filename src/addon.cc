@@ -3,8 +3,10 @@
 #include "async.h"
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
-    exports.Set(Napi::String::New(env, "pixelsDiffSync"), Napi::Function::New(env, PixelsDiffSync));
-    exports.Set(Napi::String::New(env, "pixelsDiffAsync"), Napi::Function::New(env, PixelsDiffAsync));
+    exports.Set(Napi::String::New(env, "allDiffSync"), Napi::Function::New(env, AllDiffSync));
+    exports.Set(Napi::String::New(env, "allDiffAsync"), Napi::Function::New(env, AllDiffAsync));
+    exports.Set(Napi::String::New(env, "maskDiffSync"), Napi::Function::New(env, MaskDiffSync));
+    exports.Set(Napi::String::New(env, "maskDiffAsync"), Napi::Function::New(env, MaskDiffAsync));
     /*exports.Set(Napi::String::New(env, "grayRegionsSync"), Napi::Function::New(env, GrayRegionsSync));
     exports.Set(Napi::String::New(env, "grayRegionsAsync"), Napi::Function::New(env, GrayRegionsAsync));
     exports.Set(Napi::String::New(env, "grayMaskSync"), Napi::Function::New(env, GrayRegionsSync));

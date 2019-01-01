@@ -36,3 +36,24 @@ uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCo
     }
     return 100 * diffs / pixCount;
 }
+
+//returns percent of changed pixels
+uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0; i < pixCount; i++) {
+        if (bitset[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
+        diffs++;
+    }
+    return 100 * diffs / bitsetCount;
+}
+
+//returns percent of changed pixels
+uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast32_t bufLen = pixCount * depth;
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
+        if (bitset[p] == 0 || pixDiff > RgbDiff(buf0, buf1, i)) continue;
+        diffs++;
+    }
+    return 100 * diffs / bitsetCount;
+}
