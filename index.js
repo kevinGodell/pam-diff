@@ -357,14 +357,14 @@ class PamDiff extends Transform {
 
         switch (engine) {
             case 'grayscale' :
-                this._pixelDiffEngine = PC.grayDiffAllAsync.bind(this, wxh, this._difference, this._percent);
+                this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
                 break;
             case 'grayscale_mask' :
-                this._pixelDiffEngine = PC.grayDiffMaskAsync.bind(this, wxh, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
+                this._pixelDiffEngine = PC.grayDiffMaskSync.bind(this, wxh, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
                 //this._pixelDiffEngine = PC.compareGrayMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh);
                 break;
             case 'grayscale_regions' :
-                this._pixelDiffEngine = PC.grayDiffRegionsAsync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
+                this._pixelDiffEngine = PC.grayDiffRegionsSync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
             //this._pixelDiffEngine = PC.compareGrayRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh);
                 break;
 
@@ -422,7 +422,7 @@ class PamDiff extends Transform {
         }
 
         if (process.env.NODE_ENV === 'development') {
-            this._parseChunk = this._parsePixelsAsyncDebug;
+            this._parseChunk = this._parsePixelsDebug;
             this._debugEngine = engine;
             this._debugCount = 0;
         } else {
