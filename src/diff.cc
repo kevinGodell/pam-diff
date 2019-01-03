@@ -1,10 +1,4 @@
 #include "diff.h"
-//#include <stdint.h>
-//#include <string>
-//#include <vector>
-//#include <string>
-//#include <sstream>
-//#include <iostream>
 #include <tuple>
 
 //gray all diff

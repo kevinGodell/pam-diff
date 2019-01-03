@@ -1,19 +1,10 @@
-#ifndef DIFF_H_
-#define DIFF_H_
+#ifndef SRC_DIFF_H_
+#define SRC_DIFF_H_
 
 #include <string>
-//#include <stdint.h>
-//#include <tuple>
 
-//region     =             name,              diff,                percent,      count,         bitset,               diffs
+//region     =             name,        diff,          percent,       count,         bitset,              diffs
 using Region = std::tuple <std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, const uint_fast8_t*, uint_fast32_t>;
-
-//using Region = std::tuple <std::string, const uint_fast8_t*>;
-
-/*struct MeasureDiffsStruct {
-    std::string name;
-    uint_fast8_t percent;
-};*/
 
 //absolute value
 inline uint_fast8_t AbsUint(int_fast16_t n) {

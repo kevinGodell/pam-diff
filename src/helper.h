@@ -1,5 +1,5 @@
-#ifndef HELPER_H_
-#define HELPER_H_
+#ifndef SRC_HELPER_H_
+#define SRC_HELPER_H_
 
 #include "diff.h"
 #include <napi.h>

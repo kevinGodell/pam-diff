@@ -4,7 +4,6 @@
       "target_name": "addon",
       "sources": [
         "src/addon.cc",
-        "src/helper.cc",
         "src/diff.cc",
         "src/gray_sync.cc",
         "src/gray_async.cc"

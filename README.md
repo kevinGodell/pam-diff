@@ -15,7 +15,7 @@ npm install pipe2pam --save
 ```
 ### usage:
 The following [example](https://github.com/kevinGodell/pam-diff/tree/master/examples/example.js) uses ffmpeg to connect to a rtsp ip camera video feed and generates 1000 downscaled rgb24 pam images at a rate of 1 per second. The pam images are piped from ffmpeg's stdout into pipe2pam to parse them into into pam objects. The pam objects are then piped into pam-diff to measure pixel differences. For each compared pixel that has a **difference** that exceeds the setting, it will be calculated to determine the percent of difference. If the **percent** of changed pixels exceeds the setting, a **diff** event will be emitted which contains a data object containing details. This example also shows how to take the pam image that triggered the diff event and convert it to a jpeg using ffmpeg.
-```
+```javascript
 const P2P = require('pipe2pam');
 const PamDiff = require('pam-diff');
 const ChildProcess = require('child_process');
