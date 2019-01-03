@@ -1,23 +1,14 @@
-#include <stdint.h>
 #include "diff.h"
+//#include <stdint.h>
+//#include <string>
+//#include <vector>
+//#include <string>
+//#include <sstream>
+//#include <iostream>
+//#include <tuple>
 
-//absolute value
-inline uint_fast8_t AbsUint(int_fast16_t n) {
-    return (n > 0) ? n : -n;
-}
-
-//measure difference of gray bytes
-inline uint_fast8_t GrayDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t i) {
-    return AbsUint(buf0[i] - buf1[i]);
-}
-
-//measure difference of rgb/rgba bytes
-inline uint_fast8_t RgbDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t i) {
-    return AbsUint(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
-}
-
-//returns percent of changed pixels
-uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+//gray all diff
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
         if (pixDiff > GrayDiff(buf0, buf1, i)) continue;
@@ -26,8 +17,29 @@ uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCo
     return 100 * diffs / pixCount;
 }
 
-//returns percent of changed pixels
-uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+//gray mask diff
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const uint_fast8_t *bitset, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0; i < pixCount; i++) {
+        if (bitset[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
+        diffs++;
+    }
+    return 100 * diffs / bitsetCount;
+}
+
+//gray regions diff
+void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    for (uint_fast32_t i = 0, j = 0, diff = 0; i < pixCount; i++) {
+         diff = GrayDiff(buf0, buf1, i);
+         if (minDiff > diff) continue;
+         for (j = 0; j < regLen; j++) {
+            if (std::get<4>(regionsArr[j])[i] && diff >= std::get<1>(regionsArr[j])) std::get<5>(regionsArr[j])++;
+         }
+    }
+}
+
+//rgb all diff
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t bufLen = pixCount * depth;
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += depth) {
@@ -37,18 +49,8 @@ uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCo
     return 100 * diffs / pixCount;
 }
 
-//returns percent of changed pixels
-uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    uint_fast32_t diffs = 0;
-    for (uint_fast32_t i = 0; i < pixCount; i++) {
-        if (bitset[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
-        diffs++;
-    }
-    return 100 * diffs / bitsetCount;
-}
-
-//returns percent of changed pixels
-uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+//rgb mask diff
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const uint_fast8_t *bitset, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t bufLen = pixCount * depth;
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
@@ -56,4 +58,16 @@ uint_fast8_t DiffsPercent(const uint_fast32_t pixDiff, const uint_fast32_t pixCo
         diffs++;
     }
     return 100 * diffs / bitsetCount;
+}
+
+//rgb regions diff
+void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast32_t bufLen = pixCount * depth;
+    for (uint_fast32_t i = 0, j = 0, p = 0, diff = 0; i < bufLen; i += depth, p++) {
+        diff = RgbDiff(buf0, buf1, i);
+        if (minDiff > diff) continue;
+        for (j = 0; j < regLen; j++) {
+            if (std::get<4>(regionsArr[j])[p] && diff >= std::get<1>(regionsArr[j])) std::get<5>(regionsArr[j])++;
+        }
+    }
 }
