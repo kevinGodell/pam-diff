@@ -1,21 +1,27 @@
 #include <napi.h>
 #include "diff.h"
 #include "async.h"
+#include <iostream>
 
-class AllDiffWorker : public Napi::AsyncWorker {
+class DiffAllWorker : public Napi::AsyncWorker {
 
 public:
 
-    AllDiffWorker(const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    DiffAllWorker(const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb), pixDiff_(pixDiff), diffsPerc_(diffsPerc), pixCount_(pixCount), pixDepth_(pixDepth), buf0_(buf0), buf1_(buf1), percentResult_(0) {
     }
 
-    ~AllDiffWorker() {}
+    ~DiffAllWorker() {}
 
     void Execute() {
+
+    DiffsPercentStruct asf;
         switch (this->pixDepth_) {
             case 1:
-                this->percentResult_ = DiffsPercent(pixDiff_, pixCount_, buf0_, buf1_);
+                //this->percentResult_ = 0;
+                asf = DiffsPercent(pixDiff_, pixCount_, buf0_, buf1_);
+                //std::cout << +asf.percent << std::endl;
+                this->percentResult_ = asf.percent;
                 break;
             case 3:
             case 4:
@@ -51,7 +57,7 @@ private:
     uint_fast8_t percentResult_;// percent placeholder
 };
 
-Napi::Value AllDiffAsync(const Napi::CallbackInfo &info) {
+Napi::Value DiffAllAsync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t pixDiff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t diffsPerc = info[1].As<Napi::Number>().Uint32Value();
@@ -60,22 +66,22 @@ Napi::Value AllDiffAsync(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[6].As<Napi::Function>();
-    AllDiffWorker *allDiffWorker = new AllDiffWorker(pixDiff, diffsPerc, pixCount, pixDepth, buf0, buf1, cb);
-    allDiffWorker->Queue();
+    DiffAllWorker *diffAllWorker = new DiffAllWorker(pixDiff, diffsPerc, pixCount, pixDepth, buf0, buf1, cb);
+    diffAllWorker->Queue();
     return env.Undefined();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class MaskDiffWorker : public Napi::AsyncWorker {
+class DiffMaskWorker : public Napi::AsyncWorker {
 
 public:
 
-    MaskDiffWorker(const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    DiffMaskWorker(const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t *bitset, const uint_fast32_t bitsetCount, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb), pixDiff_(pixDiff), diffsPerc_(diffsPerc), pixCount_(pixCount), pixDepth_(pixDepth), bitset_(bitset), bitsetCount_(bitsetCount), buf0_(buf0), buf1_(buf1), percentResult_(0) {
     }
 
-    ~MaskDiffWorker() {}
+    ~DiffMaskWorker() {}
 
     void Execute() {
         switch (this->pixDepth_) {
@@ -106,7 +112,6 @@ public:
     }
 
 private:
-
     const uint_fast8_t pixDiff_;// can only be 0 - 255
     const uint_fast8_t diffsPerc_;// minimum percent 0 - 100
     const uint_fast32_t pixCount_;// number of pixels
@@ -118,7 +123,7 @@ private:
     uint_fast8_t percentResult_;// percent placeholder
 };
 
-Napi::Value MaskDiffAsync(const Napi::CallbackInfo &info) {
+Napi::Value DiffMaskAsync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t pixDiff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t diffsPerc = info[1].As<Napi::Number>().Uint32Value();
@@ -129,7 +134,7 @@ Napi::Value MaskDiffAsync(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[6].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[7].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[8].As<Napi::Function>();
-    MaskDiffWorker *maskDiffWorker = new MaskDiffWorker(pixDiff, diffsPerc, pixCount, pixDepth, bitset, bitsetCount, buf0, buf1, cb);
-    maskDiffWorker->Queue();
+    DiffMaskWorker *diffMaskWorker = new DiffMaskWorker(pixDiff, diffsPerc, pixCount, pixDepth, bitset, bitsetCount, buf0, buf1, cb);
+    diffMaskWorker->Queue();
     return env.Undefined();
 }

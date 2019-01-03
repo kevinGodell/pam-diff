@@ -3,7 +3,7 @@
 //#include <iostream> /* needed for std::cout */
 #include "ccl.c"
 
-//region     =            name,        diff,          percent,       count,         bitset,                       diffs
+//region     =            name,         diff,          percent,       count,         bitset,                       diffs
 using Region = std::tuple <std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, Napi::Buffer<uint_fast8_t>, uint_fast32_t>;
 
 //blob     =            label,         count,         minX,          maxX,          minY,          maxY
@@ -250,8 +250,7 @@ Napi::Array CompareGrayRegions(const Napi::CallbackInfo &info) {
         const uint_fast32_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
         const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
         const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-        const Napi::Buffer <uint_fast8_t> bitset =
-                regionsArr.Get(i).As<Napi::Object>().Get("bitset").As < Napi::Buffer < uint_fast8_t >> ();
+        const Napi::Buffer <uint_fast8_t> bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As < Napi::Buffer < uint_fast8_t >> ();
         regionsVec[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
     }
 

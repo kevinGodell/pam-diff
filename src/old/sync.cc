@@ -1,8 +1,9 @@
 #include <napi.h>
 #include "diff.h"
 #include "sync.h"
+#include <iostream>
 
-Napi::Array AllDiffSync(const Napi::CallbackInfo &info) {
+Napi::Array DiffAllSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t pixDiff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t diffsPerc = info[1].As<Napi::Number>().Uint32Value();
@@ -11,10 +12,15 @@ Napi::Array AllDiffSync(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
 
+DiffsPercentStruct asf;
     uint_fast8_t percentResult = 0;
     switch (pixDepth) {
         case 1:// gray
-            percentResult = DiffsPercent(pixDiff, pixCount, buf0, buf1);
+            //percentResult = DiffsPercent(pixDiff, pixCount, buf0, buf1);
+            //percentResult = 0;
+            asf = DiffsPercent(pixDiff, pixCount, buf0, buf1);
+            //std::cout << +asf.percent << std::endl;
+            percentResult = asf.percent;
             break;
         case 3:// rgb
         case 4:// rgba
@@ -32,7 +38,7 @@ Napi::Array AllDiffSync(const Napi::CallbackInfo &info) {
     return resultsArray;
 }
 
-Napi::Array MaskDiffSync(const Napi::CallbackInfo &info) {
+Napi::Array DiffMaskSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t pixDiff = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t diffsPerc = info[1].As<Napi::Number>().Uint32Value();
