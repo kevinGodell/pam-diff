@@ -2,6 +2,10 @@
 
 process.env.NODE_ENV = 'development';
 
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
+
 console.time('=====> testing gray pam diffs with no region set');
 
 const assert = require('assert');

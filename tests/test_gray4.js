@@ -1,8 +1,12 @@
 'use strict';
 
-process.env.UV_THREADPOOL_SIZE = 100;
+//process.env.UV_THREADPOOL_SIZE = 100;
 
 process.env.NODE_ENV = 'development';
+
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
 
 console.time('=====> testing gray pam diffs with 4 regions set');
 
