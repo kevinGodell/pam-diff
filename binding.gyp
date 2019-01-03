@@ -27,8 +27,7 @@
           "xcode_settings": {
             "CLANG_CXX_LIBRARY": "libc++",
             "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-            "MACOSX_DEPLOYMENT_TARGET": "10.7",
-            "GCC_ENABLE_CPP_RTTI": "NO"
+            "MACOSX_DEPLOYMENT_TARGET": "10.7"
           }
         }]
       ]
