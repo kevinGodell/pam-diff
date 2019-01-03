@@ -4,9 +4,10 @@
       "target_name": "addon",
       "sources": [
         "src/addon.cc",
+        "src/helper.cc",
         "src/diff.cc",
-        "src/sync.cc",
-        "src/async.cc"
+        "src/gray_sync.cc",
+        "src/gray_async.cc"
       ],
       "cflags!": [ "-fno-exceptions" ],
       "cflags_cc!": [ "-fno-exceptions" ],
