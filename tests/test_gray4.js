@@ -1,8 +1,8 @@
 'use strict';
 
-//process.env.UV_THREADPOOL_SIZE = 100;
+const dotenv = require('dotenv');
 
-process.env.NODE_ENV = 'development';
+dotenv.config();
 
 const {cpus} = require('os');
 
@@ -20,7 +20,9 @@ const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
 
-const pamCount = 1000;
+const async = process.env.ASYNC|| false;
+
+const pamCount = 10;
 
 let pamCounter = 0;
 
@@ -58,7 +60,7 @@ const params = [
 
 const p2p = new P2P();
 
-p2p.on('pam', (data) => {
+p2p.on('pam', data => {
     pamCounter++;
 });
 
@@ -72,16 +74,16 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, async: true});
+const pamDiff = new PamDiff({regions : regions, async: async});
 
-pamDiff.on('diff', (data) => {
+pamDiff.on('diff', data => {
     assert(data.trigger[3].name === 'region4', 'trigger name is not correct');
     assert(data.trigger[3].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, {stdio: ['ignore', 'pipe', 'inherit']});
 
-ffmpeg.on('error', (error) => {
+ffmpeg.on('error', error => {
     console.log(error);
 });
 

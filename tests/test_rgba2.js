@@ -1,6 +1,12 @@
 'use strict';
 
-process.env.NODE_ENV = 'development';
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
 
 console.time('=====> testing rgba pam diffs with 2 region masks set');
 
@@ -13,6 +19,8 @@ const PamDiff = require('../index');
 const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
+
+const async = process.env.ASYNC|| false;
 
 const pamCount = 10;
 
@@ -52,7 +60,7 @@ const params = [
 
 const p2p = new P2P();
 
-p2p.on('pam', (data) => {
+p2p.on('pam', data => {
     pamCounter++;
 });
 
@@ -62,7 +70,7 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[0].name === 'mask', 'trigger name is not correct');

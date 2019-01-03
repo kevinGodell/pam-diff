@@ -1,6 +1,12 @@
 'use strict';
 
-process.env.NODE_ENV = 'development';
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
 
 console.time('=====> testing rgba pam diffs with a single region set');
 
@@ -13,6 +19,8 @@ const PamDiff = require('../index');
 const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
+
+const async = process.env.ASYNC|| false;
 
 const pamCount = 10;
 
@@ -52,7 +60,7 @@ const params = [
 
 const p2p = new P2P();
 
-p2p.on('pam', (data) => {
+p2p.on('pam', data => {
     pamCounter++;
 });
 
@@ -60,16 +68,16 @@ const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y:
 
 const regions = [region1];
 
-const pamDiff = new PamDiff({regions : regions});
+const pamDiff = new PamDiff({regions : regions, async: async});
 
-pamDiff.on('diff', (data) => {
+pamDiff.on('diff', data => {
     assert(data.trigger[0].name === 'region1', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, {stdio: ['ignore', 'pipe', 'inherit']});
 
-ffmpeg.on('error', (error) => {
+ffmpeg.on('error', error => {
     console.log(error);
 });
 
