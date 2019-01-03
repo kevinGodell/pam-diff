@@ -14,7 +14,7 @@ public:
     ~GrayDiffAllWorker() {}
 
     void Execute() {
-        this->percentResult_ = MeasureDiffs(pixCount_, pixDiff_, buf0_, buf1_);
+        this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDiff_, this->buf0_, this->buf1_);
     }
 
     void OnOK() {
@@ -64,7 +64,7 @@ public:
     ~GrayDiffMaskWorker() {}
 
     void Execute() {
-        this->percentResult_ = MeasureDiffs(pixCount_, pixDiff_, bitsetCount_, bitset_, buf0_, buf1_);
+        this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitset_, this->buf0_, this->buf1_);
     }
 
     void OnOK() {
@@ -118,7 +118,7 @@ public:
     ~GrayDiffRegionsWorker() {}
 
     void Execute() {
-        MeasureDiffs(pixCount_, minDiff_, regionsLen_, regions_, buf0_, buf1_);
+        MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regions_, this->buf0_, this->buf1_);
     }
 
     void OnOK() {
