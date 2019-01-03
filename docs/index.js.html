@@ -409,6 +409,8 @@ class PamDiff extends Transform {
             engine += '_regions';
         } else if (this._maskObj) {
             engine += '_mask';
+        } else {
+            engine += '_all';
         }
 
         if (this._blobSize) {
@@ -430,7 +432,7 @@ class PamDiff extends Transform {
         }
 
         switch (engine) {
-            case 'grayscale_sync' :
+            case 'grayscale_all_sync' :
                 this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
                 break;
             case 'grayscale_mask_sync' :
@@ -439,8 +441,7 @@ class PamDiff extends Transform {
             case 'grayscale_regions_sync' :
                 this._pixelDiffEngine = PC.grayDiffRegionsSync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
                 break;
-
-            case 'grayscale_async' :
+            case 'grayscale_all_async' :
                 this._pixelDiffEngine = PC.grayDiffAllAsync.bind(this, wxh, this._difference, this._percent);
                 break;
             case 'grayscale_mask_async' :
@@ -450,55 +451,31 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.grayDiffRegionsAsync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
                 break;
 
-                //case 'grayscale_blob' :
-                //this._pixelDiffEngine = PC.compareGrayPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh, this._width, this._height, this._blobSize);
-                //break;
-            /*case 'grayscale_regions_blob' :
-                this._pixelDiffEngine = PC.compareGrayRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh, this._width, this._height);
+
+            case 'rgb_all_sync' :
+            case 'rgb_alpha_all_sync' :
+                this._pixelDiffEngine = PC.rgbDiffAllSync.bind(this, wxh, this._depth, this._difference, this._percent);
                 break;
-            case 'grayscale_mask_blob' :
-                this._pixelDiffEngine = PC.compareGrayMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh, this._width, this._height);
-                break;*/
-            //case 'rgb' :
-                //this._pixelDiffEngine = PC.diffAllAsync.bind(this, this._difference, this._percent, wxh, this._depth);
-                //this._pixelDiffEngine = PC.compareRgbPixels.bind(this, this._difference, this._percent, wxh, wxh * 3);
-                //break;
-            //case 'rgb_regions' :
-                //this._pixelDiffEngine = PC.compareRgbRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3);
-                //break;
-            //case 'rgb_mask' :
-                //this._pixelDiffEngine = PC.diffMaskAsync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
-                //this._pixelDiffEngine = PC.compareRgbMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3);
-              //  break;
-            /*case 'rgb_blob' :
-                this._pixelDiffEngine = PC.compareRgbPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh * 3, this._width, this._height);
+            case 'rgb_mask_sync' :
+            case 'rgb_alpha_mask_sync' :
+                this._pixelDiffEngine = PC.rgbDiffMaskSync.bind(this, wxh, this._depth, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
                 break;
-            case 'rgb_regions_blob' :
-                this._pixelDiffEngine = PC.compareRgbRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 3, this._width, this._height);
+            case 'rgb_regions_sync' :
+            case 'rgb_alpha_regions_sync' :
+                this._pixelDiffEngine = PC.rgbDiffRegionsSync.bind(this, wxh, this._depth, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
                 break;
-            case 'rgb_mask_blob' :
-                this._pixelDiffEngine = PC.compareRgbMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 3, this._width, this._height);
-                break;*/
-            //case 'rgb_alpha' :
-                //this._pixelDiffEngine = PC.diffAllAsync.bind(this, this._difference, this._percent, wxh, this._depth);
-                //this._pixelDiffEngine = PC.compareRgbaPixels.bind(this, this._difference, this._percent, wxh, wxh * 4);
-                //break;
-            //case 'rgb_alpha_regions' :
-                //this._pixelDiffEngine = PC.compareRgbaRegions.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4);
-                //break;
-            //case 'rgb_alpha_mask' :
-                //this._pixelDiffEngine = PC.diffMaskAsync.bind(this, this._difference, this._percent, wxh, this._depth, this._maskObj.bitset, this._maskObj.count);
-                //this._pixelDiffEngine = PC.compareRgbaMask.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4);
-                //break;
-            /*case 'rgb_alpha_blob' :
-                this._pixelDiffEngine = PC.compareRgbaPixelsBlob.bind(this, this._difference, this._percent, wxh, wxh * 4, this._width, this._height);
+            case 'rgb_all_async' :
+            case 'rgb_alpha_all_async' :
+                this._pixelDiffEngine = PC.rgbDiffAllAsync.bind(this, wxh, this._depth, this._difference, this._percent);
                 break;
-            case 'rgb_alpha_regions_blob' :
-                this._pixelDiffEngine = PC.compareRgbaRegionsBlob.bind(this, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions, wxh * 4, this._width, this._height);
+            case 'rgb_mask_async' :
+            case 'rgb_alpha_mask_async' :
+                this._pixelDiffEngine = PC.rgbDiffMaskAsync.bind(this, wxh, this._depth, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
                 break;
-            case 'rgb_alpha_mask_blob' :
-                this._pixelDiffEngine = PC.compareRgbaMaskBlob.bind(this, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset, wxh * 4, this._width, this._height);
-                break;*/
+            case 'rgb_regions_async' :
+            case 'rgb_alpha_regions_async' :
+                this._pixelDiffEngine = PC.rgbDiffRegionsAsync.bind(this, wxh, this._depth, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
+                break;
             default:
                 throw new Error(`Did not find a matching engine for ${engine}`);
         }
@@ -719,7 +696,7 @@ module.exports = PamDiff;
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jan 03 2019 10:09:26 GMT-0600 (Central Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jan 03 2019 13:39:48 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
