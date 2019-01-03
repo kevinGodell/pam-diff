@@ -62,7 +62,7 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: true});
 
 pamDiff.on('diff', (data) => {
     assert(data.trigger[0].name === 'mask', 'trigger name is not correct');
