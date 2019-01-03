@@ -28,7 +28,7 @@
 
 <header>
     
-        <h2><span class="attribs"><span class="type-signature"></span></span>PamDiff<span class="signature">(options<span class="signature-attributes">opt</span>, mask<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>PamDiff<span class="signature">(options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h2>
         
     
 </header>
@@ -41,7 +41,7 @@
     
 
     
-    <h4 class="name" id="PamDiff"><span class="type-signature"></span>new PamDiff<span class="signature">(options<span class="signature-attributes">opt</span>, mask<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="PamDiff"><span class="type-signature"></span>new PamDiff<span class="signature">(options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
     
 
     
@@ -127,12 +127,53 @@
         
 
         
+        <th>Default</th>
+        
 
         <th class="last">Description</th>
     </tr>
     </thead>
 
     <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>async</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
+
+            <td class="description last">Pixel change detection will be sent to a libuv worker thread.</td>
+        </tr>
+
     
 
         <tr>
@@ -161,6 +202,12 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                    5
+                
+                </td>
             
 
             <td class="description last">Pixel difference value 1 to 255</td>
@@ -195,6 +242,12 @@
             
 
             
+                <td class="default">
+                
+                    5
+                
+                </td>
+            
 
             <td class="description last">Percent of pixels that exceed difference value.</td>
         </tr>
@@ -227,6 +280,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Array of regions.</td>
@@ -261,6 +318,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">Name of region.</td>
         </tr>
@@ -293,6 +354,10 @@
                 </td>
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Difference value for region.</td>
@@ -327,6 +392,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">Percent value for region.</td>
         </tr>
@@ -360,15 +429,12 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
         </tr>
 
     
@@ -400,8 +466,58 @@
             
 
             
+                <td class="default">
+                
+                    false
+                
+                </td>
+            
 
             <td class="description last">Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>blob</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Number of pixels connected at top, right, bottom, left to be considered a blob.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
         </tr>
 
     
@@ -475,7 +591,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line24">line 24</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line26">line 26</a>
     </li></ul></dd>
     
 
@@ -523,7 +639,7 @@
 
         
             
-<h4 class="name" id="callback"><span class="type-signature"></span>callback<span class="type-signature"></span></h4>
+<h4 class="name" id="blobSize"><span class="type-signature"></span>blobSize<span class="type-signature"></span></h4>
 
 
 
@@ -563,7 +679,65 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line189">line 189</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line205">line 205</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="blobSize"><span class="type-signature"></span>blobSize<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line214">line 214</a>
     </li></ul></dd>
     
 
@@ -621,7 +795,65 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line203">line 203</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line232">line 232</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="callback"><span class="type-signature"></span>callback<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line246">line 246</a>
     </li></ul></dd>
     
 
@@ -679,7 +911,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line93">line 93</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line87">line 87</a>
     </li></ul></dd>
     
 
@@ -737,7 +969,123 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line84">line 84</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line96">line 96</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="mask"><span class="type-signature"></span>mask<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line177">line 177</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="mask"><span class="type-signature"></span>mask<span class="type-signature"></span></h4>
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line187">line 187</a>
     </li></ul></dd>
     
 
@@ -795,7 +1143,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line120">line 120</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line114">line 114</a>
     </li></ul></dd>
     
 
@@ -853,7 +1201,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line111">line 111</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line123">line 123</a>
     </li></ul></dd>
     
 
@@ -911,7 +1259,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line156">line 156</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line141">line 141</a>
     </li></ul></dd>
     
 
@@ -969,7 +1317,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line138">line 138</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line159">line 159</a>
     </li></ul></dd>
     
 
@@ -1045,7 +1393,151 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line221">line 221</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line264">line 264</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PamDiff.html">PamDiff</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setBlobSize"><span class="type-signature"></span>setBlobSize<span class="signature">(number)</span><span class="type-signature"> &rarr; {<a href="PamDiff.html">PamDiff</a>}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>number</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line223">line 223</a>
     </li></ul></dd>
     
 
@@ -1194,7 +1686,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line212">line 212</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line255">line 255</a>
     </li></ul></dd>
     
 
@@ -1343,7 +1835,156 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line102">line 102</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type"><a href="PamDiff.html">PamDiff</a></span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="setMask"><span class="type-signature"></span>setMask<span class="signature">(bool)</span><span class="type-signature"> &rarr; {<a href="PamDiff.html">PamDiff</a>}</span></h4>
+    
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>bool</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line196">line 196</a>
     </li></ul></dd>
     
 
@@ -1492,7 +2133,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line129">line 129</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line132">line 132</a>
     </li></ul></dd>
     
 
@@ -1641,7 +2282,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="index.js.html">index.js</a>, <a href="index.js.html#line165">line 165</a>
+        <a href="index.js.html">index.js</a>, <a href="index.js.html#line168">line 168</a>
     </li></ul></dd>
     
 
@@ -1709,7 +2350,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Feb 15 2018 11:11:52 GMT-0600 (CST)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Jan 03 2019 08:50:51 GMT-0600 (Central Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
