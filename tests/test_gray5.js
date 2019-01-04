@@ -1,14 +1,8 @@
 'use strict';
 
-const dotenv = require('dotenv');
+process.env.NODE_ENV = 'development';
 
-dotenv.config();
-
-const {cpus} = require('os');
-
-console.log(`cpu cores available: ${cpus().length}`);
-
-console.time('=====> testing gray pam diffs with a single region set');
+console.time('=====> testing gray pam blob diffs with no region set');
 
 const assert = require('assert');
 
@@ -20,15 +14,13 @@ const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
 
-const async = process.env.ASYNC|| false;
-
 const pamCount = 10;
 
 let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [13, 13, 13, 13, 13, 13, 13, 13, 13];
+const pamDiffResults = [14, 15, 14, 14, 14, 14, 14, 14, 14];
 
 const params = [
     /* log info to console */
@@ -42,6 +34,9 @@ const params = [
     'lavfi',
     '-i',
     'testsrc=size=1920x1080:rate=15',
+
+    //'-rtsp_transport', 'tcp',
+    //'-i', 'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
 
     /* set output flags */
     '-an',
@@ -60,31 +55,36 @@ const params = [
 
 const p2p = new P2P();
 
-p2p.on('pam', data => {
+p2p.on('pam', (data) => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+const pamDiff = new PamDiff({difference: 1, percent: 1, blobSize: 1000});
 
-const regions = [region1];
-
-const pamDiff = new PamDiff({regions : regions, async: async});
-
-pamDiff.on('diff', data => {
-    assert(data.trigger[0].name === 'region1', 'trigger name is not correct');
+pamDiff.on('diff', (data) => {
+    //console.log(data.trigger[0].blobs);
+    if (pamDiffCounter === 1) {
+        assert(data.trigger[0].blobs[0].label === 3);
+        assert(data.trigger[0].blobs[0].size === 10342);
+        assert(data.trigger[0].blobs[0].minX === 0);
+        assert(data.trigger[0].blobs[0].maxX === 332);
+        assert(data.trigger[0].blobs[0].minY === 167);
+        assert(data.trigger[0].blobs[0].maxY === 198);
+    }
+    assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, {stdio: ['ignore', 'pipe', 'inherit']});
 
-ffmpeg.on('error', error => {
+ffmpeg.on('error', (error) => {
     console.log(error);
 });
 
 ffmpeg.on('exit', (code, signal) => {
     assert(code === 0, `FFMPEG exited with code ${code} and signal ${signal}`);
     assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
-    console.timeEnd('=====> testing gray pam diffs with a single region set');
+    console.timeEnd('=====> testing gray pam blob diffs with no region set');
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

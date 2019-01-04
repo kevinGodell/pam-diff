@@ -1,10 +1,7 @@
 'use strict';
 
-process.env.NODE_ENV = 'development';
-
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const ffmpegPath = require('ffmpeg-static').path;
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;
@@ -12,30 +9,43 @@ const execFile = ChildProcess.execFile;
 const params = [
     '-loglevel',
     'quiet',
-
+    
     /* use hardware acceleration */
     '-hwaccel',
     'auto',//vda, videotoolbox, none, auto
 
-    /* use a pre-recorded mp4 video as input */
-    //'-re',//comment out to have ffmpeg read video as fast as possible
+    /* use an artificial video input */
+    '-re',
+    '-f',
+    'lavfi',
     '-i',
-    `${__dirname}/in/sample.mp4`,
+    'testsrc=size=1920x1080:rate=15',
+
+    /* use an rtsp ip cam video input */
+    /*'-rtsp_transport',
+    'tcp',
+    '-i',
+    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',*/
 
     /* set output flags */
     '-an',
     '-c:v',
     'pam',
     '-pix_fmt',
-    'gray',
+    //'gray',
+    //'rgba',
+    'rgb24',
     '-f',
     'image2pipe',
     '-vf',
-    'fps=2,scale=640:360',
+    'fps=2,scale=400:225',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
+    //'fps=1,scale=iw*1/6:ih*1/6',
+    '-frames',
+    '100',
     'pipe:1'
 ];
 
-const ffmpeg = spawn(ffmpegPath, params, {
+const ffmpeg = spawn('ffmpeg', params, {
     stdio: ['ignore', 'pipe', 'ignore']
 });
 
@@ -48,7 +58,6 @@ ffmpeg.on('error', (error) => {
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
     console.log(diffCount);
-    console.timeEnd('grayOut.js');
 });
 
 const p2p = new P2P();
@@ -60,13 +69,13 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 9, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
 
-const region2 = {name: 'region2', difference: 9, percent: 9, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
 
-const region3 = {name: 'region3', difference: 9, percent: 9, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 200, y: 0}, {x: 200, y: 225}, {x: 300, y: 225}, {x: 300, y: 0}]};
 
-const region4 = {name: 'region4', difference: 9, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, y: 0}, {x: 300, y: 225}, {x: 400, y: 225}, {x: 400, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
@@ -76,9 +85,11 @@ let diffCount = 0;
 
 pamDiff.on('diff', (data) => {
     //console.log(data);
+
     diffCount++;
+
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    //if(true){return;}
+    if(true){return;}
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
@@ -86,8 +97,7 @@ pamDiff.on('diff', (data) => {
         name += `(${region.name}=${region.percent})`;
     }
     const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `${__dirname}/out/gray/${jpeg}`;
-    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
+    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
         if (data === 0) {
@@ -98,5 +108,23 @@ pamDiff.on('diff', (data) => {
     });
 });
 
-console.time('grayOut.js');
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
+
+let tempRegions;
+
+setTimeout(()=> {
+    console.log('reset cache while running -----------------------------------------------------------\n');
+    pamDiff.resetCache();
+}, 10000);
+
+setTimeout(()=> {
+    console.log('delete regions while running -----------------------------------------------------------\n');
+    tempRegions = pamDiff.regions;
+    pamDiff.regions = null;
+}, 20000);
+
+
+setTimeout(()=> {
+    console.log('add regions while running -----------------------------------------------------------\n');
+    pamDiff.regions = tempRegions;
+}, 30000);

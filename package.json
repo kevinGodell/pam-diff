@@ -4,6 +4,8 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
+    "install": "node-gyp rebuild",
+    "pretest": "npm install",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm test",
     "postversion": "npm run doc",
@@ -11,9 +13,12 @@
     "out": " node examples/grayOut && node examples/rgb24Out",
     "all": "npm test && npm run examples && npm run out",
     "doc": "jsdoc index.js -d docs && git commit -m 'update docs' -- docs",
+    "__gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3 && node tests/test_gray4 && node tests/test_gray5 && node tests/test_gray6",
     "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3 && node tests/test_gray4",
     "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3 && node tests/test_rgb4",
-    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3 && node tests/test_rgba4"
+    "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3 && node tests/test_rgba4",
+    "pub": "npm publish -tag n-api",
+    "exp": "npm install && node tests/test_gray5 && node tests/test_gray6"
   },
   "repository": {
     "type": "git",
@@ -36,12 +41,15 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
+    "bindings": "^1.3.1",
+    "node-addon-api": "^1.6.2",
     "polygon-points": "^0.5.1"
   },
   "devDependencies": {
-    "ffmpeg-static": "^2.3.0",
+    "dotenv": "^6.2.0",
+    "ffmpeg-static": "^2.4.0",
     "jsdoc": "^3.5.5",
     "pipe2pam": "^0.6.2"
   },
-  "private": false
+  "private": true
 }
