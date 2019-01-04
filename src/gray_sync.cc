@@ -1,12 +1,8 @@
 #include "gray_sync.h"
 #include "diff.h"
 #include "helper.h"
+#include <stdint.h>
 #include <napi.h>
-//#include <iostream>
-//#include <vector>
-//#include <string>
-//#include <sstream>
-//#include <iostream>
 
 Napi::Array GrayDiffAllSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();

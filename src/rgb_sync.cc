@@ -1,6 +1,7 @@
 #include "rgb_sync.h"
 #include "diff.h"
 #include "helper.h"
+#include <stdint.h>
 #include <napi.h>
 
 Napi::Array RgbDiffAllSync(const Napi::CallbackInfo &info) {

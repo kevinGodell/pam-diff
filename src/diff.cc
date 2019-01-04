@@ -1,5 +1,4 @@
 #include "diff.h"
-#include <tuple>
 
 //gray all diff
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {

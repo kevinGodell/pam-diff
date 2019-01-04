@@ -1,6 +1,8 @@
 #ifndef SRC_DIFF_H_
 #define SRC_DIFF_H_
 
+#include <stdint.h>
+#include <tuple>
 #include <string>
 
 //region     =             name,        diff,          percent,       count,         bitset,              diffs

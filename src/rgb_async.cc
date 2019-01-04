@@ -1,6 +1,7 @@
 #include "rgb_async.h"
 #include "diff.h"
 #include "helper.h"
+#include <stdint.h>
 #include <napi.h>
 
 class RgbDiffAllWorker : public Napi::AsyncWorker {
