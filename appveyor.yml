@@ -1,6 +1,8 @@
 image: Visual Studio 2017
 environment:
   matrix:
+    - nodejs_version: 8
+    - nodejs_version: 9
     - nodejs_version: LTS
     - nodejs_version: Current
 platform:
@@ -17,7 +19,7 @@ test_script:
   - node --version
   - npm --version
   - npm test
-on_success:
-  - npm run examples
-  - npm run out
+#on_success:
+#  - npm run examples
+#  - npm run out
 build: off
