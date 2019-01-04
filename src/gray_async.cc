@@ -31,7 +31,6 @@ private:
     const uint_fast32_t pixCount_;// number of pixels
     const uint_fast8_t pixDiff_;// can only be 0 - 255
     const uint_fast8_t diffsPerc_;// minimum percent 0 - 100
-    //const uint_fast8_t pixDepth_;// bytes per pixel 1(gray) 3(rgb) 4(rgba)
     const uint_fast8_t *buf0_;// pixel buffer
     const uint_fast8_t *buf1_;// pixel buffer
     uint_fast8_t percentResult_;// percent placeholder
@@ -136,11 +135,9 @@ private:
     const uint_fast32_t pixCount_;// number of pixels
     const uint_fast8_t minDiff_;// can only be 0 - 255
     const uint_fast8_t regionsLen_;// number of 1's in bitset, others are 0
-    //const uint_fast8_t pixDepth_;// bytes per pixel 1(gray) 3(rgb) 4(rgba)
     Region *regions_;// Region array
     const uint_fast8_t *buf0_;// pixel buffer
     const uint_fast8_t *buf1_;// pixel buffer
-    //uint_fast8_t percentResult_;// percent placeholder
 };
 
 Napi::Value GrayDiffRegionsAsync(const Napi::CallbackInfo &info) {
