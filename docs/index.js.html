@@ -34,6 +34,7 @@ const PP = require('polygon-points');
 
 const PC = require('bindings')('addon');
 
+
 class PamDiff extends Transform {
 
     /**
@@ -224,6 +225,21 @@ class PamDiff extends Transform {
      */
     setRegions(array) {
         this.regions = array;
+        return this;
+    }
+
+    set mask(bool) {
+        this._mask = PamDiff._validateBoolean(bool);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    get mask() {
+        return this._mask;
+    }
+
+    setMask(bool) {
+        this.mask = bool;
         return this;
     }
 
@@ -450,8 +466,6 @@ class PamDiff extends Transform {
             case 'grayscale_regions_async' :
                 this._pixelDiffEngine = PC.grayDiffRegionsAsync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
                 break;
-
-
             case 'rgb_all_sync' :
             case 'rgb_alpha_all_sync' :
                 this._pixelDiffEngine = PC.rgbDiffAllSync.bind(this, wxh, this._depth, this._difference, this._percent);
@@ -496,7 +510,6 @@ class PamDiff extends Transform {
             default:
                 throw new Error(`Did not find a matching parser for ${parser}`);
         }
-
     }
 
     /**
@@ -681,6 +694,7 @@ class PamDiff extends Transform {
  */
 module.exports = PamDiff;
 </code></pre>
+
         </article>
     </section>
 

@@ -199,6 +199,21 @@ class PamDiff extends Transform {
         return this;
     }
 
+    set mask(bool) {
+        this._mask = PamDiff._validateBoolean(bool);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    get mask() {
+        return this._mask;
+    }
+
+    setMask(bool) {
+        this.mask = bool;
+        return this;
+    }
+
     /**
      *
      * @param bool {Boolean}
@@ -466,7 +481,6 @@ class PamDiff extends Transform {
             default:
                 throw new Error(`Did not find a matching parser for ${parser}`);
         }
-
     }
 
     /**
