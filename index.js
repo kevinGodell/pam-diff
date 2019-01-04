@@ -7,7 +7,6 @@ const PP = require('polygon-points');
 const PC = require('bindings')('addon');
 
 class PamDiff extends Transform {
-
     /**
      *
      * @param [options] {Object}
