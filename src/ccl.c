@@ -1,3 +1,4 @@
+//credit: based on article @ https://www.codeproject.com/Articles/825200/%2FArticles%2F825200%2FAn-Implementation-Of-The-Connected-Component-Label
 #define CALL_LabelComponent(x, y, returnLabel) { STACK[SP] = x; STACK[SP+1] = y; STACK[SP+2] = returnLabel; SP += 3; goto START; }
 #define RETURN { SP -= 3;                \
                  switch (STACK[SP+2])    \

@@ -1,5 +1,5 @@
 # pam-diff
-###### [![dependencies Status](https://david-dm.org/kevinGodell/pam-diff/n-api/status.svg)](https://david-dm.org/kevinGodell/pam-diff/n-api) [![Build Status](https://travis-ci.org/kevinGodell/pam-diff.svg?branch=n-api)](https://travis-ci.org/kevinGodell/pam-diff) [![Build status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/n-api?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/n-api) [![GitHub issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/n-api/LICENSE)
+###### [![dependencies Status](https://david-dm.org/kevinGodell/pam-diff/n-api_async/status.svg)](https://david-dm.org/kevinGodell/pam-diff/n-api_async) [![Build Status](https://travis-ci.org/kevinGodell/pam-diff.svg?branch=n-api_async)](https://travis-ci.org/kevinGodell/pam-diff) [![Build status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/n-api_async?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/n-api_async) [![GitHub issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/n-api/LICENSE)  [![npm](https://img.shields.io/npm/dt/pam-diff.svg?style=flat-square)](https://www.npmjs.com/package/pam-diff)
 Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, and ***grayscale***. It is currently being used for a video motion detection project.
 ### installation:
 ``` 
@@ -15,7 +15,7 @@ npm install pipe2pam --save
 ```
 ### usage:
 The following [example](https://github.com/kevinGodell/pam-diff/tree/master/examples/example.js) uses ffmpeg to connect to a rtsp ip camera video feed and generates 1000 downscaled rgb24 pam images at a rate of 1 per second. The pam images are piped from ffmpeg's stdout into pipe2pam to parse them into into pam objects. The pam objects are then piped into pam-diff to measure pixel differences. For each compared pixel that has a **difference** that exceeds the setting, it will be calculated to determine the percent of difference. If the **percent** of changed pixels exceeds the setting, a **diff** event will be emitted which contains a data object containing details. This example also shows how to take the pam image that triggered the diff event and convert it to a jpeg using ffmpeg.
-```
+```javascript
 const P2P = require('pipe2pam');
 const PamDiff = require('pam-diff');
 const ChildProcess = require('child_process');

@@ -78,7 +78,7 @@ pamDiff.on('diff', (data) => {
     //console.log(data);
     diffCount++;
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    if(true){return;}
+    //if(true){return;}
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
@@ -87,7 +87,7 @@ pamDiff.on('diff', (data) => {
     }
     const jpeg = `${name}.jpeg`;
     const pathToJpeg = `${__dirname}/out/rgb24/${jpeg}`;
-    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
+    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
         if (data === 0) {
