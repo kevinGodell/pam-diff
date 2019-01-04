@@ -47,7 +47,7 @@
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
-    "ffmpeg-static": "^2.1.0",
+    "ffmpeg-static": "^2.4.0",
     "jsdoc": "^3.5.5",
     "pipe2pam": "^0.6.2"
   },
