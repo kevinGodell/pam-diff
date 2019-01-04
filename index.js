@@ -1,6 +1,6 @@
 'use strict';
 
-const { Transform } = require('stream');
+const {Transform} = require('stream');
 
 const PP = require('polygon-points');
 
@@ -367,7 +367,7 @@ class PamDiff extends Transform {
      * @private
      */
     _configurePixelDiffEngine() {
-        if (!this._tupltype || !this._width || ! this._height) {
+        if (!this._tupltype || !this._width || !this._height) {
             return;
         }
 
@@ -408,7 +408,7 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
                 break;
             case 'grayscale_mask_sync' :
-                this._pixelDiffEngine = PC.grayDiffMaskSync.bind(this, wxh, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
+                this._pixelDiffEngine = PC.grayDiffMaskSync.bind(this, wxh, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
                 break;
             case 'grayscale_regions_sync' :
                 this._pixelDiffEngine = PC.grayDiffRegionsSync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
@@ -417,20 +417,18 @@ class PamDiff extends Transform {
                 this._pixelDiffEngine = PC.grayDiffAllAsync.bind(this, wxh, this._difference, this._percent);
                 break;
             case 'grayscale_mask_async' :
-                this._pixelDiffEngine = PC.grayDiffMaskAsync.bind(this, wxh, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
+                this._pixelDiffEngine = PC.grayDiffMaskAsync.bind(this, wxh, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
                 break;
             case 'grayscale_regions_async' :
                 this._pixelDiffEngine = PC.grayDiffRegionsAsync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
                 break;
-
-
             case 'rgb_all_sync' :
             case 'rgb_alpha_all_sync' :
                 this._pixelDiffEngine = PC.rgbDiffAllSync.bind(this, wxh, this._depth, this._difference, this._percent);
                 break;
             case 'rgb_mask_sync' :
             case 'rgb_alpha_mask_sync' :
-                this._pixelDiffEngine = PC.rgbDiffMaskSync.bind(this, wxh, this._depth, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
+                this._pixelDiffEngine = PC.rgbDiffMaskSync.bind(this, wxh, this._depth, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
                 break;
             case 'rgb_regions_sync' :
             case 'rgb_alpha_regions_sync' :
@@ -442,7 +440,7 @@ class PamDiff extends Transform {
                 break;
             case 'rgb_mask_async' :
             case 'rgb_alpha_mask_async' :
-                this._pixelDiffEngine = PC.rgbDiffMaskAsync.bind(this, wxh, this._depth, this._difference, this._percent,  this._maskObj.count, this._maskObj.bitset);
+                this._pixelDiffEngine = PC.rgbDiffMaskAsync.bind(this, wxh, this._depth, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
                 break;
             case 'rgb_regions_async' :
             case 'rgb_alpha_regions_async' :
@@ -480,7 +478,7 @@ class PamDiff extends Transform {
         this._newPix = chunk.pixels;
         const results = this._pixelDiffEngine(this._oldPix, this._newPix);
         if (results.length) {
-            const data = {trigger: results, pam:chunk.pam};
+            const data = {trigger: results, pam: chunk.pam};
             if (this._callback) {
                 this._callback(data);
             }
@@ -505,7 +503,7 @@ class PamDiff extends Transform {
         this._newPix = chunk.pixels;
         const results = this._pixelDiffEngine(this._oldPix, this._newPix);
         if (results.length) {
-            const data = {trigger: results, pam:chunk.pam};
+            const data = {trigger: results, pam: chunk.pam};
             if (this._callback) {
                 this._callback(data);
             }
@@ -517,18 +515,14 @@ class PamDiff extends Transform {
             }
         }
         this._oldPix = this._newPix;
-        //console.timeEnd(this._pixelDiffEngine.name);
         console.timeEnd(`${this._debugEngine}-${debugCount}`);
     }
 
     _parsePixelsAsync(chunk) {
         this._newPix = chunk.pixels;
-        const oldPix = this._oldPix;
-        const newPix = chunk.pixels;
-        //(()=> {
-        this._pixelDiffEngine(oldPix, newPix, (err, results)=> {
+        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
-                const data = {trigger: results, pam:chunk.pam};
+                const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -540,58 +534,16 @@ class PamDiff extends Transform {
                 }
             }
         });
-
-        //})();
-
-        this._oldPix = newPix;
+        this._oldPix = this._newPix;
     }
 
     _parsePixelsAsyncDebug(chunk) {
-
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
-
-        //const name = Math.random();
-        //console.time(name)
-        //console.time(this._pixelDiffEngine.name);
-        //console.time(this._pixelDiffEngine.name);
         this._newPix = chunk.pixels;
-
-        const oldPix = this._oldPix;
-        const newPix = chunk.pixels;
-        //(()=> {
-
-            this._pixelDiffEngine(oldPix, newPix, (err, results)=> {
-
-                //console.log(this._oldPix === oldPix);
-                //console.log(this._oldPix === newPix);
-                //console.log(this._newPix === newPix);
-
-                if (results.length) {
-                    const data = {trigger: results, pam:chunk.pam};
-                    if (this._callback) {
-                        this._callback(data);
-                    }
-                    if (this._readableState.pipesCount > 0) {
-                        this.push(data);
-                    }
-                    if (this.listenerCount('diff') > 0) {
-                        this.emit('diff', data);
-                    }
-                }
-
-                //console.timeEnd(this._pixelDiffEngine.name);
-                //console.timeEnd(name);
-                console.timeEnd(`${this._debugEngine}-${debugCount}`);
-            });
-
-        //})();
-
-        //console.log('update old pix');
-        this._oldPix = newPix;
-        /*this._pixelDiffEngine(this._oldPix, this._newPix, (err, results)=> {
+        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
-                const data = {trigger: results, pam:chunk.pam};
+                const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -602,11 +554,10 @@ class PamDiff extends Transform {
                     this.emit('diff', data);
                 }
             }
-            this._oldPix = this._newPix;
-            console.timeEnd(this._pixelDiffEngine.name);
-        });*/
+            console.timeEnd(`${this._debugEngine}-${debugCount}`);
+        });
+        this._oldPix = this._newPix;
     }
-
 
 
     /**
