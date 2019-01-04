@@ -380,6 +380,8 @@ Napi::Array CompareGrayPixelsBlob(const Napi::CallbackInfo &info) {
     bool *pixelBitset = new bool[wxh]();// set empty bool array, remember to delete
     //iterate pixels, count diffs, and set true and false of bool array
 
+    //todo note: use std::vector<bool> for specialized storage
+
     for (uint_fast32_t i = 0; i < bufLen; i++) {
         if (diff > GrayDiff(buf0, buf1, i)) continue;
         diffs++;
