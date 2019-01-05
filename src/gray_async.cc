@@ -20,11 +20,14 @@ public:
 
     void OnOK() {
         const Napi::Env env = Env();
+
         Napi::HandleScope scope(env);
 
-        Napi::Array jsArray = allResultsToJS(env, this->diffsPerc_, this->percentResult_);
+        Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-        Callback().Call({env.Null(), jsArray});
+        allResultsToJs(env, this->diffsPerc_, this->percentResult_, resultsJs);
+
+        Callback().Call({env.Null(), resultsJs});
     }
 
 private:
@@ -69,11 +72,14 @@ public:
 
     void OnOK() {
         const Napi::Env env = Env();
+
         Napi::HandleScope scope(env);
 
-        Napi::Array jsArray = maskResultsToJS(env, this->diffsPerc_, this->percentResult_);
+        Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-        Callback().Call({env.Null(), jsArray});
+        maskResultsToJs(env, this->diffsPerc_, this->percentResult_, resultsJs);
+
+        Callback().Call({env.Null(), resultsJs});
     }
 
 private:
@@ -111,31 +117,34 @@ class GrayDiffRegionsWorker : public Napi::AsyncWorker {
 public:
 
     GrayDiffRegionsWorker(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, Region *regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regions_(regions), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionsCpp_(regions), buf0_(buf0), buf1_(buf1) {
     }
 
     ~GrayDiffRegionsWorker() {}
 
     void Execute() {
-        MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regions_, this->buf0_, this->buf1_);
+        MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsCpp_, this->buf0_, this->buf1_);
     }
 
     void OnOK() {
         const Napi::Env env = Env();
+
         Napi::HandleScope scope(env);
 
-        Napi::Array jsArray = regionsResultsToJS(env, this->regionsLen_, this->regions_);
+        Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-        delete[] this->regions_;
+        regionsResultsToJs(env, this->regionsLen_, this->regionsCpp_, resultsJs);
 
-        Callback().Call({env.Null(), jsArray});
+        delete[] this->regionsCpp_;
+
+        Callback().Call({env.Null(), resultsJs});
     }
 
 private:
     const uint_fast32_t pixCount_;// number of pixels
     const uint_fast8_t minDiff_;// can only be 0 - 255
     const uint_fast8_t regionsLen_;// number of 1's in bitset, others are 0
-    Region *regions_;// Region array
+    Region *regionsCpp_;// Region array
     const uint_fast8_t *buf0_;// pixel buffer
     const uint_fast8_t *buf1_;// pixel buffer
 };
@@ -145,23 +154,16 @@ Napi::Value GrayDiffRegionsAsync(const Napi::CallbackInfo &info) {
     const uint_fast32_t pixCount = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t minDiff = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast8_t regionsLen = info[2].As<Napi::Number>().Uint32Value();
-    const Napi::Array regionsArr = info[3].As<Napi::Array>();
+    const Napi::Array regionsJs = info[3].As<Napi::Array>();
     const uint_fast8_t *buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[6].As<Napi::Function>();
 
-    Region *regions = new Region[regionsLen]();
+    Region *regionsCpp = new Region[regionsLen]();// create array of type Region on heap
 
-    for (uint_fast32_t i = 0; i < regionsLen; i++) {
-        const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
-        const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-        const uint_fast8_t *bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
-        regions[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
-    }
+    regionsJsToCpp(regionsLen, regionsJs, regionsCpp);// convert js array to cpp array
 
-    GrayDiffRegionsWorker *grayDiffRegionsWorker = new GrayDiffRegionsWorker(pixCount, minDiff, regionsLen, regions, buf0, buf1, cb);
+    GrayDiffRegionsWorker *grayDiffRegionsWorker = new GrayDiffRegionsWorker(pixCount, minDiff, regionsLen, regionsCpp, buf0, buf1, cb);
     grayDiffRegionsWorker->Queue();
 
     return env.Undefined();
