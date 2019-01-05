@@ -54,10 +54,10 @@ npm install pam-diff@latest --save
       const pamDiff = new pamDiff({difference: 10, percent: 20}, myCallback);
 
       //via the setter
-      pamDiff.callback = myFunc;
+      pamDiff.callback = myCallback;
 
       //via the chain-able setter
-      pamDiff.setCallback(myFunc).setDifference(10).setPercent(20);
+      pamDiff.setCallback(myCallback).setDifference(10).setPercent(20);
 
       //remove the callback
       pamDiff.callback = null;
