@@ -16,9 +16,11 @@ Napi::Value RgbDiffAllSync(const Napi::CallbackInfo &info) {
 
     uint_fast8_t percentResult = MeasureDiffs(pixCount, depth, pixDiff, buf0, buf1);
 
-    Napi::Array jsArray = allResultsToJS(env, diffsPerc, percentResult);
+    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-    cb.Call({env.Null(), jsArray});
+    allResultsToJs(env, diffsPerc, percentResult, resultsJs);
+
+    cb.Call({env.Null(), resultsJs});
 
     return env.Undefined();
 }
@@ -37,9 +39,11 @@ Napi::Value RgbDiffMaskSync(const Napi::CallbackInfo &info) {
 
     uint_fast8_t percentResult = MeasureDiffs(pixCount, depth, pixDiff, bitsetCount, bitset, buf0, buf1);
 
-    Napi::Array jsArray = maskResultsToJS(env, diffsPerc, percentResult);
+    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-    cb.Call({env.Null(), jsArray});
+    maskResultsToJs(env, diffsPerc, percentResult, resultsJs);
+
+    cb.Call({env.Null(), resultsJs});
 
     return env.Undefined();
 }
@@ -50,29 +54,24 @@ Napi::Value RgbDiffRegionsSync(const Napi::CallbackInfo &info) {
     const uint_fast8_t depth = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast8_t minDiff = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast8_t regionsLen = info[3].As<Napi::Number>().Uint32Value();
-    const Napi::Array regionsArr = info[4].As<Napi::Array>();
+    const Napi::Array regionsJs = info[4].As<Napi::Array>();
     const uint_fast8_t *buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[7].As<Napi::Function>();
 
-    Region *regions = new Region[regionsLen]();
+    Region *regionsCpp = new Region[regionsLen]();// create array of type Region on heap
 
-    for (uint_fast32_t i = 0; i < regionsLen; i++) {
-        const std::string name = regionsArr.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
-        const uint_fast8_t diff = regionsArr.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t percent = regionsArr.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t count = regionsArr.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-        const uint_fast8_t *bitset = regionsArr.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
-        regions[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
-    }
+    regionsJsToCpp(regionsLen, regionsJs, regionsCpp);// convert js array to cpp array
 
-    MeasureDiffs(pixCount, depth, minDiff, regionsLen, regions, buf0, buf1);
+    MeasureDiffs(pixCount, depth, minDiff, regionsLen, regionsCpp, buf0, buf1);// pass data to measure diffs
 
-    Napi::Array jsArray = regionsResultsToJS(env, regionsLen, regions);
+    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
 
-    delete[] regions;
+    regionsResultsToJs(env, regionsLen, regionsCpp, resultsJs);//  convert cpp array to js results array
 
-    cb.Call({env.Null(), jsArray});
+    delete[] regionsCpp;
+
+    cb.Call({env.Null(), resultsJs});
 
     return env.Undefined();
 }

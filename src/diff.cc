@@ -21,12 +21,12 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
 }
 
 //gray regions diff
-void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsCpp, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     for (uint_fast32_t i = 0, j = 0, diff = 0; i < pixCount; i++) {
          diff = GrayDiff(buf0, buf1, i);
          if (minDiff > diff) continue;
          for (j = 0; j < regLen; j++) {
-            if (std::get<4>(regionsArr[j])[i] && diff >= std::get<1>(regionsArr[j])) std::get<5>(regionsArr[j])++;
+            if (std::get<4>(regionsCpp[j])[i] && diff >= std::get<1>(regionsCpp[j])) std::get<5>(regionsCpp[j])++;
          }
     }
 }
@@ -54,13 +54,13 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth
 }
 
 //rgb regions diff
-void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsCpp, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t bufLen = pixCount * depth;
     for (uint_fast32_t i = 0, j = 0, p = 0, diff = 0; i < bufLen; i += depth, p++) {
         diff = RgbDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
         for (j = 0; j < regLen; j++) {
-            if (std::get<4>(regionsArr[j])[p] && diff >= std::get<1>(regionsArr[j])) std::get<5>(regionsArr[j])++;
+            if (std::get<4>(regionsCpp[j])[p] && diff >= std::get<1>(regionsCpp[j])) std::get<5>(regionsCpp[j])++;
         }
     }
 }
