@@ -18,10 +18,10 @@ class PamDiff extends Transform {
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
      * @param [options.regions[i].percent=options.percent] {Number} - Percent value for region.
      * @param options.regions[i].polygon {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
-     * @param [options.mask=false] {Boolean} - Indicate if regions should be used as masks of pixels to ignore instead of areas of interest.
-     * @param [options.blob] {Number} - Number of pixels connected at top, right, bottom, left to be considered a blob.
+     * @param [options.mask=false] {Boolean} - Indicate if regions should be used as masks of pixels to ignore.
      * @param [callback] {Function} - Function to be called when diff event occurs.
      */
+    //[options.blob] {Number} - Number of pixels connected at top, right, bottom, left to be considered a blob.
     constructor(options, callback) {
         super(options);
         Transform.call(this, {objectMode: true});
@@ -217,28 +217,28 @@ class PamDiff extends Transform {
      *
      * @param number {Number}
      */
-    set blobSize(number) {
+    /*set blobSize(number) {
         this._blobSize = PamDiff._validateNumber(parseInt(number), 0, 0, 100000);
         this._configurePixelDiffEngine();
-    }
+    }*/
 
     /**
      *
      * @return {Number}
      */
-    get blobSize() {
+    /*get blobSize() {
         return this._blobSize || 0;
-    }
+    }*/
 
     /**
      *
      * @param number
      * @return {PamDiff}
      */
-    setBlobSize(number) {
+    /*setBlobSize(number) {
         this.blobSize = number;
         return this;
-    }
+    }*/
 
     /**
      *
