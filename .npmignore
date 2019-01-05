@@ -8,3 +8,4 @@ build/
 appveyor.yml
 .jshintrc
 pam-diff.iml
+.env
