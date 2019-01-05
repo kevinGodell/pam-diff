@@ -14,7 +14,7 @@
      "cflags_cc!": [ "-fno-exceptions" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
-     "defines": [ "NAPI_CPP_EXCEPTIONS" ],
+     "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED" ],
      "conditions": [
        ["OS==\"win\"", {
          "msvs_settings": {
