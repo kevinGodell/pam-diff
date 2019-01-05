@@ -215,34 +215,6 @@ class PamDiff extends Transform {
 
     /**
      *
-     * @param bool {Boolean}
-     */
-    set mask(bool) {
-        this._mask = PamDiff._validateBoolean(bool);
-        this._processRegions();
-        this._configurePixelDiffEngine();
-    }
-
-    /**
-     *
-     * @return {Boolean}
-     */
-    get mask() {
-        return this._mask || false;
-    }
-
-    /**
-     *
-     * @param bool {Boolean}
-     * @return {PamDiff}
-     */
-    setMask(bool) {
-        this.mask = bool;
-        return this;
-    }
-
-    /**
-     *
      * @param number {Number}
      */
     set blobSize(number) {
