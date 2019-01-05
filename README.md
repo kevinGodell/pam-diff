@@ -6,8 +6,7 @@ Measure differences between pixel arrays extracted from pam images. Works well w
 npm install pam-diff@latest --save
 ```
 #### *Important Note*: The js-only version will no longer receive any updates. All future work will be dedicated to the n-api version because it is much more efficient.
-#### *New Feature*: Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor options object.
-#### *Future Plans*: I may introduce node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
+#### *New Feature*: Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor.
 ### Usage Options:
 ##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
 1. all (default)
@@ -36,14 +35,14 @@ npm install pam-diff@latest --save
       ```
 ##### Getting results back from the pixel difference detection:
 1. event
-    - A *diff* event will be emitted with a details object passed as the only argument.
+    - A *diff* event will be emitted with a data object passed as the only argument.
     - ```javascript
       pamDiff.on('diff', data => {
           console.log(data);
       }); 
       ```
 2. callback
-    - A *callback* function will be called with a details object passed as the only argument.
+    - A *callback* function will be called with a data object passed as the only argument.
     - The callback can be passed as the 2nd argument to the constructor or it can be added later.
     - ```javascript
       //callback function      
@@ -92,5 +91,9 @@ npm install pam-diff@latest --save
         pam: <Buffer>
       }
       ```
-### Other resources:
+### Other Resources:
 View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests), or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
+### Future Plans:
+- Add node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
+- Include option to return coordinates for bounding box of changed pixels.
+- Introduce blob filtering to group changed pixels with their neighbors.
