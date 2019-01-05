@@ -18,8 +18,8 @@
     "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3 && node tests/test_gray4",
     "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3 && node tests/test_rgb4",
     "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3 && node tests/test_rgba4",
-    "__pub": "npm publish -tag n-api",
-    "pub": "npm publish",
+    "pub": "npm publish -tag n-api",
+    "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6"
   },
   "repository": {
