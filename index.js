@@ -29,7 +29,7 @@ class PamDiff extends Transform {
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
         this.mask = PamDiff._parseOptions('mask', options);// should be processed before regions
-        this.blobSize = PamDiff._parseOptions('blobSize', options);// should be processed before regions
+        //this.blobSize = PamDiff._parseOptions('blobSize', options);// should be processed before regions
         this.regions = PamDiff._parseOptions('regions', options);// can be zero regions, a single region, or multiple regions. if no regions, all pixels will be compared.
         this.callback = callback;// callback function to be called when pixel difference is detected
         this._parseChunk = this._parseFirstChunk;// first parsing will be reading settings and configuring internal pixel reading
@@ -371,22 +371,14 @@ class PamDiff extends Transform {
             engine += '_all';
         }
 
-        if (this._blobSize) {
+        /*if (this._blobSize) {
             engine += '_blob';
-        }
+        }*/
 
         if (this._async) {
             engine += '_async';
-            parser += 'async';
         } else {
             engine += '_sync';
-            parser += 'sync';
-        }
-
-        if (process.env.NODE_ENV === 'development') {
-            parser += '_dev';
-            this._debugEngine = engine;
-            this._debugCount = 0;
         }
 
         switch (engine) {
@@ -436,74 +428,16 @@ class PamDiff extends Transform {
                 throw new Error(`Did not find a matching engine for ${engine}`);
         }
 
-        switch (parser) {
-            case 'sync':
-                this._parseChunk = this._parsePixelsSync;
-                break;
-            case 'sync_dev':
-                this._parseChunk = this._parsePixelsSyncDebug;
-                break;
-            case 'async':
-                this._parseChunk = this._parsePixelsAsync;
-                break;
-            case 'async_dev':
-                this._parseChunk = this._parsePixelsAsyncDebug;
-                break;
-            default:
-                throw new Error(`Did not find a matching parser for ${parser}`);
+        if (process.env.NODE_ENV === 'development') {
+            this._parseChunk = this._parsePixelsDebug;
+            this._debugEngine = engine;
+            this._debugCount = 0;
+        } else {
+            this._parseChunk = this._parsePixels;
         }
     }
 
-    /**
-     *
-     * @param chunk
-     * @private
-     */
-    _parsePixelsSync(chunk) {
-        this._newPix = chunk.pixels;
-        const results = this._pixelDiffEngine(this._oldPix, this._newPix);
-        if (results.length) {
-            const data = {trigger: results, pam: chunk.pam};
-            if (this._callback) {
-                this._callback(data);
-            }
-            if (this._readableState.pipesCount > 0) {
-                this.push(data);
-            }
-            if (this.listenerCount('diff') > 0) {
-                this.emit('diff', data);
-            }
-        }
-        this._oldPix = this._newPix;
-    }
-
-    /**
-     *
-     * @param chunk
-     * @private
-     */
-    _parsePixelsSyncDebug(chunk) {
-        const debugCount = this._debugCount++;
-        console.time(`${this._debugEngine}-${debugCount}`);
-        this._newPix = chunk.pixels;
-        const results = this._pixelDiffEngine(this._oldPix, this._newPix);
-        if (results.length) {
-            const data = {trigger: results, pam: chunk.pam};
-            if (this._callback) {
-                this._callback(data);
-            }
-            if (this._readableState.pipesCount > 0) {
-                this.push(data);
-            }
-            if (this.listenerCount('diff') > 0) {
-                this.emit('diff', data);
-            }
-        }
-        this._oldPix = this._newPix;
-        console.timeEnd(`${this._debugEngine}-${debugCount}`);
-    }
-
-    _parsePixelsAsync(chunk) {
+    _parsePixels(chunk) {
         this._newPix = chunk.pixels;
         this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
@@ -522,7 +456,7 @@ class PamDiff extends Transform {
         this._oldPix = this._newPix;
     }
 
-    _parsePixelsAsyncDebug(chunk) {
+    _parsePixelsDebug(chunk) {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
@@ -543,7 +477,6 @@ class PamDiff extends Transform {
         });
         this._oldPix = this._newPix;
     }
-
 
     /**
      *
