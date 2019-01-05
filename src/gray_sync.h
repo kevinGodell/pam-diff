@@ -4,10 +4,10 @@
 #include "diff.h"
 #include <napi.h>
 
-Napi::Array GrayDiffAllSync(const Napi::CallbackInfo &info);
+Napi::Value GrayDiffAllSync(const Napi::CallbackInfo &info);
 
-Napi::Array GrayDiffMaskSync(const Napi::CallbackInfo &info);
+Napi::Value GrayDiffMaskSync(const Napi::CallbackInfo &info);
 
-Napi::Array GrayDiffRegionsSync(const Napi::CallbackInfo &info);
+Napi::Value GrayDiffRegionsSync(const Napi::CallbackInfo &info);
 
 #endif

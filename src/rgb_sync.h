@@ -4,10 +4,10 @@
 #include "diff.h"
 #include <napi.h>
 
-Napi::Array RgbDiffAllSync(const Napi::CallbackInfo &info);
+Napi::Value RgbDiffAllSync(const Napi::CallbackInfo &info);
 
-Napi::Array RgbDiffMaskSync(const Napi::CallbackInfo &info);
+Napi::Value RgbDiffMaskSync(const Napi::CallbackInfo &info);
 
-Napi::Array RgbDiffRegionsSync(const Napi::CallbackInfo &info);
+Napi::Value RgbDiffRegionsSync(const Napi::CallbackInfo &info);
 
 #endif
