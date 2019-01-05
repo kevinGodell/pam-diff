@@ -1,6 +1,6 @@
 {
   "name": "pam-diff",
-  "version": "0.13.0-napi",
+  "version": "0.13.0",
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
     "gray": "node tests/test_gray && node tests/test_gray2 && node tests/test_gray3 && node tests/test_gray4",
     "rgb": "node tests/test_rgb && node tests/test_rgb2 && node tests/test_rgb3 && node tests/test_rgb4",
     "rgba": "node tests/test_rgba && node tests/test_rgba2 && node tests/test_rgba3 && node tests/test_rgba4",
-    "pub": "npm publish -tag n-api",
+    "pub": "npm publish -tag latest",
     "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6"
   },
