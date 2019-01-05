@@ -1,111 +1,96 @@
 # pam-diff
 ###### [![dependencies Status](https://david-dm.org/kevinGodell/pam-diff/master/status.svg)](https://david-dm.org/kevinGodell/pam-diff/master) [![Build Status](https://travis-ci.org/kevinGodell/pam-diff.svg?branch=master)](https://travis-ci.org/kevinGodell/pam-diff) [![Build status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/master?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/master) [![GitHub issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/master/LICENSE) [![npm](https://img.shields.io/npm/dt/pam-diff.svg?style=flat-square)](https://www.npmjs.com/package/pam-diff)
 Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported ***tupltypes*** are ***rgb***, ***rgb_alpha***, and ***grayscale***. It is currently being used for a video motion detection project.
-### installation:
+### Installation:
 ``` 
 npm install pam-diff@latest --save
 ```
-### installation of experimental n-api version:
-```
-npm install pam-diff@n-api --save
-```
-**To run the example below, also install pipe2pam:**
-```
-npm install pipe2pam --save
-```
-### usage:
-The following [example](https://github.com/kevinGodell/pam-diff/tree/master/examples/example.js) uses ffmpeg to connect to a rtsp ip camera video feed and generates 1000 downscaled rgb24 pam images at a rate of 1 per second. The pam images are piped from ffmpeg's stdout into pipe2pam to parse them into into pam objects. The pam objects are then piped into pam-diff to measure pixel differences. For each compared pixel that has a **difference** that exceeds the setting, it will be calculated to determine the percent of difference. If the **percent** of changed pixels exceeds the setting, a **diff** event will be emitted which contains a data object containing details. This example also shows how to take the pam image that triggered the diff event and convert it to a jpeg using ffmpeg.
-```javascript
-const P2P = require('pipe2pam');
-const PamDiff = require('pam-diff');
-const ChildProcess = require('child_process');
-const spawn = ChildProcess.spawn;
-const execFile = ChildProcess.execFile;
+#### *Important Note*: The js-only version will no longer receive any updates. All future work will be dedicated to the n-api version because it is much more efficient.
+#### *New Feature*: Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor options object.
+#### *Future Plans*: I may introduce node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
+### Usage Options:
+##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
+1. all (default)
+    - All pixels will be targeted when checking for differences.
+    - To use this option, set the configuration object without creating any regions.
+    - ```javascript
+      const pamDiff = new PamDiff({difference: 5, percent: 5});
+      ```
+2. regions
+    - Specific regions of pixels will be targeted when checking for differences and the rest will be ignored.
+    - To use this option, create a regions array and pass it to the constructor.
+    - ```javascript
+      const region1 = {name: 'region1', difference: 12, percent: 22, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+      const region2 = {name: 'region2', difference: 14, percent: 10, polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
+      const regions = [region1, region2];
+      const pamDiff = new PamDiff({regions : regions});
+      ```
+3. mask
+    - Specific regions of pixels will be ignored when checking for differences.
+    - To use this option, create a regions array and set the mask option to true.
+    - ```javascript
+      const region1 = {name: 'region1', polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+      const region2 = {name: 'region2', polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
+      const regions = [region1, region2];
+      const pamDiff = new PamDiff({difference: 12, percent: 10, mask: true, regions : regions});
+      ```
+##### Getting results back from the pixel difference detection:
+1. event
+    - A *diff* event will be emitted with a details object passed as the only argument.
+    - ```javascript
+      pamDiff.on('diff', data => {
+          console.log(data);
+      }); 
+      ```
+2. callback
+    - A *callback* function will be called with a details object passed as the only argument.
+    - The callback can be passed as the 2nd argument to the constructor or it can be added later.
+    - ```javascript
+      //callback function      
+      function myCallback(data) {
+          console.log(data);
+      }
 
-const params = [
-    '-loglevel',
-    'quiet',
+      //via the constructor
+      const pamDiff = new pamDiff({difference: 10, percent: 20}, myCallback);
 
-    /* use hardware acceleration */
-    '-hwaccel',
-    'auto', //vda, videotoolbox, none, auto
+      //via the setter
+      pamDiff.callback = myFunc;
 
-    /* use an artificial video input */
-    /*'-re',
-     '-f',
-     'lavfi',
-     '-i',
-     'testsrc=size=1920x1080:rate=15',*/
+      //via the chain-able setter
+      pamDiff.setCallback(myFunc).setDifference(10).setPercent(20);
 
-    /* use an rtsp ip cam video input */
-    '-rtsp_transport',
-    'tcp',
-    '-i',
-    'rtsp://192.168.1.4:554/user=admin_password=pass_channel=1_stream=0.sdp',
-
-    /* set output flags */
-    '-an',
-    '-c:v',
-    'pam',
-    '-pix_fmt',
-    'rgb24',//rgba, rgb24, gray
-    '-f',
-    'image2pipe',
-    '-vf',
-    'fps=1,scale=320:180',//1920:1080 scaled down: 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
-    //'fps=1,scale=iw*1/6:ih*1/6',
-    '-frames',
-    '1000',
-    'pipe:1'
-];
-
-const ffmpeg = spawn('ffmpeg', params);
-
-console.log(ffmpeg.spawnargs.join(' '));
-
-ffmpeg.on('error', (error) => {
-    console.log(error);
-});
-
-ffmpeg.on('exit', (code, signal) => {
-    console.log('exit', code, signal);
-});
-
-const p2p = new P2P();
-
-let counter = 0;
-
-p2p.on('pam', (data) => {
-    //you do not have to listen to this event if you are just piping this data to pam-diff
-    console.log(`received pam ${++counter}`);
-});
-
-const pamDiff = new PamDiff({difference: 5, percent: 5});
-
-pamDiff.on('diff', (data) => {
-    console.log(data);
-    
-    //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    if(true){return;}
-    
-    const date = new Date();
-    let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
-    for (const region of data.trigger) {
-        name += `(${region.name}=${region.percent})`;
-    }
-    const jpeg = `${name}.jpeg`;
-    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
-    ff.stdin.end(data.pam);
-    ff.on('exit', (data) => {
-        if (data === 0) {
-            console.log(`FFMPEG clean exit after creating ${jpeg}`);
-        } else {
-            throw new Error('FFMPEG is not working with current parameters');
-        }
-    });
-});
-
-ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
-```
-
-See [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests) or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
+      //remove the callback
+      pamDiff.callback = null;
+      ```
+##### Expected results:
+1. When targeting all pixels:
+    - ```
+      {
+        trigger: [
+          {name: 'all', percent: 13}
+        ],
+        pam: <Buffer>
+      }
+      ```
+2. When targeting regions of pixels:
+    - ```
+      {
+        trigger: [
+          {name: 'region1', percent: 13},
+          {name: 'region2', percent: 22}
+        ],
+        pam: <Buffer>
+      }
+      ```
+3. When targeting all pixels ignored by mask:
+    - ```
+      {
+        trigger: [
+          {name: 'mask', percent: 13}
+        ],
+        pam: <Buffer>
+      }
+      ```
+### Other resources:
+View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests), or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
