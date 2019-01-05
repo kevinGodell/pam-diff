@@ -4,25 +4,22 @@
 #include <stdint.h>
 #include <napi.h>
 
-Napi::Value GrayDiffAllSync(const Napi::CallbackInfo &info) {
+Napi::Array GrayDiffAllSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast32_t pixCount = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t pixDiff = info[1].As<Napi::Number>().Uint32Value();
     const uint_fast8_t diffsPerc = info[2].As<Napi::Number>().Uint32Value();
     const uint_fast8_t *buf0 = info[3].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[5].As<Napi::Function>();
 
     uint_fast8_t percentResult = MeasureDiffs(pixCount, pixDiff, buf0, buf1);
 
     Napi::Array jsArray = allResultsToJS(env, diffsPerc, percentResult);
 
-    cb.Call({env.Null(), jsArray});
-
-    return env.Undefined();
+    return jsArray;
 }
 
-Napi::Value GrayDiffMaskSync(const Napi::CallbackInfo &info) {
+Napi::Array GrayDiffMaskSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast32_t pixCount = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t pixDiff = info[1].As<Napi::Number>().Uint32Value();
@@ -31,18 +28,15 @@ Napi::Value GrayDiffMaskSync(const Napi::CallbackInfo &info) {
     const uint_fast8_t *bitset = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf0 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[6].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[7].As<Napi::Function>();
 
     uint_fast8_t percentResult = MeasureDiffs(pixCount, pixDiff, bitsetCount, bitset, buf0, buf1);
 
     Napi::Array jsArray = maskResultsToJS(env, diffsPerc, percentResult);
 
-    cb.Call({env.Null(), jsArray});
-
-    return env.Undefined();
+    return jsArray;
 }
 
-Napi::Value GrayDiffRegionsSync(const Napi::CallbackInfo &info) {
+Napi::Array GrayDiffRegionsSync(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast32_t pixCount = info[0].As<Napi::Number>().Uint32Value();
     const uint_fast8_t minDiff = info[1].As<Napi::Number>().Uint32Value();
@@ -50,7 +44,6 @@ Napi::Value GrayDiffRegionsSync(const Napi::CallbackInfo &info) {
     const Napi::Array regionsArr = info[3].As<Napi::Array>();
     const uint_fast8_t *buf0 = info[4].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[5].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[6].As<Napi::Function>();
 
     Region *regions = new Region[regionsLen]();
 
@@ -69,7 +62,5 @@ Napi::Value GrayDiffRegionsSync(const Napi::CallbackInfo &info) {
 
     delete[] regions;
 
-    cb.Call({env.Null(), jsArray});
-
-    return env.Undefined();
+    return jsArray;
 }
