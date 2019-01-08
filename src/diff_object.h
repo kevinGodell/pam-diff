@@ -55,7 +55,9 @@ class Example : public Napi::ObjectWrap<Example> {
     //Region *regionsCpp_;// regions, cpp array of regions
     //Napi::Array regionsJs_;// regions, js array of objects
 
-    std::vector<Region> regionsVec_;
+    std::vector<Region2> regionsVec_;
+
+    //std::vector<Region2> regionsVec2_;
 
     bool async_;// using async or sync
 

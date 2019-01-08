@@ -59,8 +59,13 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
 
     if (obj.Has("regions")) {
         const Napi::Array regionsJs = obj.Get("regions").As<Napi::Array>();
+
         this->regionsLen_ = regionsJs.Length();
-        regionsJsToCpp(this->regionsLen_, regionsJs, this->regionsVec_);
+
+        //regionsJsToCpp(this->regionsLen_, regionsJs, this->regionsVec_);
+
+        //regionsJsToCpp(this->regionsLen_, regionsJs, this->regionsVec_);
+        regionsJsToCppVec(this->pixCount_, this->regionsLen_, regionsJs, this->regionsVec_);
     }
 
     switch (this->engineType_) {

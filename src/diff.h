@@ -10,6 +10,8 @@
 //region     =             name,        diff,          percent,       count,         bitset,              diffs
 using Region = std::tuple <std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, const uint_fast8_t*, uint_fast32_t>;
 
+using Region2 = std::tuple <const std::string, const uint_fast32_t, const uint_fast32_t, const uint_fast32_t, const std::vector<bool>>;
+
 //absolute value
 inline uint_fast8_t AbsUint(int_fast16_t n) {
     return (n > 0) ? n : -n;
@@ -58,7 +60,7 @@ void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, cons
 //void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 //gray regions vec and return vec
-inline void GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<uint_fast32_t> &resultsVec) {
+inline void GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, const std::vector<Region2> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<uint_fast32_t> &resultsVec) {
     for (uint_fast32_t i = 0, j = 0, diff = 0; i < pixCount; i++) {
          diff = GrayDiff(buf0, buf1, i);
          if (minDiff > diff) continue;

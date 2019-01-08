@@ -6,6 +6,9 @@
 #include <tuple>
 #include <string>
 #include <napi.h>
+#include <iostream>
+#include <vector>
+#include <typeinfo>
 
 enum {//if not service impacting, may always return bounds(min max x y), in which case filtering will be blobs or no blobs
     GRAY_ALL_PERCENT_SYNC = 0,
@@ -109,7 +112,7 @@ inline void regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, 
 //Napi::Array resultsJs = Napi::Array::New(env);
 
 //vec
-inline void /*Napi::Array*/ regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec, Napi::Array &resultsJs) {
+inline void /*Napi::Array*/ regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Region2> &regionsVec, const std::vector<uint_fast32_t> &resultsVec, Napi::Array &resultsJs) {
     //Napi::Array resultsJs = Napi::Array::New(env);
     for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
         percent = 100 * resultsVec[i] / std::get<3>(regionsVec[i]);
@@ -134,15 +137,43 @@ inline void regionsJsToCpp(const uint_fast8_t regionsLen, const Napi::Array &reg
     }
 }
 
+
+//todo create internal vector<bool> bitsetVec
 inline void regionsJsToCpp(const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Region> &regionsVec) {
+    std::cout << "call regions js to cpp using vec" << std::endl;
     for (uint_fast32_t i = 0; i < regionsLen; i++) {
         const std::string name = regionsJs.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
         const uint_fast8_t diff = regionsJs.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
         const uint_fast32_t percent = regionsJs.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
         const uint_fast32_t count = regionsJs.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
         const uint_fast8_t *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
+        //const uint_fast32_t len = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Length();
+        //std::cout << len << std::endl;
+        //const bool *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
+        //std::vector<bool> bitsetVec;
+        //bitsetVec.assign(bitset, bitset + len);
         //regionsCpp[i] = std::make_tuple(name, diff, percent, count, bitset, 0);
         regionsVec.push_back(std::make_tuple(name, diff, percent, count, bitset, 0));
+        //regionsVec.push_back(std::make_tuple(name, diff, percent, count, bitsetVec));
+
+    }
+}
+
+inline void regionsJsToCppVec(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Region2> &regionsVec) {
+    std::cout << "call regions js to cpp using vec and vec" << std::endl;
+    for (uint_fast32_t i = 0; i < regionsLen; i++) {
+        const std::string name = regionsJs.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
+        const uint_fast8_t diff = regionsJs.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t percent = regionsJs.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t count = regionsJs.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
+        const bool *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
+
+        std::vector<bool> bitsetVec;
+
+        bitsetVec.assign(bitset, bitset + pixLen);
+
+        regionsVec.push_back(std::make_tuple(name, diff, percent, count, bitsetVec));
+
     }
 }
 

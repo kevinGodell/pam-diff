@@ -11,8 +11,8 @@
        "src/rgb_sync.cc",
        "src/rgb_async.cc"
      ],
-     "cflags!": [ "-fno-exceptions" ],
-     "cflags_cc!": [ "-fno-exceptions" ],
+     "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
+     "cflags_cc!": [ "-fno-exceptions", "-fno-rtti" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
      "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED" ],
@@ -28,7 +28,8 @@
          "xcode_settings": {
            "CLANG_CXX_LIBRARY": "libc++",
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-           "MACOSX_DEPLOYMENT_TARGET": "10.7"
+           "MACOSX_DEPLOYMENT_TARGET": "10.7",
+           "GCC_ENABLE_CPP_RTTI" : "YES"
          }
        }]
      ]
