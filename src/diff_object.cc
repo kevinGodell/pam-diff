@@ -99,7 +99,7 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
+    uint_fast8_t percentResult = GrayAllPercent(this->pixCount_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = allResultsToJs(env, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -107,7 +107,7 @@ Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    uint_fast8_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = maskResultsToJs(env, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -115,8 +115,10 @@ Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fa
 
 Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<uint_fast32_t> resultsVec = MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
-    Napi::Array resultsJs = regionsResultsToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);//  convert cpp array to js results array
+    std::vector<uint_fast32_t> resultsVec(this->regionsLen_, 0);
+    GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, resultsVec);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    regionsResultsToJs(env, this->regionsLen_, this->regionsVec_, resultsVec, resultsJs);//  convert cpp array to js results array
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }

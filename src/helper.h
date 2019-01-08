@@ -109,8 +109,8 @@ inline void regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, 
 //Napi::Array resultsJs = Napi::Array::New(env);
 
 //vec
-inline Napi::Array regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, std::vector<Region> &regionsVec, std::vector<uint_fast32_t> &resultsVec) {
-    Napi::Array resultsJs = Napi::Array::New(env);
+inline void /*Napi::Array*/ regionsResultsToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec, Napi::Array &resultsJs) {
+    //Napi::Array resultsJs = Napi::Array::New(env);
     for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
         percent = 100 * resultsVec[i] / std::get<3>(regionsVec[i]);
         //std::get<5>(regionsVec[i]) = 0;//have to reset to 0 in case re-using, todo will have to separate input from output separate object
@@ -120,7 +120,7 @@ inline Napi::Array regionsResultsToJs(const Napi::Env &env, const uint_fast8_t r
         obj.Set("percent", percent);
         resultsJs[j++] = obj;
     }
-    return resultsJs;
+    //return resultsJs;
 }
 
 inline void regionsJsToCpp(const uint_fast8_t regionsLen, const Napi::Array &regionsJs, Region *regionsCpp) {
