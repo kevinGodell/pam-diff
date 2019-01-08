@@ -18,6 +18,8 @@ class Example : public Napi::ObjectWrap<Example> {
 
     static Napi::FunctionReference constructor;
 
+    uint_fast32_t engineType_;// int used in switch for determining which function to use
+
     std::string myValue_;// used as a test for setter/getter
 
     std::string target_;// all, mask, region
@@ -30,7 +32,9 @@ class Example : public Napi::ObjectWrap<Example> {
 
     uint_fast32_t depth_;// 1, 3, 4
 
-    uint_fast32_t pixCount_;// width * height * depth
+    uint_fast32_t pixCount_;// width * height
+
+    uint_fast32_t bufLen_;// pixCount_ * depth
 
     uint_fast8_t pixDiff_;// 1 - 255
 
@@ -38,20 +42,22 @@ class Example : public Napi::ObjectWrap<Example> {
 
     uint_fast32_t bitsetCount_;// mask, count of 1's in bitset
 
-    uint_fast8_t *bitset_;// mask, buffer of 0's and 1's based on index of targeted pixel
+    //uint_fast8_t *bitset_;// mask, buffer of 0's and 1's based on index of targeted pixel
 
-    std::vector<bool> myVec_;
+    std::vector<bool> bitsetVec_;
+
+    //std::vector<bool> myVec_;
 
     uint_fast32_t minDiff_;// regions, minimum pixDiff when comparing all set regions
 
     uint_fast32_t regionsLen_;// regions, number of regions
 
-    Region *regionsCpp_;// regions, cpp array of regions
+    //Region *regionsCpp_;// regions, cpp array of regions
     //Napi::Array regionsJs_;// regions, js array of objects
 
-    bool async_;// using async or sync
+    std::vector<Region> regionsVec_;
 
-    void Destroy();
+    bool async_;// using async or sync
 
     void Compare(const Napi::CallbackInfo &info);// instance method
 

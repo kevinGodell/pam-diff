@@ -373,7 +373,7 @@ class PamDiff extends Transform {
 
             config.target = 'regions';
             config.minDiff = this._regionObj.minDiff;
-            config.regionsLen = this._regionObj.length;
+            //config.regionsLen = this._regionObj.length;
             config.regions = this._regionObj.regions;
 
             //console.log(config.regions);

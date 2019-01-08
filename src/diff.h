@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 
+//todo get rid of "diffs" entry in tuple
 //region     =             name,        diff,          percent,       count,         bitset,              diffs
 using Region = std::tuple <std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, const uint_fast8_t*, uint_fast32_t>;
 
@@ -35,6 +36,12 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
 
 //gray regions
 void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+//gray regions vec
+//void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+//gray regions vec and return vec
+std::vector<uint_fast32_t> MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 //rgb(a) all
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);

@@ -40,57 +40,43 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     this->filter_ = obj.Get("filter").As<Napi::String>().Utf8Value();
     this->async_ =  obj.Get("async").As<Napi::Boolean>().Value();
 
-    this->pixCount_ = this->width_ * this->height_ * this->depth_;
+    // calculate some values based on required information
+    this->pixCount_ = this->width_ * this->height_;
+    this->bufLen_ = this->pixCount_ * this->depth_;
+    this->engineType_ = engineType(this->depth_, this->target_, this->filter_, this->async_);
 
-    /*std::cout << "width: " << this->width_ << std::endl;
-    std::cout << "height: " << this->height_ << std::endl;
-    std::cout << "depth: " << this->depth_ << std::endl;
-    std::cout << "target: " << this->target_ << std::endl;
-    std::cout << "filter: " << this->filter_ << std::endl;
-    std::cout << "async: " << this->async_ << std::endl;*/
+    // the following settings are optional depending on chosen engine, grab whatever is available
+    if (obj.Has("difference")) this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
+    if (obj.Has("percent")) this->diffsPerc_ = obj.Get("percent").As<Napi::Number>().Uint32Value();
+    if (obj.Has("minDiff")) this->minDiff_ = obj.Get("minDiff").As<Napi::Number>().Uint32Value();
+    if (obj.Has("bitsetCount")) this->bitsetCount_ = obj.Get("bitsetCount").As<Napi::Number>().Uint32Value();
 
-    //std::cout << "engine number: " << engineType(this->depth_, this->target_, this->filter_, this->async_) << std::endl;
-//std::vector<bool> myVec;
-    switch (engineType(this->depth_, this->target_, this->filter_, this->async_)) {
+    if (obj.Has("bitset")) {
+        //this->bitset_ = obj.Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
+        const bool *bitset = obj.Get("bitset").As<Napi::Buffer<bool>>().Data();
+        this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    }
+
+    if (obj.Has("regions")) {
+        const Napi::Array regionsJs = obj.Get("regions").As<Napi::Array>();
+        this->regionsLen_ = regionsJs.Length();
+        regionsJsToCpp(this->regionsLen_, regionsJs, this->regionsVec_);
+    }
+
+    switch (this->engineType_) {
         case GRAY_ALL_PERCENT_SYNC :
-            this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
-            this->diffsPerc_ = obj.Get("percent").As<Napi::Number>().Uint32Value();
             this->comparePtr_ = &Example::GrayAllPercentSync;
         break;
         case GRAY_MASK_PERCENT_SYNC :
-            //std::cout << "using gray mask percent sync" << std::endl;
-            this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
-            this->diffsPerc_ = obj.Get("percent").As<Napi::Number>().Uint32Value();
-            this->bitsetCount_ = obj.Get("bitsetCount").As<Napi::Number>().Uint32Value();
-            this->bitset_ = obj.Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
-
-            //std::vector<bool> myVec;// = obj.Get("bitset").As<Napi::Buffer<bool>>().Data();
-            this->myVec_.assign(this->bitset_, this->bitset_ + this->pixCount_);
-
-            //std::cout << this->myVec_.size() << std::endl;
-
-            //std::cout << this->myVec_[199] << std::endl;
-
             this->comparePtr_ = &Example::GrayMaskPercentSync;
         break;
         case GRAY_REGIONS_PERCENT_SYNC :
-            //std::cout << "using gray regions percent sync" << std::endl;
-            this->minDiff_ = obj.Get("minDiff").As<Napi::Number>().Uint32Value();
-            this->regionsLen_ = obj.Get("regionsLen").As<Napi::Number>().Uint32Value();
-            const Napi::Array regionsJs = obj.Get("regions").As<Napi::Array>();
-            this->regionsCpp_ = new Region[this->regionsLen_]();// create array of type Region on heap
-            regionsJsToCpp(this->regionsLen_, regionsJs, this->regionsCpp_);// convert js array to cpp array
             this->comparePtr_ = &Example::GrayRegionsPercentSync;
         break;
     }
-
 }
 
-Example::~Example() {
-    if (this->regionsCpp_) {
-        delete[] this->regionsCpp_;
-    }
-};
+Example::~Example() {};
 
 Napi::FunctionReference Example::constructor;
 
@@ -103,12 +89,10 @@ void Example::Compare(const Napi::CallbackInfo &info) {
 }
 
 void Example::SetMyValue(const Napi::CallbackInfo &info, const Napi::Value& value) {
-    //std::cout << "set myValue" << std::endl;
     this->myValue_ = value.As<Napi::String>();
 }
 
 Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
-    //std::cout << "get myValue" << std::endl;
     Napi::Env env = info.Env();
     return Napi::String::New(env, this->myValue_);
 }
@@ -116,37 +100,23 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
-    allResultsToJs(env, this->diffsPerc_, percentResult, resultsJs);
+    Napi::Array resultsJs = allResultsToJs(env, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
 
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    //uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitset_, buf0, buf1);
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->myVec_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
-    maskResultsToJs(env, this->diffsPerc_, percentResult, resultsJs);
+    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    Napi::Array resultsJs = maskResultsToJs(env, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
 
 Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-
-    //Region *regionsCpp = new Region[this->regionsLen_]();// create array of type Region on heap
-
-    //regionsJsToCpp(this->regionsLen_, this->regionsJs_, regionsCpp);// convert js array to cpp array
-
-    MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsCpp_, buf0, buf1);
-
-    Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
-
-    regionsResultsToJs(env, this->regionsLen_, this->regionsCpp_, resultsJs);//  convert cpp array to js results array
-
-    //delete[] regionsCpp;//should reset results value to 0 for next usage
-
+    std::vector<uint_fast32_t> resultsVec = MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
+    Napi::Array resultsJs = regionsResultsToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);//  convert cpp array to js results array
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }

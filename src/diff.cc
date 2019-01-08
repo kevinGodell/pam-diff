@@ -24,7 +24,6 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
 
 //gray mask diff vec
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &myVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    //std::cout << myVec.size() << std::endl;
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
         if (myVec[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
@@ -42,6 +41,19 @@ void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, cons
             if (std::get<4>(regionsCpp[j])[i] && diff >= std::get<1>(regionsCpp[j])) std::get<5>(regionsCpp[j])++;
          }
     }
+}
+
+//gray regions diff vec
+std::vector<uint_fast32_t> MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    std::vector<uint_fast32_t> resultsVec(regLen, 0);
+    for (uint_fast32_t i = 0, j = 0, diff = 0; i < pixCount; i++) {
+         diff = GrayDiff(buf0, buf1, i);
+         if (minDiff > diff) continue;
+         for (j = 0; j < regLen; j++) {
+            if (std::get<4>(regionsVec[j])[i] && diff >= std::get<1>(regionsVec[j])) resultsVec[j]++;
+         }
+    }
+    return resultsVec;
 }
 
 //rgb all diff
