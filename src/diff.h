@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <tuple>
 #include <string>
+#include <vector>
 
 //region     =             name,        diff,          percent,       count,         bitset,              diffs
 using Region = std::tuple <std::string, uint_fast32_t, uint_fast32_t, uint_fast32_t, const uint_fast8_t*, uint_fast32_t>;
