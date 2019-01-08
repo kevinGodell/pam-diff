@@ -2,7 +2,13 @@
 #include "gray_async.h"
 #include "rgb_sync.h"
 #include "rgb_async.h"
+#include "diff_object.h"
+
 #include <napi.h>
+
+//https://github.com/nodejs/node-addon-api/blob/master/doc/object_wrap.md
+
+//https://nodejs.github.io/node-addon-api/class_napi_1_1_object_wrap.html
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "grayDiffAllSync"), Napi::Function::New(env, GrayDiffAllSync));
@@ -17,6 +23,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports.Set(Napi::String::New(env, "rgbDiffMaskAsync"), Napi::Function::New(env, RgbDiffMaskAsync));
     exports.Set(Napi::String::New(env, "rgbDiffRegionsSync"), Napi::Function::New(env, RgbDiffRegionsSync));
     exports.Set(Napi::String::New(env, "rgbDiffRegionsAsync"), Napi::Function::New(env, RgbDiffRegionsAsync));
+    Example::Init(env, exports);
     return exports;
 }
 
