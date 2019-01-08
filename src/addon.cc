@@ -1,4 +1,4 @@
-//#define _SECURE_SCL 0
+#define _SECURE_SCL 0
 
 #include "gray_sync.h"
 #include "gray_async.h"
