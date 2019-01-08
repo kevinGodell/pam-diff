@@ -1,4 +1,6 @@
 #include "diff.h"
+//#include <iostream>
+#include <vector>
 
 //gray all diff
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
@@ -15,6 +17,17 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
         if (bitset[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
+        diffs++;
+    }
+    return 100 * diffs / bitsetCount;
+}
+
+//gray mask diff vec
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &myVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    //std::cout << myVec.size() << std::endl;
+    uint_fast32_t diffs = 0;
+    for (uint_fast32_t i = 0; i < pixCount; i++) {
+        if (myVec[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
         diffs++;
     }
     return 100 * diffs / bitsetCount;

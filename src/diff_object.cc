@@ -50,7 +50,7 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     std::cout << "async: " << this->async_ << std::endl;*/
 
     //std::cout << "engine number: " << engineType(this->depth_, this->target_, this->filter_, this->async_) << std::endl;
-
+//std::vector<bool> myVec;
     switch (engineType(this->depth_, this->target_, this->filter_, this->async_)) {
         case GRAY_ALL_PERCENT_SYNC :
             this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
@@ -63,6 +63,14 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
             this->diffsPerc_ = obj.Get("percent").As<Napi::Number>().Uint32Value();
             this->bitsetCount_ = obj.Get("bitsetCount").As<Napi::Number>().Uint32Value();
             this->bitset_ = obj.Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
+
+            //std::vector<bool> myVec;// = obj.Get("bitset").As<Napi::Buffer<bool>>().Data();
+            this->myVec_.assign(this->bitset_, this->bitset_ + this->pixCount_);
+
+            //std::cout << this->myVec_.size() << std::endl;
+
+            //std::cout << this->myVec_[199] << std::endl;
+
             this->comparePtr_ = &Example::GrayMaskPercentSync;
         break;
         case GRAY_REGIONS_PERCENT_SYNC :
@@ -116,7 +124,8 @@ Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitset_, buf0, buf1);
+    //uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitset_, buf0, buf1);
+    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->myVec_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);// results placeholder, will be passed to callback
     maskResultsToJs(env, this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});

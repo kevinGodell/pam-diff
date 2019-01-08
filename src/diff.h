@@ -29,6 +29,9 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
 //gray mask
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const uint_fast8_t *bitset, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+//vec
+uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &myVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 //gray regions
 void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, Region *regionsArr, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 

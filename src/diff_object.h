@@ -40,6 +40,8 @@ class Example : public Napi::ObjectWrap<Example> {
 
     uint_fast8_t *bitset_;// mask, buffer of 0's and 1's based on index of targeted pixel
 
+    std::vector<bool> myVec_;
+
     uint_fast32_t minDiff_;// regions, minimum pixDiff when comparing all set regions
 
     uint_fast32_t regionsLen_;// regions, number of regions
