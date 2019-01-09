@@ -409,7 +409,7 @@ class PamDiff extends Transform {
         this._example = new PC.Example(config);
         //this._example = new Example({target: target, async: false, filter: "percent", percent: this._percent, difference: this._difference, engine: "grayscale_all_sync", depth: this._depth, width: this._width, height: this._height}, 11);
 
-        switch (engine) {
+        /*switch (engine) {
             case 'grayscale_all_sync' :
                 this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
                 break;
@@ -454,7 +454,7 @@ class PamDiff extends Transform {
                 break;
             default:
                 throw new Error(`Did not find a matching engine for ${engine}`);
-        }
+        }*/
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;

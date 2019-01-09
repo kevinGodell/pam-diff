@@ -5,10 +5,7 @@
      "sources": [
        "src/addon.cc",
        "src/diff_object.cc",
-       "src/diff.cc",
-       "src/gray_sync.cc",
        "src/gray_async.cc",
-       "src/rgb_sync.cc",
        "src/rgb_async.cc"
      ],
      "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
@@ -29,7 +26,7 @@
            "CLANG_CXX_LIBRARY": "libc++",
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
            "MACOSX_DEPLOYMENT_TARGET": "10.7",
-           "GCC_ENABLE_CPP_RTTI" : "YES"
+           "__GCC_ENABLE_CPP_RTTI" : "YES"
          }
        }]
      ]
