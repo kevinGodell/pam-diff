@@ -41,7 +41,6 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     if (obj.Has("bitsetCount")) this->bitsetCount_ = obj.Get("bitsetCount").As<Napi::Number>().Uint32Value();
 
     if (obj.Has("bitset")) {
-        //this->bitset_ = obj.Get("bitset").As<Napi::Buffer<uint_fast8_t>>().Data();
         const bool *bitset = obj.Get("bitset").As<Napi::Buffer<bool>>().Data();
         this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
     }

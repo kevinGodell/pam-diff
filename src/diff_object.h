@@ -9,7 +9,6 @@ class Example : public Napi::ObjectWrap<Example> {
 public:
     static void Init(const Napi::Env &env, Napi::Object &exports);// initializes class and adds it to exports
     Example(const Napi::CallbackInfo &info);// constructor
-    ~Example();
 
 private:
     static Napi::FunctionReference constructor;
