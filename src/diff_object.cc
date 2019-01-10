@@ -1,9 +1,7 @@
 #include "diff_object.h"
 #include "diff.h"
 #include "helper.h"
-#include "gray_async.h"
-#include "rgb_async.h"
-#include "gray_async2.h"
+#include "async.h"
 #include <napi.h>
 
 void Example::Init(const Napi::Env &env, Napi::Object &exports) {
@@ -71,7 +69,6 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         case GRAY_REGIONS_PERCENT_ASYNC :
             this->comparePtr_ = &Example::GrayRegionsPercentAsync;
         break;
-
         case RGB_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbAllPercentSync;
         break;
@@ -99,7 +96,6 @@ void Example::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-
     (this->*(this->comparePtr_))(buf0, buf1, cb);
 }
 
@@ -111,6 +107,8 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     return Napi::String::New(env, this->myValue_);
 }
+
+/////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -140,49 +138,28 @@ Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint
     return env.Undefined();
 }
 
-//
+/////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
-    grayDiffWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::GrayMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
-    grayDiffWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
-    grayDiffWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
-
-/*Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
-    const Napi::Env env = cb.Env();
-    GrayDiffAllWorker *grayDiffAllWorker = new GrayDiffAllWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
-    grayDiffAllWorker->Queue();
-    return env.Undefined();
-}
-
-Napi::Value Example::GrayMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
-    const Napi::Env env = cb.Env();
-    GrayDiffMaskWorker *grayDiffMaskWorker = new GrayDiffMaskWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
-    grayDiffMaskWorker->Queue();
-    return env.Undefined();
-}
-
-Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
-    const Napi::Env env = cb.Env();
-    GrayDiffRegionsWorker *grayDiffRegionsWorker = new GrayDiffRegionsWorker(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
-    grayDiffRegionsWorker->Queue();
-    return env.Undefined();
-}*/
 
 /////////////////////////////////////////////////////////////////////
 
@@ -214,24 +191,26 @@ Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_
     return env.Undefined();
 }
 
+/////////////////////////////////////////////////////////////////////
+
 Napi::Value Example::RgbAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbDiffAllWorker *rgbDiffAllWorker = new RgbDiffAllWorker(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
-    rgbDiffAllWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::RgbMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbDiffMaskWorker *rgbDiffMaskWorker = new RgbDiffMaskWorker(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
-    rgbDiffMaskWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbDiffRegionsWorker *rgbDiffRegionsWorker = new RgbDiffRegionsWorker(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
-    rgbDiffRegionsWorker->Queue();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    diffWorker->Queue();
     return env.Undefined();
 }
 
