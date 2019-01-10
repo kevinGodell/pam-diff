@@ -151,12 +151,19 @@ void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regi
 /////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+
     const Napi::Env env = cb.Env();
+    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    diffWorker->Execute();
+    diffWorker->OnOK();
+    return env.Undefined();
+
+    /*const Napi::Env env = cb.Env();
     uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});
-    return env.Undefined();
+    return env.Undefined();*/
 }
 
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
