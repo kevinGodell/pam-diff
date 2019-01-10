@@ -5,12 +5,10 @@
      "sources": [
        "src/addon.cc",
        "src/diff_object.cc",
-       "src/gray_async.cc",
-       "src/rgb_async.cc",
-       "src/gray_async2.cc"
+       "src/async.cc"
      ],
-     "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
-     "cflags_cc!": [ "-fno-exceptions", "-fno-rtti" ],
+     "cflags!": [ "-fno-exceptions" ],
+     "cflags_cc!": [ "-fno-exceptions" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
      "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED" ],
