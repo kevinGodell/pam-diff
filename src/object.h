@@ -1,7 +1,10 @@
 #ifndef SRC_DIFF_OBJECT_H_
 #define SRC_DIFF_OBJECT_H_
 
-#include "diff.h"
+#include "engine.h"
+#include <stdint.h>
+#include <string>
+#include <vector>
 #include <napi.h>
 
 class Example : public Napi::ObjectWrap<Example> {
@@ -45,6 +48,46 @@ private:
     Napi::Value RgbAllPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     Napi::Value RgbMaskPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     Napi::Value RgbRegionsPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
+    static uint_fast32_t GetEngine(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async);
+    static void RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Region> &regionsVec);
+    enum Engine {
+        GRAY_ALL_PERCENT_SYNC = 0,
+        GRAY_MASK_PERCENT_SYNC = 10,
+        GRAY_REGIONS_PERCENT_SYNC = 20,
+        GRAY_ALL_BOUNDS_SYNC = 100,
+        GRAY_MASK_BOUNDS_SYNC = 110,
+        GRAY_REGIONS_BOUNDS_SYNC = 120,
+        GRAY_ALL_BLOBS_SYNC = 200,
+        GRAY_MASK_BLOBS_SYNC = 210,
+        GRAY_REGIONS_BLOBS_SYNC = 220,
+        GRAY_ALL_PERCENT_ASYNC = 1000,
+        GRAY_MASK_PERCENT_ASYNC = 1010,
+        GRAY_REGIONS_PERCENT_ASYNC = 1020,
+        GRAY_ALL_BOUND_ASYNC = 1100,
+        GRAY_MASK_BOUNDS_ASYNC = 1110,
+        GRAY_REGIONS_BOUNDS_ASYNC = 1120,
+        GRAY_ALL_BLOBS_ASYNC = 1200,
+        GRAY_MASK_BLOBS_ASYNC = 1210,
+        GRAY_REGIONS_BLOBS_ASYNC = 1220,
+        RGB_ALL_PERCENT_SYNC = 1,
+        RGB_MASK_PERCENT_SYNC = 11,
+        RGB_REGIONS_PERCENT_SYNC = 21,
+        RGB_ALL_BOUNDS_SYNC = 101,
+        RGB_MASK_BOUNDS_SYNC = 111,
+        RGB_REGIONS_BOUNDS_SYNC = 121,
+        RGB_ALL_BLOBS_SYNC = 201,
+        RGB_MASK_BLOBS_SYNC = 211,
+        RGB_REGIONS_BLOBS_SYNC = 221,
+        RGB_ALL_PERCENT_ASYNC = 1001,
+        RGB_MASK_PERCENT_ASYNC = 1011,
+        RGB_REGIONS_PERCENT_ASYNC = 1021,
+        RGB_ALL_BOUND_ASYNC = 1101,
+        RGB_MASK_BOUNDS_ASYNC = 1111,
+        RGB_REGIONS_BOUNDS_ASYNC = 1121,
+        RGB_ALL_BLOBS_ASYNC = 1201,
+        RGB_MASK_BLOBS_ASYNC = 1211,
+        RGB_REGIONS_BLOBS_ASYNC = 1221
+    };
 };
 
 #endif

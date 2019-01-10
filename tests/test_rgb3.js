@@ -1,7 +1,5 @@
 'use strict';
 
-console.log('hello');
-
 const dotenv = require('dotenv');
 
 dotenv.config();

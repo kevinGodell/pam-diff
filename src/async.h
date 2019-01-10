@@ -1,9 +1,9 @@
 #ifndef SRC_ASYNC_H_
 #define SRC_ASYNC_H_
 
-#include "helper.h"
-#include "diff.h"
+#include "engine.h"
 #include <stdint.h>
+#include <vector>
 #include <napi.h>
 
 class DiffWorker : public Napi::AsyncWorker {
@@ -19,14 +19,14 @@ public:
     void OnOK();
 
 private:
-    const uint_fast32_t pixCount_;// number of pixels
-    const uint_fast8_t pixDepth_;// number of bytes per pixel
-    const uint_fast8_t pixDiff_;// can only be 0 - 255
-    const uint_fast8_t diffsPerc_;// minimum percent 0 - 100
-    const uint_fast32_t bitsetCount_;// number of 1's in bitset, others are 0
+    uint_fast32_t pixCount_;// number of pixels
+    uint_fast8_t pixDepth_;// number of bytes per pixel
+    uint_fast8_t pixDiff_;// can only be 0 - 255
+    uint_fast8_t diffsPerc_;// minimum percent 0 - 100
+    uint_fast32_t bitsetCount_;// number of 1's in bitset, others are 0
     const std::vector<bool> bitsetVec_;// mask, 1's and 0's based on pixel index
-    const uint_fast8_t minDiff_;// can only be 0 - 255
-    const uint_fast8_t regionsLen_;// number of 1's in bitset, others are 0
+    uint_fast8_t minDiff_;// can only be 0 - 255
+    uint_fast8_t regionsLen_;// number of 1's in bitset, others are 0
     const std::vector<Region> regionsVec_;//
     const uint_fast8_t *buf0_;// pixel buffer
     const uint_fast8_t *buf1_;// pixel buffer

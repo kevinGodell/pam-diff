@@ -1,4 +1,4 @@
-#include "diff_object.h"
+#include "object.h"
 #include <napi.h>
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
