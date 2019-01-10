@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-//gray all
+//gray all percent
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
@@ -14,7 +14,7 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
     return 100 * diffs / pixCount;
 }
 
-//gray mask
+//gray mask percent
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
@@ -24,7 +24,7 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDi
     return 100 * diffs / bitsetCount;
 }
 
-//gray regions
+//gray regions percent
 void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<uint_fast32_t> &resultsVec) {
     for (uint_fast32_t i = 0, j = 0, diff = 0; i < pixCount; i++) {
          diff = GrayDiff(buf0, buf1, i);
@@ -35,7 +35,7 @@ void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, cons
     }
 }
 
-//rgb all
+//rgb all percent
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t bufLen = pixCount * depth;
     uint_fast32_t diffs = 0;
@@ -46,7 +46,7 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth
     return 100 * diffs / pixCount;
 }
 
-//rgb mask
+//rgb mask percent
 uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t bufLen = pixCount * depth;
     uint_fast32_t diffs = 0;
@@ -57,7 +57,7 @@ uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth
     return 100 * diffs / bitsetCount;
 }
 
-//rgb regions
+//rgb regions percent
 void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<uint_fast32_t> &resultsVec) {
     uint_fast32_t bufLen = pixCount * depth;
     for (uint_fast32_t i = 0, j = 0, p = 0, diff = 0; i < bufLen; i += depth, p++) {
