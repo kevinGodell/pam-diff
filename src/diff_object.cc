@@ -3,6 +3,7 @@
 #include "helper.h"
 #include "gray_async.h"
 #include "rgb_async.h"
+#include "gray_async2.h"
 #include <napi.h>
 
 void Example::Init(const Napi::Env &env, Napi::Object &exports) {
@@ -139,7 +140,30 @@ Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint
     return env.Undefined();
 }
 
+//
+
 Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    grayDiffWorker->Queue();
+    return env.Undefined();
+}
+
+Napi::Value Example::GrayMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    grayDiffWorker->Queue();
+    return env.Undefined();
+}
+
+Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    GrayDiffWorker *grayDiffWorker = new GrayDiffWorker(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    grayDiffWorker->Queue();
+    return env.Undefined();
+}
+
+/*Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     GrayDiffAllWorker *grayDiffAllWorker = new GrayDiffAllWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     grayDiffAllWorker->Queue();
@@ -158,7 +182,7 @@ Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uin
     GrayDiffRegionsWorker *grayDiffRegionsWorker = new GrayDiffRegionsWorker(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     grayDiffRegionsWorker->Queue();
     return env.Undefined();
-}
+}*/
 
 /////////////////////////////////////////////////////////////////////
 

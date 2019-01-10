@@ -6,7 +6,8 @@
        "src/addon.cc",
        "src/diff_object.cc",
        "src/gray_async.cc",
-       "src/rgb_async.cc"
+       "src/rgb_async.cc",
+       "src/gray_async2.cc"
      ],
      "cflags!": [ "-fno-exceptions", "-fno-rtti" ],
      "cflags_cc!": [ "-fno-exceptions", "-fno-rtti" ],

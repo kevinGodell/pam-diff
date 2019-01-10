@@ -469,7 +469,8 @@ class PamDiff extends Transform {
 
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
+        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
