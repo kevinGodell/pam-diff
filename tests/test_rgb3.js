@@ -1,5 +1,7 @@
 'use strict';
 
+console.log('hello');
+
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -83,8 +85,10 @@ ffmpeg.on('error', error => {
 
 ffmpeg.on('exit', (code, signal) => {
     assert(code === 0, `FFMPEG exited with code ${code} and signal ${signal}`);
-    assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
-    console.timeEnd('=====> testing rgb pam diffs with a single region set');
+    setTimeout(()=> {
+        assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
+        console.timeEnd('=====> testing rgb pam diffs with a single region set');
+    }, 100);
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

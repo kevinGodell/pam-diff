@@ -89,8 +89,10 @@ ffmpeg.on('error', error => {
 
 ffmpeg.on('exit', (code, signal) => {
     assert(code === 0, `FFMPEG exited with code ${code} and signal ${signal}`);
-    assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
-    console.timeEnd('=====> testing gray pam diffs with 4 regions set');
+    setTimeout(()=> {
+        assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
+        console.timeEnd('=====> testing gray pam diffs with 4 regions set');
+    }, 100);
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
