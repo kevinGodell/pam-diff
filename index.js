@@ -277,6 +277,7 @@ class PamDiff extends Transform {
      * @return {PamDiff}
      */
     resetCache() {
+        delete this._example;
         delete this._oldPix;
         delete this._newPix;
         delete this._width;
@@ -357,18 +358,40 @@ class PamDiff extends Transform {
             return;
         }
 
+        const config = {width: this._width, height: this._height, depth: this._depth, filter: 'percent'};
+
         const wxh = this._width * this._height;
 
         let engine = this._tupltype;
 
-        let parser = '';
+        //let parser = '';
+        let target;
 
         if (this._regionObj) {
             engine += '_regions';
+            target = 'regions';
+
+            config.target = 'regions';
+            config.minDiff = this._regionObj.minDiff;
+            //config.regionsLen = this._regionObj.length;
+            config.regions = this._regionObj.regions;
+
+            //console.log(config.regions);
         } else if (this._maskObj) {
             engine += '_mask';
+            target = 'mask';
+
+            config.target = 'mask';
+            config.difference = this._difference;
+            config.percent = this._percent;
+            config.bitsetCount = this._maskObj.count;
+            config.bitset = this._maskObj.bitset;
         } else {
             engine += '_all';
+            target = 'all';
+            config.target = 'all';
+            config.difference = this._difference;
+            config.percent = this._percent;
         }
 
         /*if (this._blobSize) {
@@ -377,11 +400,16 @@ class PamDiff extends Transform {
 
         if (this._async) {
             engine += '_async';
+            config.async = true;
         } else {
             engine += '_sync';
+            config.async = false;
         }
 
-        switch (engine) {
+        this._example = new PC.Example(config);
+        //this._example = new Example({target: target, async: false, filter: "percent", percent: this._percent, difference: this._difference, engine: "grayscale_all_sync", depth: this._depth, width: this._width, height: this._height}, 11);
+
+        /*switch (engine) {
             case 'grayscale_all_sync' :
                 this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
                 break;
@@ -426,7 +454,7 @@ class PamDiff extends Transform {
                 break;
             default:
                 throw new Error(`Did not find a matching engine for ${engine}`);
-        }
+        }*/
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -435,11 +463,14 @@ class PamDiff extends Transform {
         } else {
             this._parseChunk = this._parsePixels;
         }
+
+        //this._pixelDiffEngine = this._example.Compare;
     }
 
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
+        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
@@ -460,7 +491,8 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
+        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {

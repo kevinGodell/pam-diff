@@ -1,6 +1,8 @@
 'use strict';
 
-process.env.NODE_ENV = 'development';
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
@@ -8,6 +10,8 @@ const ffmpegPath = require('ffmpeg-static').path;
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;
+
+const async = process.env.ASYNC|| false;
 
 const params = [
     '-loglevel',
@@ -70,7 +74,7 @@ const region4 = {name: 'region4', difference: 15, percent: 15, polygon: [{x: 480
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions});
+const pamDiff = new PamDiff({regions : regions, async: async});
 
 let diffCount = 0;
 

@@ -4,17 +4,16 @@
      "target_name": "addon",
      "sources": [
        "src/addon.cc",
-       "src/diff.cc",
-       "src/gray_sync.cc",
-       "src/gray_async.cc",
-       "src/rgb_sync.cc",
-       "src/rgb_async.cc"
+       "src/object.cc",
+       "src/async.cc",
+       "src/engine.cc",
+       "src/results.cc"
      ],
      "cflags!": [ "-fno-exceptions" ],
      "cflags_cc!": [ "-fno-exceptions" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
-     "defines": [ "NAPI_CPP_EXCEPTIONS" ],
+     "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED" ],
      "conditions": [
        ["OS==\"win\"", {
          "msvs_settings": {
@@ -27,7 +26,8 @@
          "xcode_settings": {
            "CLANG_CXX_LIBRARY": "libc++",
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-           "MACOSX_DEPLOYMENT_TARGET": "10.7"
+           "MACOSX_DEPLOYMENT_TARGET": "10.7",
+           "__GCC_ENABLE_CPP_RTTI" : "YES"
          }
        }]
      ]
