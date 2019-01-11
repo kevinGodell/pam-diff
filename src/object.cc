@@ -135,7 +135,7 @@ uint_fast32_t Example::GetEngine(const uint_fast32_t depth, const std::string ta
     return value;
 }
 
-void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Region> &regionsVec) {
+void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region> &regionsVec) {
     for (uint_fast32_t i = 0; i < regionsLen; i++) {
         const std::string name = regionsJs.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
         const uint_fast8_t diff = regionsJs.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
@@ -151,24 +151,17 @@ void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regi
 /////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
-
     const Napi::Env env = cb.Env();
-    DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
-    diffWorker->Execute();
-    diffWorker->OnOK();
-    return env.Undefined();
-
-    /*const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});
-    return env.Undefined();*/
+    return env.Undefined();
 }
 
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, "mask", this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});
@@ -178,7 +171,7 @@ Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fa
 Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     std::vector<uint_fast32_t> resultsVec(this->regionsLen_, 0);
-    MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, resultsVec);
+    Engine::MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, resultsVec);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, this->regionsLen_, this->regionsVec_, resultsVec, resultsJs);
     cb.Call({env.Null(), resultsJs});
@@ -212,7 +205,7 @@ Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uin
 
 Napi::Value Example::RgbAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, buf0, buf1);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});
@@ -221,7 +214,7 @@ Napi::Value Example::RgbAllPercentSync(const uint_fast8_t *buf0, const uint_fast
 
 Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, "mask", this->diffsPerc_, percentResult, resultsJs);
     cb.Call({env.Null(), resultsJs});
@@ -231,7 +224,7 @@ Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fas
 Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     std::vector<uint_fast32_t> resultsVec(this->regionsLen_, 0);
-    MeasureDiffs(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, resultsVec);
+    Engine::MeasureDiffs(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, resultsVec);
     Napi::Array resultsJs = Napi::Array::New(env);
     Results::ConvertToJs(env, this->regionsLen_, this->regionsVec_, resultsVec, resultsJs);
     cb.Call({env.Null(), resultsJs});
@@ -260,6 +253,3 @@ Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint
     diffWorker->Queue();
     return env.Undefined();
 }
-
-// Napi::Object obj = constructor.New({ Napi::Number::New(info.Env(), this->value_ * multiple.DoubleValue()) });
-// https://nodejs.github.io/node-addon-api/class_napi_1_1_object_wrap.html

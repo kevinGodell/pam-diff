@@ -30,7 +30,7 @@ private:
     std::vector<bool> bitsetVec_;// mask, 1's and 0's based on pixel index
     uint_fast32_t minDiff_;// regions, minimum pixDiff when comparing all set regions
     uint_fast32_t regionsLen_;// regions, number of regions
-    std::vector<Region> regionsVec_;// regions
+    std::vector<Engine::Region> regionsVec_;// regions
     bool async_;// using async or sync
     void Compare(const Napi::CallbackInfo &info);// instance method
     void SetMyValue(const Napi::CallbackInfo &info, const Napi::Value &value);// setter
@@ -49,8 +49,8 @@ private:
     Napi::Value RgbMaskPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     Napi::Value RgbRegionsPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     static uint_fast32_t GetEngine(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async);
-    static void RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Region> &regionsVec);
-    enum Engine {
+    static void RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region> &regionsVec);
+    enum Engines {
         GRAY_ALL_PERCENT_SYNC = 0,
         GRAY_MASK_PERCENT_SYNC = 10,
         GRAY_REGIONS_PERCENT_SYNC = 20,

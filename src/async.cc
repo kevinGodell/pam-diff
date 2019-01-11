@@ -20,7 +20,7 @@ DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDiff,
 }
 
 //gray regions percent
-DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) :
+DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) :
     Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
     this->ExecutePtr_ = &DiffWorker::GrayRegionsPercentExecute;
     this->OnOkPtr_ = &DiffWorker::GrayRegionsPercentOnOk;
@@ -41,7 +41,7 @@ DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth
 }
 
 //rgb regions percent
-DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) :
+DiffWorker::DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) :
     Napi::AsyncWorker(cb), pixCount_(pixCount), pixDepth_(pixDepth), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
     this->ExecutePtr_ = &DiffWorker::RgbRegionsPercentExecute;
     this->OnOkPtr_ = &DiffWorker::RgbRegionsPercentOnOk;
@@ -56,7 +56,7 @@ void DiffWorker::OnOK() {
 }
 
 void DiffWorker::GrayAllPercentExecute() {
-    this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDiff_, this->buf0_, this->buf1_);
+    this->percentResult_ = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, this->buf0_, this->buf1_);
 }
 
 void DiffWorker::GrayAllPercentOnOk() {
@@ -68,7 +68,7 @@ void DiffWorker::GrayAllPercentOnOk() {
 }
 
 void DiffWorker::GrayMaskPercentExecute() {
-    this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    this->percentResult_ = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
 }
 
 void DiffWorker::GrayMaskPercentOnOk() {
@@ -81,7 +81,7 @@ void DiffWorker::GrayMaskPercentOnOk() {
 
 void DiffWorker::GrayRegionsPercentExecute() {
     this->resultsVec_ = std::vector<uint_fast32_t> (this->regionsLen_, 0);
-    MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_, this->resultsVec_);
+    Engine::MeasureDiffs(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_, this->resultsVec_);
 }
 
 void DiffWorker::GrayRegionsPercentOnOk() {
@@ -93,7 +93,7 @@ void DiffWorker::GrayRegionsPercentOnOk() {
 }
 
 void DiffWorker::RgbAllPercentExecute() {
-    this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDepth_, this->pixDiff_, this->buf0_, this->buf1_);
+    this->percentResult_ = Engine::MeasureDiffs(this->pixCount_, this->pixDepth_, this->pixDiff_, this->buf0_, this->buf1_);
 }
 
 void DiffWorker::RgbAllPercentOnOk() {
@@ -105,7 +105,7 @@ void DiffWorker::RgbAllPercentOnOk() {
 }
 
 void DiffWorker::RgbMaskPercentExecute() {
-    this->percentResult_ = MeasureDiffs(this->pixCount_, this->pixDepth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    this->percentResult_ = Engine::MeasureDiffs(this->pixCount_, this->pixDepth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
 }
 
 void DiffWorker::RgbMaskPercentOnOk() {
@@ -118,7 +118,7 @@ void DiffWorker::RgbMaskPercentOnOk() {
 
 void DiffWorker::RgbRegionsPercentExecute() {
     this->resultsVec_ = std::vector<uint_fast32_t> (this->regionsLen_, 0);
-    MeasureDiffs(this->pixCount_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_, this->resultsVec_);
+    Engine::MeasureDiffs(this->pixCount_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_, this->resultsVec_);
 }
 
 void DiffWorker::RgbRegionsPercentOnOk() {

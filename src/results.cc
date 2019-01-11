@@ -14,7 +14,7 @@ void Results::ConvertToJs(const Napi::Env &env, const std::string name, const ui
     }
 }
 
-void Results::ConvertToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec, Napi::Array &resultsJs) {
+void Results::ConvertToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Engine::Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec, Napi::Array &resultsJs) {
     for (uint_fast32_t i = 0, j = 0, percent = 0; i < regLen; i++) {
         percent = 100 * resultsVec[i] / std::get<3>(regionsVec[i]);
         if (std::get<2>(regionsVec[i]) > percent) continue;
