@@ -20,7 +20,7 @@ namespace Engine {
         return AbsUint(buf0[i] - buf1[i]);
     }
 
-    //measure difference of rgb(a) bytes
+    //measure difference of rgb(a) bytes using average
     inline uint_fast8_t RgbDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t i) {
         return AbsUint(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
     }
