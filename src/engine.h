@@ -25,6 +25,16 @@ namespace Engine {
         return AbsUint(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
     }
 
+    //math min
+    inline uint_fast16_t MinUint(uint_fast16_t a, uint_fast16_t b) {
+        return (a < b) ? a : b;
+    }
+
+    //math max
+    inline uint_fast16_t MaxUint(uint_fast16_t a, uint_fast16_t b) {
+        return (a > b) ? a : b;
+    }
+
     //gray all percent
     uint_fast8_t MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
@@ -42,6 +52,12 @@ namespace Engine {
 
     //rgb regions percent
     void MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<uint_fast32_t> &resultsVec);
+
+    //experimnets
+
+    uint_fast8_t MeasureDiffs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+    uint_fast8_t MeasureDiffs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 }
 

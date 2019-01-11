@@ -18,7 +18,7 @@ private:
     uint_fast32_t engineType_;// int used in switch for determining which function to use
     std::string myValue_;// used as a test for setter/getter
     std::string target_;// all, mask, region
-    std::string filter_;// percent, bounds, blobs
+    std::string response_;// percent, bounds, blobs
     uint_fast32_t width_;// pixel width
     uint_fast32_t height_;// pixel height
     uint_fast32_t depth_;// 1, 3, 4
@@ -48,6 +48,9 @@ private:
     Napi::Value RgbAllPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     Napi::Value RgbMaskPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
     Napi::Value RgbRegionsPercentAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
+
+    Napi::Value GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+
     static uint_fast32_t GetEngine(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async);
     static void RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region> &regionsVec);
     enum Engines {

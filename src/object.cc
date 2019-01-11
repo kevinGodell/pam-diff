@@ -29,13 +29,13 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     this->height_ = obj.Get("height").As<Napi::Number>().Uint32Value();
     this->depth_ = obj.Get("depth").As<Napi::Number>().Uint32Value();
     this->target_ = obj.Get("target").As<Napi::String>().Utf8Value();
-    this->filter_ = obj.Get("filter").As<Napi::String>().Utf8Value();
+    this->response_ = obj.Get("response").As<Napi::String>().Utf8Value();
     this->async_ =  obj.Get("async").As<Napi::Boolean>().Value();
 
     // calculate some values based on required information
     this->pixCount_ = this->width_ * this->height_;
     this->bufLen_ = this->pixCount_ * this->depth_;
-    this->engineType_ = Example::GetEngine(this->depth_, this->target_, this->filter_, this->async_);
+    this->engineType_ = Example::GetEngine(this->depth_, this->target_, this->response_, this->async_);
 
     // the following settings are optional depending on chosen engine, grab whatever is available
     if (obj.Has("difference")) this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
@@ -73,6 +73,11 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         case GRAY_REGIONS_PERCENT_ASYNC :
             this->comparePtr_ = &Example::GrayRegionsPercentAsync;
         break;
+
+        case GRAY_ALL_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::GrayAllBoundsSync;
+        break;
+
         case RGB_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbAllPercentSync;
         break;
@@ -114,7 +119,7 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
 
 /////////////////////////////////////////////////////////////////////
 
-uint_fast32_t Example::GetEngine(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async) {
+uint_fast32_t Example::GetEngine(const uint_fast32_t depth, const std::string target, const std::string response, const bool async) {
     uint_fast32_t value = 0;
     if (depth == 3 || depth == 4) {//dont add for depth == 1
         value += 1;
@@ -124,9 +129,9 @@ uint_fast32_t Example::GetEngine(const uint_fast32_t depth, const std::string ta
     } else if (target == "regions") {
         value += 20;
     }
-    if (returns == "bounds") {//dont add for target == "percent"
+    if (response == "bounds") {//dont add for target == "percent"
         value += 100;
-    } else if (returns == "blobs") {
+    } else if (response == "blobs") {
         value += 200;
     }
     if (async) {
@@ -251,5 +256,16 @@ Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint
     const Napi::Env env = cb.Env();
     DiffWorker *diffWorker = new DiffWorker(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     diffWorker->Queue();
+    return env.Undefined();
+}
+
+/////////////////////////////////////////////////////////////////////
+
+Napi::Value Example::GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult, resultsJs);
+    cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }

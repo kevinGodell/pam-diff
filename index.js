@@ -25,6 +25,7 @@ class PamDiff extends Transform {
     constructor(options, callback) {
         super(options);
         Transform.call(this, {objectMode: true});
+        this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
         this.async = PamDiff._parseOptions('async', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
@@ -78,6 +79,47 @@ class PamDiff extends Transform {
      */
     static _validateBoolean(bool) {
         return (bool === true || bool === 'true' || bool === 1 || bool === '1');
+    }
+
+    /**
+     *
+     * @param string
+     * @return {String}
+     * @private
+     */
+    static _validateString(string, strings) {
+        if (strings.includes(string)) {
+            return string;
+        }
+        return strings[0];
+    }
+
+    /**
+     *
+     * @param string {String}
+     */
+    set response(string) {
+        this._response = PamDiff._validateString(string, ['percent', 'bounds', 'blobs']);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    /**
+     *
+     * @return {String}
+     */
+    get response() {
+        return this._response || null;
+    }
+
+    /**
+     *
+     * @param string {String}
+     * @return {PamDiff}
+     */
+    setResponse(string) {
+        this.response = string;
+        return this;
     }
 
     /**
@@ -217,28 +259,28 @@ class PamDiff extends Transform {
      *
      * @param number {Number}
      */
-    /*set blobSize(number) {
+    set blobSize(number) {
         this._blobSize = PamDiff._validateNumber(parseInt(number), 0, 0, 100000);
         this._configurePixelDiffEngine();
-    }*/
+    }
 
     /**
      *
      * @return {Number}
      */
-    /*get blobSize() {
+    get blobSize() {
         return this._blobSize || 0;
-    }*/
+    }
 
     /**
      *
      * @param number
      * @return {PamDiff}
      */
-    /*setBlobSize(number) {
+    setBlobSize(number) {
         this.blobSize = number;
         return this;
-    }*/
+    }
 
     /**
      *
@@ -286,7 +328,6 @@ class PamDiff extends Transform {
         delete this._tupltype;
         delete this._regionObj;
         delete this._maskObj;
-        delete this._pixelDiffEngine;
         this._parseChunk = this._parseFirstChunk;
         return this;
     }
@@ -358,29 +399,19 @@ class PamDiff extends Transform {
             return;
         }
 
-        const config = {width: this._width, height: this._height, depth: this._depth, filter: 'percent'};
-
-        const wxh = this._width * this._height;
-
         let engine = this._tupltype;
 
-        //let parser = '';
-        let target;
+        engine += `_${this._width}_x_${this._height}`;
+
+        const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
 
         if (this._regionObj) {
             engine += '_regions';
-            target = 'regions';
-
             config.target = 'regions';
             config.minDiff = this._regionObj.minDiff;
-            //config.regionsLen = this._regionObj.length;
             config.regions = this._regionObj.regions;
-
-            //console.log(config.regions);
         } else if (this._maskObj) {
             engine += '_mask';
-            target = 'mask';
-
             config.target = 'mask';
             config.difference = this._difference;
             config.percent = this._percent;
@@ -388,73 +419,16 @@ class PamDiff extends Transform {
             config.bitset = this._maskObj.bitset;
         } else {
             engine += '_all';
-            target = 'all';
             config.target = 'all';
             config.difference = this._difference;
             config.percent = this._percent;
         }
 
-        /*if (this._blobSize) {
-            engine += '_blob';
-        }*/
+        engine += `_${this._response}`;
 
-        if (this._async) {
-            engine += '_async';
-            config.async = true;
-        } else {
-            engine += '_sync';
-            config.async = false;
-        }
+        engine += this._async ? '_async' : '_sync';
 
         this._example = new PC.Example(config);
-        //this._example = new Example({target: target, async: false, filter: "percent", percent: this._percent, difference: this._difference, engine: "grayscale_all_sync", depth: this._depth, width: this._width, height: this._height}, 11);
-
-        /*switch (engine) {
-            case 'grayscale_all_sync' :
-                this._pixelDiffEngine = PC.grayDiffAllSync.bind(this, wxh, this._difference, this._percent);
-                break;
-            case 'grayscale_mask_sync' :
-                this._pixelDiffEngine = PC.grayDiffMaskSync.bind(this, wxh, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
-                break;
-            case 'grayscale_regions_sync' :
-                this._pixelDiffEngine = PC.grayDiffRegionsSync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
-                break;
-            case 'grayscale_all_async' :
-                this._pixelDiffEngine = PC.grayDiffAllAsync.bind(this, wxh, this._difference, this._percent);
-                break;
-            case 'grayscale_mask_async' :
-                this._pixelDiffEngine = PC.grayDiffMaskAsync.bind(this, wxh, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
-                break;
-            case 'grayscale_regions_async' :
-                this._pixelDiffEngine = PC.grayDiffRegionsAsync.bind(this, wxh, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
-                break;
-            case 'rgb_all_sync' :
-            case 'rgb_alpha_all_sync' :
-                this._pixelDiffEngine = PC.rgbDiffAllSync.bind(this, wxh, this._depth, this._difference, this._percent);
-                break;
-            case 'rgb_mask_sync' :
-            case 'rgb_alpha_mask_sync' :
-                this._pixelDiffEngine = PC.rgbDiffMaskSync.bind(this, wxh, this._depth, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
-                break;
-            case 'rgb_regions_sync' :
-            case 'rgb_alpha_regions_sync' :
-                this._pixelDiffEngine = PC.rgbDiffRegionsSync.bind(this, wxh, this._depth, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
-                break;
-            case 'rgb_all_async' :
-            case 'rgb_alpha_all_async' :
-                this._pixelDiffEngine = PC.rgbDiffAllAsync.bind(this, wxh, this._depth, this._difference, this._percent);
-                break;
-            case 'rgb_mask_async' :
-            case 'rgb_alpha_mask_async' :
-                this._pixelDiffEngine = PC.rgbDiffMaskAsync.bind(this, wxh, this._depth, this._difference, this._percent, this._maskObj.count, this._maskObj.bitset);
-                break;
-            case 'rgb_regions_async' :
-            case 'rgb_alpha_regions_async' :
-                this._pixelDiffEngine = PC.rgbDiffRegionsAsync.bind(this, wxh, this._depth, this._regionObj.minDiff, this._regionObj.length, this._regionObj.regions);
-                break;
-            default:
-                throw new Error(`Did not find a matching engine for ${engine}`);
-        }*/
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -464,7 +438,6 @@ class PamDiff extends Transform {
             this._parseChunk = this._parsePixels;
         }
 
-        //this._pixelDiffEngine = this._example.Compare;
     }
 
     _parsePixels(chunk) {

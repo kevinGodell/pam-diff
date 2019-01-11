@@ -70,3 +70,39 @@ void Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth
         }
     }
 }
+
+//experiment
+
+//gray all bounds
+uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast16_t x = 0, y = 0, maxX = 0, maxY = 0, minX = width - 1, minY = height - 1;
+    uint_fast32_t i = 0, diffs = 0;
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++, i++) {
+            if (pixDiff > GrayDiff(buf0, buf1, i)) continue;
+            maxX = MaxUint(maxX, x);
+            maxY = MaxUint(maxY, y);
+            minX = MinUint(minX, x);
+            minY = MinUint(minY, y);
+            diffs++;
+        }
+    }
+    return 100 * diffs / pixCount;
+}
+
+//gray mask bounds
+uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast16_t x = 0, y = 0, maxX = 0, maxY = 0, minX = width - 1, minY = height - 1;
+    uint_fast32_t i = 0, diffs = 0;
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++, i++) {
+            if (bitsetVec[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
+            maxX = MaxUint(maxX, x);
+            maxY = MaxUint(maxY, y);
+            minX = MinUint(minX, x);
+            minY = MinUint(minY, y);
+            diffs++;
+        }
+    }
+    return 100 * diffs / pixCount;
+}
