@@ -15,10 +15,20 @@ public:
     DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     DiffWorker(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+
+    //experiment
+    DiffWorker(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    DiffWorker(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+
     void Execute();
     void OnOK();
 
 private:
+
+    //experiment
+    uint_fast16_t width_;
+    uint_fast16_t height_;
+
     uint_fast32_t pixCount_;// number of pixels
     uint_fast8_t pixDepth_;// number of bytes per pixel
     uint_fast8_t pixDiff_;// can only be 0 - 255
@@ -31,7 +41,10 @@ private:
     const uint_fast8_t *buf0_;// pixel buffer
     const uint_fast8_t *buf1_;// pixel buffer
     uint_fast8_t percentResult_;// percent placeholder
-    std::vector<uint_fast32_t> resultsVec_;//
+    std::vector<uint_fast8_t> resultsVec_;//
+
+    //experiment
+    Engine::BoundsResult boundsResult_;
 
     void (DiffWorker::*ExecutePtr_)();// function pointer
     void (DiffWorker::*OnOkPtr_)();// function pointer
@@ -53,6 +66,13 @@ private:
 
     void RgbRegionsPercentExecute();
     void RgbRegionsPercentOnOk();
+
+    //experiment
+    void GrayAllBoundsExecute();
+    void GrayAllBoundsOnOk();
+
+    void GrayMaskBoundsExecute();
+    void GrayMaskBoundsOnOk();
 };
 
 #endif

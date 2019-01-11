@@ -83,7 +83,8 @@ class PamDiff extends Transform {
 
     /**
      *
-     * @param string
+     * @param string {String}
+     * @param strings {Array}
      * @return {String}
      * @private
      */
