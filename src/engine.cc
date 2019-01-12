@@ -26,8 +26,6 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
 
 //gray regions percent experiment return array containing percent number of diffs per region
 std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::vector<uint_fast8_t> resultsVec;
-    resultsVec.reserve(regionsLen);
     std::vector<uint_fast32_t> diffsVec(regionsLen, 0);
     for (uint_fast32_t i = 0; i < pixCount; i++) {
          uint_fast8_t diff = GrayDiff(buf0, buf1, i);
@@ -37,6 +35,8 @@ std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, con
              diffsVec[r]++;
          }
     }
+    std::vector<uint_fast8_t> resultsVec;
+    resultsVec.reserve(regionsLen);
     for (uint_fast8_t r = 0; r < regionsLen; r++) {
         resultsVec[r] = diffsVec[r] * 100 / std::get<3>(regionsVec[r]);
     }
@@ -65,9 +65,9 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
 
 //rgb regions percent
 std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::vector<uint_fast8_t> resultsVec;
-    resultsVec.reserve(regionsLen);
+
     std::vector<uint_fast32_t> diffsVec(regionsLen, 0);
+
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
         uint_fast8_t diff = RgbDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
@@ -76,9 +76,14 @@ std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, con
             diffsVec[r]++;
         }
     }
+
+    std::vector<uint_fast8_t> resultsVec;
+    resultsVec.reserve(regionsLen);
+
     for (uint_fast8_t r = 0; r < regionsLen; r++) {
         resultsVec[r] = diffsVec[r] * 100 / std::get<3>(regionsVec[r]);
     }
+
     return resultsVec;
 }
 
@@ -120,9 +125,19 @@ Engine::BoundsResult Engine::MeasureDiffs(const uint_fast16_t width, const uint_
 }
 
 /*std::vector<Engine::BoundsResult> Engine::MeasureDiffs(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    //declare return vector
     std::vector<Engine::BoundsResult> resultsVec;
+    //reserve size
     resultsVec.reserve(regionsLen);
+    //iterate and populate
+    for (uint_fast8_t r; r < regionsLen; r++) {
 
+    }
+
+
+
+
+    return resultsVec;
 }*/
 
 //if (x > maxX) maxX = x;
