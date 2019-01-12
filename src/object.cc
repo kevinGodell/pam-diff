@@ -173,7 +173,7 @@ void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regi
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -181,7 +181,7 @@ Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fas
 Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "mask", this->diffsPerc_, percentResult);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -198,14 +198,14 @@ Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint
 
 Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayAllPercent *grayAllPercent = new GrayAllPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    GrayAllPercent *grayAllPercent = new GrayAllPercent(this->target_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     grayAllPercent->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::GrayMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayMaskPercent *grayMaskPercent = new GrayMaskPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    GrayMaskPercent *grayMaskPercent = new GrayMaskPercent(this->target_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     grayMaskPercent->Queue();
     return env.Undefined();
 }
@@ -221,23 +221,23 @@ Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uin
 
 Napi::Value Example::RgbAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "all", this->diffsPerc_, percentResult);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, buf0, buf1);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
 
 Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "mask", this->diffsPerc_, percentResult);
+    uint_fast8_t percentResult = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
 
 Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<uint_fast8_t> resultsVec = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
+    std::vector<uint_fast8_t> resultsVec = Engine::MeasureDiffs(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ConvertToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -247,21 +247,21 @@ Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_
 
 Napi::Value Example::RgbAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbAllPercent *rgbAllPercent = new RgbAllPercent(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    RgbAllPercent *rgbAllPercent = new RgbAllPercent(this->target_, this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     rgbAllPercent->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::RgbMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbMaskPercent *rgbMaskPercent = new RgbMaskPercent(this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    RgbMaskPercent *rgbMaskPercent = new RgbMaskPercent(this->target_, this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     rgbMaskPercent->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbRegionsPercent *rgbRegionsPercent = new RgbRegionsPercent(this->pixCount_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    RgbRegionsPercent *rgbRegionsPercent = new RgbRegionsPercent(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     rgbRegionsPercent->Queue();
     return env.Undefined();
 }
@@ -271,7 +271,7 @@ Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint
 Napi::Value Example::GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     Engine::BoundsResult boundsResult = Engine::MeasureDiffs(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "all", this->diffsPerc_, boundsResult);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -279,7 +279,7 @@ Napi::Value Example::GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast
 Napi::Value Example::GrayMaskBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     Engine::BoundsResult boundsResult = Engine::MeasureDiffs(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = Results::ConvertToJs(env, "mask", this->diffsPerc_, boundsResult);
+    Napi::Array resultsJs = Results::ConvertToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -294,14 +294,14 @@ Napi::Value Example::GrayRegionsBoundsSync(const uint_fast8_t *buf0, const uint_
 
 Napi::Value Example::GrayAllBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayAllBounds *grayAllBounds = new GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    GrayAllBounds *grayAllBounds = new GrayAllBounds(this->target_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     grayAllBounds->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::GrayMaskBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayMaskBounds *grayMaskBounds = new GrayMaskBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    GrayMaskBounds *grayMaskBounds = new GrayMaskBounds(this->target_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     grayMaskBounds->Queue();
     return env.Undefined();
 }
