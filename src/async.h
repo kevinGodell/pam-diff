@@ -78,12 +78,11 @@ class RgbAllPercent : public Napi::AsyncWorker {
 //does not need pixCount
 class RgbMaskPercent : public Napi::AsyncWorker {
     public:
-        RgbMaskPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbMaskPercent(const std::string target, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
         void OnOK();
     private:
         const std::string target_;
-        const uint_fast32_t pixCount_;
         const uint_fast8_t pixDepth_;
         const uint_fast32_t bufLen_;
         const uint_fast8_t pixDiff_;
@@ -117,11 +116,10 @@ class GrayRegionsPercent : public Napi::AsyncWorker {
 //does not need pixCount
 class RgbRegionsPercent : public Napi::AsyncWorker {
     public:
-        RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbRegionsPercent(const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
         void OnOK();
     private:
-        const uint_fast32_t pixCount_;
         const uint_fast8_t pixDepth_;
         const uint_fast32_t bufLen_;
         const uint_fast8_t minDiff_;

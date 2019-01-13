@@ -51,9 +51,8 @@ uint_fast32_t Engine::RgbAllPercent(const uint_fast32_t pixCount, const uint_fas
     return 100 * diffs / pixCount;
 }
 
-//does not need pixCount
 // rgb mask percent
-uint_fast32_t Engine::RgbMaskPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+uint_fast32_t Engine::RgbMaskPercent(const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
         if (bitsetVec[p] == 0 || pixDiff > RgbDiff(buf0, buf1, i)) continue;
@@ -64,7 +63,7 @@ uint_fast32_t Engine::RgbMaskPercent(const uint_fast32_t pixCount, const uint_fa
 
 //does not need pixCount
 // rgb regions percent
-std::vector<uint_fast32_t> Engine::RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+std::vector<uint_fast32_t> Engine::RgbRegionsPercent(const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t i = 0, p = 0, r = 0; i < bufLen; i += depth, p++) {
         uint_fast8_t diff = RgbDiff(buf0, buf1, i);

@@ -253,7 +253,7 @@ Napi::Value Example::RgbAllPercentSync(const uint_fast8_t *buf0, const uint_fast
 
 Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    uint_fast8_t percentResult = Engine::RgbMaskPercent(this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    uint_fast8_t percentResult = Engine::RgbMaskPercent(this->depth_, this->bufLen_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -261,7 +261,7 @@ Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<uint_fast32_t> resultsVec = Engine::RgbRegionsPercent(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
+    std::vector<uint_fast32_t> resultsVec = Engine::RgbRegionsPercent(this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -278,14 +278,14 @@ Napi::Value Example::RgbAllPercentAsync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::RgbMaskPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbMaskPercent *rgbMaskPercent = new RgbMaskPercent(this->target_, this->pixCount_, this->depth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    RgbMaskPercent *rgbMaskPercent = new RgbMaskPercent(this->target_, this->depth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     rgbMaskPercent->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    RgbRegionsPercent *rgbRegionsPercent = new RgbRegionsPercent(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    RgbRegionsPercent *rgbRegionsPercent = new RgbRegionsPercent(this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     rgbRegionsPercent->Queue();
     return env.Undefined();
 }
