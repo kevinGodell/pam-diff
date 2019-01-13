@@ -25,7 +25,7 @@ class GrayAllPercent : public Napi::AsyncWorker {
         GrayAllPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
         void OnOK();
-    protected:
+    private:
         const std::string target_;
         const uint_fast32_t pixCount_;
         const uint_fast8_t pixDiff_;
@@ -37,37 +37,62 @@ class GrayAllPercent : public Napi::AsyncWorker {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskPercent : public GrayAllPercent {
+class GrayMaskPercent : public Napi::AsyncWorker {
     public:
         GrayMaskPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
-    protected:
+        void OnOK();
+    private:
+        const std::string target_;
+        const uint_fast32_t pixCount_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
         const uint_fast32_t bitsetCount_;
         const std::vector<bool> &bitsetVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        uint_fast32_t percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbAllPercent : public GrayAllPercent {
+class RgbAllPercent : public Napi::AsyncWorker {
     public:
         RgbAllPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
+        void OnOK();
     private:
+        const std::string target_;
+        const uint_fast32_t pixCount_;
         const uint_fast8_t pixDepth_;
         const uint_fast32_t bufLen_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        uint_fast32_t percentResult_;
 };
 
-
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //does not need pixCount
-class RgbMaskPercent : public GrayMaskPercent {
+class RgbMaskPercent : public Napi::AsyncWorker {
     public:
         RgbMaskPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
+        void OnOK();
     private:
+        const std::string target_;
+        const uint_fast32_t pixCount_;
         const uint_fast8_t pixDepth_;
         const uint_fast32_t bufLen_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
+        const uint_fast32_t bitsetCount_;
+        const std::vector<bool> &bitsetVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        uint_fast32_t percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -77,7 +102,7 @@ class GrayRegionsPercent : public Napi::AsyncWorker {
         GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
         void OnOK();
-    protected:
+    private:
         const uint_fast32_t pixCount_;
         const uint_fast8_t minDiff_;
         const uint_fast8_t regionsLen_;
@@ -88,14 +113,23 @@ class GrayRegionsPercent : public Napi::AsyncWorker {
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //does not need pixCount
-class RgbRegionsPercent : public GrayRegionsPercent {
+class RgbRegionsPercent : public Napi::AsyncWorker {
     public:
         RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
+        void OnOK();
     private:
+        const uint_fast32_t pixCount_;
         const uint_fast8_t pixDepth_;
         const uint_fast32_t bufLen_;
+        const uint_fast8_t minDiff_;
+        const uint_fast8_t regionsLen_;
+        const std::vector<Engine::Region> &regionsVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        std::vector<uint_fast32_t> percentResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,13 +154,23 @@ class GrayAllBounds : public Napi::AsyncWorker {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskBounds : public GrayAllBounds {
+class GrayMaskBounds : public Napi::AsyncWorker {
     public:
         GrayMaskBounds(const std::string target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
+        void OnOK();
     private:
+        const std::string target_;
+        const uint_fast32_t width_;
+        const uint_fast32_t height_;
+        const uint_fast32_t pixCount_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
         const uint_fast32_t bitsetCount_;
         const std::vector<bool> &bitsetVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        Engine::BoundsResult boundsResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
