@@ -4,8 +4,8 @@
 #include <string>
 #include <vector>
 
-//gray all percent
-uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// gray all percent
+uint_fast32_t Engine::GrayAllPercent(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
         if (pixDiff > GrayDiff(buf0, buf1, i)) continue;
@@ -14,8 +14,8 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
     return 100 * diffs / pixCount;
 }
 
-//gray mask percent
-uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// gray mask percent
+uint_fast32_t Engine::GrayMaskPercent(const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < pixCount; i++) {
         if (bitsetVec[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
@@ -24,27 +24,25 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
     return 100 * diffs / bitsetCount;
 }
 
-//gray regions percent experiment return array containing percent number of diffs per region
-std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::vector<uint_fast32_t> diffsVec(regionsLen, 0);
+// gray regions percent
+std::vector<uint_fast32_t> Engine::GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t i = 0; i < pixCount; i++) {
          uint_fast8_t diff = GrayDiff(buf0, buf1, i);
          if (minDiff > diff) continue;
          for (uint_fast8_t r = 0; r < regionsLen; r++) {
              if (std::get<4>(regionsVec[r])[i] == 0 || std::get<1>(regionsVec[r]) > diff) continue;
-             diffsVec[r]++;
+             percentResultVec[r]++;
          }
     }
-    std::vector<uint_fast8_t> resultsVec;
-    resultsVec.reserve(regionsLen);
     for (uint_fast8_t r = 0; r < regionsLen; r++) {
-        resultsVec[r] = diffsVec[r] * 100 / std::get<3>(regionsVec[r]);
+        percentResultVec[r] = percentResultVec[r] * 100 / std::get<3>(regionsVec[r]);
     }
-    return resultsVec;
+    return percentResultVec;
 }
 
-//rgb all percent
-uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// rgb all percent
+uint_fast32_t Engine::RgbAllPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += depth) {
         if (pixDiff > RgbDiff(buf0, buf1, i)) continue;
@@ -53,8 +51,8 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
     return 100 * diffs / pixCount;
 }
 
-//rgb mask percent
-uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// rgb mask percent
+uint_fast32_t Engine::RgbMaskPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
         if (bitsetVec[p] == 0 || pixDiff > RgbDiff(buf0, buf1, i)) continue;
@@ -63,34 +61,25 @@ uint_fast8_t Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8
     return 100 * diffs / bitsetCount;
 }
 
-//rgb regions percent
-std::vector<uint_fast8_t> Engine::MeasureDiffs(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-
-    std::vector<uint_fast32_t> diffsVec(regionsLen, 0);
-
+// rgb regions percent
+std::vector<uint_fast32_t> Engine::RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t i = 0, p = 0; i < bufLen; i += depth, p++) {
         uint_fast8_t diff = RgbDiff(buf0, buf1, i);
         if (minDiff > diff) continue;
         for (uint_fast8_t r = 0; r < regionsLen; r++) {
             if (std::get<4>(regionsVec[r])[p] == 0 || std::get<1>(regionsVec[r]) > diff) continue;
-            diffsVec[r]++;
+            percentResultVec[r]++;
         }
     }
-
-    std::vector<uint_fast8_t> resultsVec;
-    resultsVec.reserve(regionsLen);
-
     for (uint_fast8_t r = 0; r < regionsLen; r++) {
-        resultsVec[r] = diffsVec[r] * 100 / std::get<3>(regionsVec[r]);
+        percentResultVec[r] = percentResultVec[r] * 100 / std::get<3>(regionsVec[r]);
     }
-
-    return resultsVec;
+    return percentResultVec;
 }
 
-//experiment
-
-//gray all bounds
-Engine::BoundsResult Engine::MeasureDiffs(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// gray all bounds
+Engine::BoundsResult Engine::GrayAllBounds(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast16_t maxX = 0, maxY = 0, minX = width - 1, minY = height - 1;
     uint_fast32_t i = 0, diffs = 0;
     for (uint_fast16_t y = 0; y < height; y++) {
@@ -103,11 +92,11 @@ Engine::BoundsResult Engine::MeasureDiffs(const uint_fast16_t width, const uint_
             diffs++;
         }
     }
-    return BoundsResult {uint_fast8_t(100 * diffs / pixCount), minX, maxX, minY, maxY};
+    return BoundsResult {100 * diffs / pixCount, minX, maxX, minY, maxY};
 }
 
-//gray mask bounds
-Engine::BoundsResult Engine::MeasureDiffs(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// gray mask bounds
+Engine::BoundsResult Engine::GrayMaskBounds(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast16_t maxX = 0, maxY = 0, minX = width - 1, minY = height - 1;
     uint_fast32_t i = 0, diffs = 0;
     for (uint_fast16_t y = 0; y < height; y++) {
@@ -117,30 +106,42 @@ Engine::BoundsResult Engine::MeasureDiffs(const uint_fast16_t width, const uint_
             maxX = MaxUint(maxX, x);
             minY = MinUint(minY, y);
             maxY = MaxUint(maxY, y);
-
             diffs++;
         }
     }
-    return BoundsResult {uint_fast8_t(100 * diffs / bitsetCount), minX, maxX, minY, maxY};
+    return BoundsResult {100 * diffs / bitsetCount, minX, maxX, minY, maxY};
 }
 
-/*std::vector<Engine::BoundsResult> Engine::MeasureDiffs(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    //declare return vector
-    std::vector<Engine::BoundsResult> resultsVec;
-    //reserve size
-    resultsVec.reserve(regionsLen);
-    //iterate and populate
-    for (uint_fast8_t r; r < regionsLen; r++) {
-
+// gray regions bounds
+std::vector<Engine::BoundsResult> Engine::GrayRegionsBounds(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    uint_fast16_t minX = width - 1, maxX = 0, minY = height - 1, maxY = 0;
+    std::vector<Engine::BoundsResult> boundsResultVec;
+    boundsResultVec.reserve(regionsLen);
+    for (uint_fast8_t r = 0; r < regionsLen; r++) {
+        boundsResultVec[r] = BoundsResult {0, minX , maxX, minY, maxY};
     }
+    uint_fast32_t i = 0;
+    for (uint_fast16_t y = 0; y < height; y++) {
+        for (uint_fast16_t x = 0; x < width; x++, i++) {
+            uint_fast8_t diff = GrayDiff(buf0, buf1, i);
+            if (minDiff > diff) continue;
+            for (uint_fast8_t r = 0; r < regionsLen; r++) {
+                if (std::get<4>(regionsVec[r])[i] == 0 || std::get<1>(regionsVec[r]) > diff) continue;
+                boundsResultVec[r].minX = MinUint(boundsResultVec[r].minX, x);
+                boundsResultVec[r].maxX = MaxUint(boundsResultVec[r].maxX, x);
+                boundsResultVec[r].minY = MinUint(boundsResultVec[r].minY, y);
+                boundsResultVec[r].maxY = MaxUint(boundsResultVec[r].maxY, y);
+                boundsResultVec[r].percent++;
+            }
+        }
+    }
+    for (uint_fast8_t r = 0; r < regionsLen; r++) {
+        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / std::get<3>(regionsVec[r]);
+    }
+    return boundsResultVec;
+}
 
-
-
-
-    return resultsVec;
-}*/
-
-//if (x > maxX) maxX = x;
-//if (y > maxY) maxY = y;
-//if (x < minX) minX = x;
-//if (y < minY) minY = y;
+// if (x > maxX) maxX = x;
+// if (y > maxY) maxY = y;
+// if (x < minX) minX = x;
+// if (y < minY) minY = y;

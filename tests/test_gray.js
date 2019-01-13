@@ -67,6 +67,7 @@ p2p.on('pam', data => {
 const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, response: 'bounds'});
 
 pamDiff.on('diff', data => {
+    console.log(data.trigger[0]);
     assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });

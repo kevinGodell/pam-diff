@@ -73,6 +73,7 @@ const regions = [region1, region2];
 const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async, response: 'bounds'});
 
 pamDiff.on('diff', data => {
+    console.log(data.trigger[0]);
     assert(data.trigger[0].name === 'mask', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });

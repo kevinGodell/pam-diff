@@ -10,11 +10,11 @@
 
 class naming scheme = TypeTargetResponse
 
-GrayAllPercent = gray pixels, target all pixels, respond with percent
+GrayAllPercent = gray pixels, target all, respond with percent
 
-Mask sub classes add bitsetCount and bitset
+"Mask" sub classes add bitsetCount_ and bitset_
 
-Rgb sub classes add pixDepth
+"Rgb" sub classes add pixDepth_ and bufLen_
 
 */
 
@@ -32,7 +32,7 @@ class GrayAllPercent : public Napi::AsyncWorker {
         const uint_fast8_t diffsPerc_;
         const uint_fast8_t *buf0_;
         const uint_fast8_t *buf1_;
-        uint_fast8_t percentResult_;
+        uint_fast32_t percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -82,7 +82,7 @@ class GrayRegionsPercent : public Napi::AsyncWorker {
         const std::vector<Engine::Region> &regionsVec_;
         const uint_fast8_t *buf0_;
         const uint_fast8_t *buf1_;
-        std::vector<uint_fast8_t> resultsVec_;
+        std::vector<uint_fast32_t> percentResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ class GrayMaskBounds : public GrayAllBounds {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*class GrayRegionsBounds : public Napi::AsyncWorker {
+class GrayRegionsBounds : public Napi::AsyncWorker {
     public:
         GrayRegionsBounds(const uint_fast16_t width, const uint_fast16_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute();
@@ -143,8 +143,8 @@ class GrayMaskBounds : public GrayAllBounds {
         const std::vector<Engine::Region> &regionsVec_;
         const uint_fast8_t *buf0_;
         const uint_fast8_t *buf1_;
-        std::vector<uint_fast8_t> resultsVec_;
-};*/
+        std::vector<Engine::BoundsResult> boundsResultVec_;
+};
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

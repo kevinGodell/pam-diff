@@ -9,15 +9,17 @@
 
 namespace Results {
 
-    //used for all/mask percent
-    Napi::Array ConvertToJs(const Napi::Env &env, const std::string name, const uint_fast8_t diffsPerc, const uint_fast8_t percentResult);
+    // all/mask percent to js
+    Napi::Array ToJs(const Napi::Env &env, const std::string name, const uint_fast8_t diffsPerc, const uint_fast32_t percentResult);
 
-    //used for regions percent
-    Napi::Array ConvertToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Engine::Region> &regionsVec, const std::vector<uint_fast8_t> &resultsVec);
+    // regions percent to js
+    Napi::Array ToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Engine::Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec);
 
-    //used for all/mask bounds
-    Napi::Array ConvertToJs(const Napi::Env &env, const std::string name, const uint_fast8_t diffsPerc, const Engine::BoundsResult boundsResult);
+    // all/mask bounds to js
+    Napi::Array ToJs(const Napi::Env &env, const std::string name, const uint_fast8_t diffsPerc, const Engine::BoundsResult boundsResult);
 
+    // regions bounds to js
+    Napi::Array ToJs(const Napi::Env &env, const uint_fast8_t regLen, const std::vector<Engine::Region> &regionsVec, const std::vector<Engine::BoundsResult> &resultsVec);
 }
 
 #endif
