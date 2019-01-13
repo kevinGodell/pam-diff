@@ -12,7 +12,7 @@ Napi::Array Results::ToJs(const Napi::Env &env, const std::string name, const ui
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", name);
         obj.Set("percent", percentResult);
-        resultsJs[0u] = obj;
+        resultsJs.Set(0u, obj);
     }
     return resultsJs;
 }
@@ -20,27 +20,14 @@ Napi::Array Results::ToJs(const Napi::Env &env, const std::string name, const ui
 // regions percent to js
 Napi::Array Results::ToJs(const Napi::Env &env, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const std::vector<uint_fast32_t> &resultsVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0, percent = 0; i < regionsLen; i++) {
-        percent = resultsVec[i];
-        if (std::get<2>(regionsVec[i]) > percent) continue;
+    for (uint_fast32_t r = 0, j = 0, percent = 0; r < regionsLen; r++) {
+        percent = resultsVec[r];
+        Engine::Region region = regionsVec[r];
+        if (region.percent > percent) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", std::get<0>(regionsVec[i]));
+        obj.Set("name", region.name);
         obj.Set("percent", percent);
-        resultsJs[j++] = obj;
-    }
-    return resultsJs;
-}
-
-// regions percent to js 2
-Napi::Array Results::ToJs(const Napi::Env &env, const uint_fast8_t regionsLen, const std::vector<Engine::Region2> &regionsVec, const std::vector<uint_fast32_t> &resultsVec) {
-    Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0, percent = 0; i < regionsLen; i++) {
-        percent = resultsVec[i];
-        if (regionsVec[i].percent > percent) continue;
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", regionsVec[i].name);
-        obj.Set("percent", percent);
-        resultsJs[j++] = obj;
+        resultsJs.Set(j++, obj);
     }
     return resultsJs;
 }
@@ -56,7 +43,7 @@ Napi::Array Results::ToJs(const Napi::Env &env, const std::string name, const ui
         obj.Set("maxX", boundsResult.maxX);
         obj.Set("minY", boundsResult.minY);
         obj.Set("maxY", boundsResult.maxY);
-        resultsJs[0u] = obj;
+        resultsJs.Set(0u, obj);
     }
     return resultsJs;
 }
@@ -64,17 +51,18 @@ Napi::Array Results::ToJs(const Napi::Env &env, const std::string name, const ui
 // regions bounds to js
 Napi::Array Results::ToJs(const Napi::Env &env, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const std::vector<Engine::BoundsResult> &boundsResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t i = 0, j = 0; i < regionsLen; i++) {
-        Engine::BoundsResult boundsResult = boundsResultVec[i];
-        if (std::get<2>(regionsVec[i]) > boundsResult.percent) continue;
+    for (uint_fast32_t r = 0, j = 0; r < regionsLen; r++) {
+        Engine::BoundsResult boundsResult = boundsResultVec[r];
+        Engine::Region region = regionsVec[r];
+        if (region.percent > boundsResult.percent) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", std::get<0>(regionsVec[i]));
+        obj.Set("name", region.name);
         obj.Set("percent", boundsResult.percent);
         obj.Set("minX", boundsResult.minX);
         obj.Set("maxX", boundsResult.maxX);
         obj.Set("minY", boundsResult.minY);
         obj.Set("maxY", boundsResult.maxY);
-        resultsJs[j++] = obj;
+        resultsJs.Set(j++, obj);
     }
     return resultsJs;
 }

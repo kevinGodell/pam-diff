@@ -31,7 +31,6 @@ private:
     uint_fast32_t minDiff_;// regions, minimum pixDiff when comparing all set regions
     uint_fast32_t regionsLen_;// regions, number of regions
     std::vector<Engine::Region> regionsVec_;// regions
-    std::vector<Engine::Region2> regionsVec2_;// regions
     bool async_;// using async or sync
 
     void Compare(const Napi::CallbackInfo &info);// instance method
@@ -75,8 +74,6 @@ private:
     static uint_fast32_t EngineType(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async);
 
     static void RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region> &regionsVec);
-
-    static void RegionsJsToCpp2(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region2> &regionsVec);
 
     enum Engines {
 
