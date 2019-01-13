@@ -11,8 +11,15 @@ namespace Engine {
     // todo switch to struct         name               pixDiff              percent              bitsetCount          bitset
     using Region = std::tuple <const std::string, const uint_fast32_t, const uint_fast32_t, const uint_fast32_t, const std::vector<bool>>;
 
-    struct BoundsResult
-    {
+    struct Region2 {
+        const std::string name;
+        const uint_fast32_t pixDiff;
+        const uint_fast32_t percent;
+        const uint_fast32_t bitsetCount;
+        const std::vector<bool> bitset;
+    };
+
+    struct BoundsResult {
         uint_fast32_t percent;
         uint_fast32_t minX;
         uint_fast32_t maxX;
@@ -54,18 +61,25 @@ namespace Engine {
     // gray regions percent
     std::vector<uint_fast32_t> GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+    // gray regions percent
+    std::vector<uint_fast32_t> GrayRegionsPercent2(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region2> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
     // rgb all percent
     uint_fast32_t RgbAllPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+    //does not need pixCount
     // rgb mask percent
     uint_fast32_t RgbMaskPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+    //does not need pixCount
     // rgb regions percent
     std::vector<uint_fast32_t> RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<uint_fast32_t> RgbRegionsPercent2(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region2> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // gray all bounds
     BoundsResult GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+    //does not need pixCount
     // gray mask bounds
     BoundsResult GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 

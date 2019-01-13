@@ -31,6 +31,20 @@ Napi::Array Results::ToJs(const Napi::Env &env, const uint_fast8_t regionsLen, c
     return resultsJs;
 }
 
+// regions percent to js 2
+Napi::Array Results::ToJs(const Napi::Env &env, const uint_fast8_t regionsLen, const std::vector<Engine::Region2> &regionsVec, const std::vector<uint_fast32_t> &resultsVec) {
+    Napi::Array resultsJs = Napi::Array::New(env);
+    for (uint_fast32_t i = 0, j = 0, percent = 0; i < regionsLen; i++) {
+        percent = resultsVec[i];
+        if (regionsVec[i].percent > percent) continue;
+        Napi::Object obj = Napi::Object::New(env);
+        obj.Set("name", regionsVec[i].name);
+        obj.Set("percent", percent);
+        resultsJs[j++] = obj;
+    }
+    return resultsJs;
+}
+
 // all/mask bounds to js
 Napi::Array Results::ToJs(const Napi::Env &env, const std::string name, const uint_fast8_t diffsPerc, const Engine::BoundsResult boundsResult) {
     Napi::Array resultsJs = Napi::Array::New(env);

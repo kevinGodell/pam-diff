@@ -24,16 +24,6 @@ void GrayAllPercent::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbAllPercent::RgbAllPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : GrayAllPercent(target, pixCount, pixDiff, diffsPerc, buf0, buf1, cb), pixDepth_(pixDepth), bufLen_(bufLen) {
-}
-
-void RgbAllPercent::Execute() {
-    this->percentResult_ = Engine::RgbAllPercent(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, this->buf0_, this->buf1_);
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 GrayMaskPercent::GrayMaskPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
     : GrayAllPercent(target, pixCount, pixDiff, diffsPerc, buf0, buf1, cb), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec) {
 }
@@ -44,6 +34,19 @@ void GrayMaskPercent::Execute() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+RgbAllPercent::RgbAllPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    : GrayAllPercent(target, pixCount, pixDiff, diffsPerc, buf0, buf1, cb), pixDepth_(pixDepth), bufLen_(bufLen) {
+}
+
+void RgbAllPercent::Execute() {
+    this->percentResult_ = Engine::RgbAllPercent(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, this->buf0_, this->buf1_);
+}
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//does not need pixCount
 RgbMaskPercent::RgbMaskPercent(const std::string target, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
     : GrayMaskPercent(target, pixCount, pixDiff, diffsPerc, bitsetCount, bitsetVec, buf0, buf1, cb), pixDepth_(pixDepth), bufLen_(bufLen) {
 }
@@ -71,6 +74,7 @@ void GrayRegionsPercent::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//does not need pixCount
 RgbRegionsPercent::RgbRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
     : GrayRegionsPercent(pixCount, minDiff, regionsLen, regionsVec, buf0, buf1, cb), pixDepth_(pixDepth), bufLen_(bufLen) {
 }
@@ -99,6 +103,7 @@ void GrayAllBounds::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//does not need pixCount
 GrayMaskBounds::GrayMaskBounds(const std::string target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
     : GrayAllBounds(target, width, height, pixCount, pixDiff, diffsPerc, buf0, buf1, cb), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec) {
 }
@@ -109,6 +114,7 @@ void GrayMaskBounds::Execute() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+//does not need pixCount
 GrayRegionsBounds::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
     : Napi::AsyncWorker(cb), width_(width), height_(height), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
 }

@@ -56,6 +56,7 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         const Napi::Array regionsJs = obj.Get("regions").As<Napi::Array>();
         this->regionsLen_ = regionsJs.Length();
         this->RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs, this->regionsVec_);
+        this->RegionsJsToCpp2(this->pixCount_, this->regionsLen_, regionsJs, this->regionsVec2_);
     }
 
     // todo move this to private method
@@ -190,6 +191,19 @@ void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regi
     }
 }
 
+void Example::RegionsJsToCpp2(const uint_fast32_t pixLen, const uint_fast8_t regionsLen, const Napi::Array &regionsJs, std::vector<Engine::Region2> &regionsVec) {
+    for (uint_fast32_t i = 0; i < regionsLen; i++) {
+        const std::string name = regionsJs.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
+        const uint_fast8_t diff = regionsJs.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t percent = regionsJs.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t count = regionsJs.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
+        const bool *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
+        std::vector<bool> bitsetVec;
+        bitsetVec.assign(bitset, bitset + pixLen);
+        regionsVec.push_back(Engine::Region2 {name, diff, percent, count, bitsetVec});
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
@@ -210,8 +224,8 @@ Napi::Value Example::GrayMaskPercentSync(const uint_fast8_t *buf0, const uint_fa
 
 Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<uint_fast32_t> resultsVec = Engine::GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);
+    std::vector<uint_fast32_t> resultsVec = Engine::GrayRegionsPercent2(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec2_, buf0, buf1);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec2_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -259,8 +273,8 @@ Napi::Value Example::RgbMaskPercentSync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<uint_fast32_t> resultsVec = Engine::RgbRegionsPercent(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);
+    std::vector<uint_fast32_t> resultsVec = Engine::RgbRegionsPercent2(this->pixCount_, this->depth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec2_, buf0, buf1);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec2_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
