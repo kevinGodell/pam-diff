@@ -75,6 +75,12 @@ namespace Engine {
     // rgb all bounds
     BoundsResult RgbAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+    // rgb mask bounds
+    BoundsResult RgbMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+    // rgb regions bounds
+    std::vector<Engine::BoundsResult> RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 }
 
 #endif

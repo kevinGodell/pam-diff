@@ -66,6 +66,8 @@ private:
     Napi::Value GrayRegionsBoundsAsync(const uint_fast8_t * buf0, const uint_fast8_t * buf1, const Napi::Function &cb);
 
     Napi::Value RgbAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    Napi::Value RgbMaskBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    Napi::Value RgbRegionsBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
 
     static void DoSomething(uint_fast32_t myInt);
 

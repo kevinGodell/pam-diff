@@ -4,6 +4,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const async = process.env.ASYNC || false;
+
+const response = process.env.RESPONSE || 'percent';
+
 const {cpus} = require('os');
 
 console.log(`cpu cores available: ${cpus().length}`);
@@ -19,8 +23,6 @@ const PamDiff = require('../index');
 const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
-
-const async = process.env.ASYNC|| false;
 
 const pamCount = 10;
 
@@ -70,9 +72,10 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async, response: response});
 
 pamDiff.on('diff', data => {
+    //console.log(data);
     assert(data.trigger[0].name === 'mask', 'trigger name is not correct');
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });

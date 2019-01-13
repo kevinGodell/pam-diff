@@ -126,6 +126,12 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         case RGB_ALL_BOUNDS_SYNC :
             this->comparePtr_ = &Example::RgbAllBoundsSync;
         break;
+        case RGB_MASK_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::RgbMaskBoundsSync;
+        break;
+        case RGB_REGIONS_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::RgbRegionsBoundsSync;
+        break;
 
     }
 }
@@ -337,6 +343,22 @@ Napi::Value Example::RgbAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8
     const Napi::Env env = cb.Env();
     Engine::BoundsResult boundsResult = Engine::RgbAllBounds(this->width_, this->height_, this->pixCount_, this->depth_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, boundsResult);
+    cb.Call({env.Null(), resultsJs});
+    return env.Undefined();
+}
+
+Napi::Value Example::RgbMaskBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    Engine::BoundsResult boundsResult = Engine::RgbMaskBounds(this->width_, this->height_, this->depth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, boundsResult);
+    cb.Call({env.Null(), resultsJs});
+    return env.Undefined();
+}
+
+Napi::Value Example::RgbRegionsBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    std::vector<Engine::BoundsResult> boundsResultVec = Engine::RgbRegionsBounds(this->width_, this->height_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, boundsResultVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
