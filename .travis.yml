@@ -4,12 +4,12 @@ node_js:
   - 9
   - lts/*
   - node
-os:
-  - linux
-  - osx
-dist:
-  - trusty
-  - xenial
+matrix:
+  include:
+  - os: linux
+    dist: xenial
+  - os: osx
+    osx_image: xcode10.1
 cache:
   directories:
     - node_modules
