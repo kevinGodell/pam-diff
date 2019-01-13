@@ -7,12 +7,7 @@ node_js:
 os:
   - linux
   - osx
-matrix:
-  include:
-  - os: linux
-    dist: xenial
-  - os: osx
-    osx_image: xcode10.1
+dist: xenial
 cache:
   directories:
     - node_modules
