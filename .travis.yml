@@ -1,21 +1,18 @@
 language: node_js
-
+node_js:
+  - 8
+  - 9
+  - lts/*
+  - node
+os:
+  - linux
+  - osx
 matrix:
   include:
   - os: linux
     dist: xenial
-    node_js:
-    - 8
-    - 9
-    - lts/*
-    - node
   - os: osx
     osx_image: xcode10.1
-    node_js:
-    - 8
-    - 9
-    - lts/*
-    - node
 cache:
   directories:
     - node_modules
