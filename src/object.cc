@@ -37,9 +37,9 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     // calculate some values based on required information
     this->pixCount_ = this->width_ * this->height_;
     this->bufLen_ = this->pixCount_ * this->depth_;
-    this->engineType_ = Example::GetEngine(this->depth_, this->target_, this->response_, this->async_);
+    this->engineType_ = Example::EngineType(this->depth_, this->target_, this->response_, this->async_);
 
-    std::cout << " engine type " << this->engineType_ << std::endl;
+    std::cout << "engine type : " << this->engineType_ << std::endl;
 
     // the following settings are optional depending on chosen engine, grab whatever is available
     if (obj.Has("difference")) this->pixDiff_ = obj.Get("difference").As<Napi::Number>().Uint32Value();
@@ -58,6 +58,7 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         this->RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs, this->regionsVec_);
     }
 
+    // todo move this to private method
     switch (this->engineType_) {
         case GRAY_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::GrayAllPercentSync;
@@ -78,24 +79,7 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
             this->comparePtr_ = &Example::GrayRegionsPercentAsync;
         break;
 
-        case GRAY_ALL_BOUNDS_SYNC :
-            this->comparePtr_ = &Example::GrayAllBoundsSync;
-        break;
-        case GRAY_MASK_BOUNDS_SYNC :
-            this->comparePtr_ = &Example::GrayMaskBoundsSync;
-        break;
-        case GRAY_REGIONS_BOUNDS_SYNC :
-            this->comparePtr_ = &Example::GrayRegionsBoundsSync;
-        break;
-        case GRAY_ALL_BOUNDS_ASYNC :
-            this->comparePtr_ = &Example::GrayAllBoundsAsync;
-        break;
-        case GRAY_MASK_BOUNDS_ASYNC :
-            this->comparePtr_ = &Example::GrayMaskBoundsAsync;
-        break;
-        case GRAY_REGIONS_BOUNDS_ASYNC :
-            this->comparePtr_ = &Example::GrayRegionsBoundsAsync;
-        break;
+        ///////////
 
         case RGB_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbAllPercentSync;
@@ -115,6 +99,34 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         case RGB_REGIONS_PERCENT_ASYNC :
             this->comparePtr_ = &Example::RgbRegionsPercentAsync;
         break;
+
+        ///////////
+
+        case GRAY_ALL_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::GrayAllBoundsSync;
+        break;
+        case GRAY_MASK_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::GrayMaskBoundsSync;
+        break;
+        case GRAY_REGIONS_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::GrayRegionsBoundsSync;
+        break;
+        case GRAY_ALL_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::GrayAllBoundsAsync;
+        break;
+        case GRAY_MASK_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::GrayMaskBoundsAsync;
+        break;
+        case GRAY_REGIONS_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::GrayRegionsBoundsAsync;
+        break;
+
+        ///////////
+
+        case RGB_ALL_BOUNDS_SYNC :
+            this->comparePtr_ = &Example::RgbAllBoundsSync;
+        break;
+
     }
 }
 
@@ -138,7 +150,7 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
 
 /////////////////////////////////////////////////////////////////////
 
-uint_fast32_t Example::GetEngine(const uint_fast32_t depth, const std::string target, const std::string response, const bool async) {
+uint_fast32_t Example::EngineType(const uint_fast32_t depth, const std::string target, const std::string response, const bool async) {
     uint_fast32_t value = 0;
     if (depth == 3 || depth == 4) {//dont add for depth == 1
         value += 1;
@@ -172,7 +184,7 @@ void Example::RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast8_t regi
     }
 }
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -198,7 +210,7 @@ Napi::Value Example::GrayRegionsPercentSync(const uint_fast8_t *buf0, const uint
     return env.Undefined();
 }
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -221,7 +233,7 @@ Napi::Value Example::GrayRegionsPercentAsync(const uint_fast8_t *buf0, const uin
     return env.Undefined();
 }
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::RgbAllPercentSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -247,7 +259,7 @@ Napi::Value Example::RgbRegionsPercentSync(const uint_fast8_t *buf0, const uint_
     return env.Undefined();
 }
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::RgbAllPercentAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -270,7 +282,7 @@ Napi::Value Example::RgbRegionsPercentAsync(const uint_fast8_t *buf0, const uint
     return env.Undefined();
 }
 
-/////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Napi::Value Example::GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
@@ -296,6 +308,8 @@ Napi::Value Example::GrayRegionsBoundsSync(const uint_fast8_t *buf0, const uint_
     return env.Undefined();
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 Napi::Value Example::GrayAllBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
     GrayAllBounds *grayAllBounds = new GrayAllBounds(this->target_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
@@ -314,5 +328,15 @@ Napi::Value Example::GrayRegionsBoundsAsync(const uint_fast8_t *buf0, const uint
     const Napi::Env env = cb.Env();
     GrayRegionsBounds *grayRegionsBounds = new GrayRegionsBounds(this->width_, this->height_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     grayRegionsBounds->Queue();
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Napi::Value Example::RgbAllBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    Engine::BoundsResult boundsResult = Engine::RgbAllBounds(this->width_, this->height_, this->pixCount_, this->depth_, this->pixDiff_, buf0, buf1);
+    Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, boundsResult);
+    cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
