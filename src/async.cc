@@ -41,18 +41,18 @@ void GrayMaskPercent::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GrayRegionsPercent::GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
+GrayRegionsPercent::GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayRegionsPercent::Execute() {
-    this->percentResultVec_ = Engine::GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_);
+    this->percentResultVec_ = Engine::GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
 }
 
 void GrayRegionsPercent::OnOK() {
     const Napi::Env env = Env();
     Napi::HandleScope scope(env);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, this->percentResultVec_);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -92,18 +92,18 @@ void RgbMaskPercent::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsPercent::RgbRegionsPercent(const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), pixDepth_(pixDepth), bufLen_(bufLen), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
+RgbRegionsPercent::RgbRegionsPercent(const uint_fast8_t pixDepth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    : Napi::AsyncWorker(cb), pixDepth_(pixDepth), bufLen_(bufLen), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbRegionsPercent::Execute() {
-    this->percentResultVec_ = Engine::RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_);
+    this->percentResultVec_ = Engine::RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
 }
 
 void RgbRegionsPercent::OnOK() {
     const Napi::Env env = Env();
     Napi::HandleScope scope(env);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, this->percentResultVec_);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -143,18 +143,18 @@ void GrayMaskBounds::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GrayRegionsBounds::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
+GrayRegionsBounds::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayRegionsBounds::Execute() {
-    this->boundsResultVec_ = Engine::GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_);
+    this->boundsResultVec_ = Engine::GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
 }
 
 void GrayRegionsBounds::OnOK() {
     const Napi::Env env = Env();
     Napi::HandleScope scope(env);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, this->boundsResultVec_);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -191,21 +191,20 @@ void RgbMaskBounds::OnOK() {
     Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
-//this->width_, this->height_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsBounds::RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), width_(width), height_(height), pixDepth_(pixDepth), minDiff_(minDiff), regionsLen_(regionsLen), regionsVec_(regionsVec), buf0_(buf0), buf1_(buf1) {
+RgbRegionsBounds::RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
+    : Napi::AsyncWorker(cb), width_(width), height_(height), pixDepth_(pixDepth), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbRegionsBounds::Execute() {
-    this->boundsResultVec_ = Engine::RgbRegionsBounds(this->width_, this->height_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionsVec_, this->buf0_, this->buf1_);
+    this->boundsResultVec_ = Engine::RgbRegionsBounds(this->width_, this->height_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
 }
 
 void RgbRegionsBounds::OnOK() {
     const Napi::Env env = Env();
     Napi::HandleScope scope(env);
-    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, this->boundsResultVec_);
+    Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
