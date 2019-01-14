@@ -69,6 +69,10 @@ private:
     Napi::Value RgbMaskBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     Napi::Value RgbRegionsBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
 
+    Napi::Value RgbAllBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    Napi::Value RgbMaskBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    Napi::Value RgbRegionsBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+
     static void DoSomething(uint_fast32_t myInt);
 
     static uint_fast32_t EngineType(const uint_fast32_t depth, const std::string target, const std::string returns, const bool async);

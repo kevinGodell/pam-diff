@@ -132,6 +132,15 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
         case RGB_REGIONS_BOUNDS_SYNC :
             this->comparePtr_ = &Example::RgbRegionsBoundsSync;
         break;
+        case RGB_ALL_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::RgbAllBoundsAsync;
+        break;
+        case RGB_MASK_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::RgbMaskBoundsAsync;
+        break;
+        case RGB_REGIONS_BOUNDS_ASYNC :
+            this->comparePtr_ = &Example::RgbRegionsBoundsAsync;
+        break;
 
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(this->engineType_));
@@ -362,5 +371,28 @@ Napi::Value Example::RgbRegionsBoundsSync(const uint_fast8_t *buf0, const uint_f
     std::vector<Engine::BoundsResult> boundsResultVec = Engine::RgbRegionsBounds(this->width_, this->height_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, boundsResultVec);
     cb.Call({env.Null(), resultsJs});
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Napi::Value Example::RgbAllBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    RgbAllBounds *rgbAllBounds = new RgbAllBounds(this->target_, this->width_, this->height_, this->pixCount_, this->depth_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    rgbAllBounds->Queue();
+    return env.Undefined();
+}
+
+Napi::Value Example::RgbMaskBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    RgbMaskBounds *rgbMaskBounds = new RgbMaskBounds(this->target_, this->width_, this->height_, this->depth_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    rgbMaskBounds->Queue();
+    return env.Undefined();
+}
+
+Napi::Value Example::RgbRegionsBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
+    const Napi::Env env = cb.Env();
+    RgbRegionsBounds *rgbRegionsBounds = new RgbRegionsBounds(this->width_, this->height_, this->depth_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    rgbRegionsBounds->Queue();
     return env.Undefined();
 }

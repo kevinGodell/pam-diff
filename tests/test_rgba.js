@@ -4,6 +4,10 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const async = process.env.ASYNC || false;
+
+const response = process.env.RESPONSE || 'percent';
+
 const {cpus} = require('os');
 
 console.log(`cpu cores available: ${cpus().length}`);
@@ -19,8 +23,6 @@ const PamDiff = require('../index');
 const ffmpegPath = require('ffmpeg-static').path;
 
 const spawn = require('child_process').spawn;
-
-const async = process.env.ASYNC|| false;
 
 const pamCount = 10;
 
@@ -64,7 +66,7 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, async: async});
+const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, response: response});
 
 pamDiff.on('diff', data => {
     assert(data.trigger[0].name === 'all', 'trigger name is not correct');

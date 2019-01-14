@@ -186,4 +186,62 @@ class GrayRegionsBounds : public Napi::AsyncWorker {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class RgbAllBounds : public Napi::AsyncWorker {
+    public:
+        RgbAllBounds(const std::string target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDepth, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        void Execute();
+        void OnOK();
+    protected:
+        const std::string target_;
+        const uint_fast32_t width_;
+        const uint_fast32_t height_;
+        const uint_fast32_t pixCount_;
+        const uint_fast8_t pixDepth_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        Engine::BoundsResult boundsResult_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class RgbMaskBounds : public Napi::AsyncWorker {
+    public:
+        RgbMaskBounds(const std::string target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDepth, const uint_fast8_t pixDiff, const uint_fast8_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        void Execute();
+        void OnOK();
+    private:
+        const std::string target_;
+        const uint_fast32_t width_;
+        const uint_fast32_t height_;
+        const uint_fast8_t pixDepth_;
+        const uint_fast8_t pixDiff_;
+        const uint_fast8_t diffsPerc_;
+        const uint_fast32_t bitsetCount_;
+        const std::vector<bool> &bitsetVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        Engine::BoundsResult boundsResult_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class RgbRegionsBounds : public Napi::AsyncWorker {
+    public:
+        RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDepth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        void Execute();
+        void OnOK();
+    private:
+        const uint_fast32_t width_;
+        const uint_fast32_t height_;
+        const uint_fast8_t pixDepth_;
+        const uint_fast8_t minDiff_;
+        const uint_fast8_t regionsLen_;
+        const std::vector<Engine::Region> &regionsVec_;
+        const uint_fast8_t *buf0_;
+        const uint_fast8_t *buf1_;
+        std::vector<Engine::BoundsResult> boundsResultVec_;
+};
+
 #endif
