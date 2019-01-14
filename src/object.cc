@@ -302,7 +302,7 @@ Napi::Value Example::GrayAllBoundsSync(const uint_fast8_t *buf0, const uint_fast
 
 Napi::Value Example::GrayMaskBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    Engine::BoundsResult boundsResult = Engine::GrayMaskBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    Engine::BoundsResult boundsResult = Engine::GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -310,7 +310,7 @@ Napi::Value Example::GrayMaskBoundsSync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::GrayRegionsBoundsSync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    std::vector<Engine::BoundsResult> resultsVec = Engine::GrayRegionsBounds(this->width_, this->height_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
+    std::vector<Engine::BoundsResult> resultsVec = Engine::GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1);
     Napi::Array resultsJs = Results::ToJs(env, this->regionsLen_, this->regionsVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -327,14 +327,14 @@ Napi::Value Example::GrayAllBoundsAsync(const uint_fast8_t *buf0, const uint_fas
 
 Napi::Value Example::GrayMaskBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayMaskBounds *grayMaskBounds = new GrayMaskBounds(this->target_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    GrayMaskBounds *grayMaskBounds = new GrayMaskBounds(this->target_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     grayMaskBounds->Queue();
     return env.Undefined();
 }
 
 Napi::Value Example::GrayRegionsBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb) {
     const Napi::Env env = cb.Env();
-    GrayRegionsBounds *grayRegionsBounds = new GrayRegionsBounds(this->width_, this->height_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
+    GrayRegionsBounds *grayRegionsBounds = new GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionsVec_, buf0, buf1, cb);
     grayRegionsBounds->Queue();
     return env.Undefined();
 }

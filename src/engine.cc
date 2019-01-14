@@ -61,7 +61,6 @@ uint_fast32_t Engine::RgbMaskPercent(const uint_fast8_t depth, const uint_fast32
     return 100 * diffs / bitsetCount;
 }
 
-//does not need pixCount
 // rgb regions percent
 std::vector<uint_fast32_t> Engine::RgbRegionsPercent(const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
@@ -95,9 +94,8 @@ Engine::BoundsResult Engine::GrayAllBounds(const uint_fast32_t width, const uint
     return Engine::BoundsResult {100 * diffs / pixCount, minX, maxX, minY, maxY};
 }
 
-//does not need pixCount
 // gray mask bounds
-Engine::BoundsResult Engine::GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+Engine::BoundsResult Engine::GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t minX = width - 1, maxX = 0, minY = height - 1, maxY = 0, diffs = 0;
     for (uint_fast32_t y = 0, x = 0, i = 0; y < height; y++) {
         for (x = 0; x < width; x++, i++) {
@@ -112,7 +110,8 @@ Engine::BoundsResult Engine::GrayMaskBounds(const uint_fast32_t width, const uin
     return Engine::BoundsResult {100 * diffs / bitsetCount, minX, maxX, minY, maxY};
 }
 
-std::vector<Engine::BoundsResult> Engine::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+// gray regions bounds
+std::vector<Engine::BoundsResult> Engine::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<Engine::BoundsResult> boundsResultVec(regionsLen, Engine::BoundsResult {0, width - 1 , 0, height - 1, 0});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; y++) {
         for (x = 0; x < width; x++, i++) {
@@ -134,8 +133,7 @@ std::vector<Engine::BoundsResult> Engine::GrayRegionsBounds(const uint_fast32_t 
     return boundsResultVec;
 }
 
-///////////////////--------------
-
+// rgb all bounds
 Engine::BoundsResult Engine::RgbAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t minX = width - 1, maxX = 0, minY = height - 1, maxY = 0, diffs = 0;
     for (uint_fast32_t y = 0, x = 0, i = 0; y < height; y++) {
@@ -151,6 +149,7 @@ Engine::BoundsResult Engine::RgbAllBounds(const uint_fast32_t width, const uint_
     return Engine::BoundsResult {100 * diffs / pixCount, minX, maxX, minY, maxY};
 }
 
+// rgb mask bounds
 Engine::BoundsResult Engine::RgbMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t minX = width - 1, maxX = 0, minY = height - 1, maxY = 0, diffs = 0;
     for (uint_fast32_t y = 0, x = 0, i = 0, p = 0; y < height; y++) {
@@ -166,7 +165,7 @@ Engine::BoundsResult Engine::RgbMaskBounds(const uint_fast32_t width, const uint
     return Engine::BoundsResult {100 * diffs / bitsetCount, minX, maxX, minY, maxY};
 }
 
-// rgb regions bounds 2
+// rgb regions bounds
 std::vector<Engine::BoundsResult> Engine::RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t depth, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<Engine::BoundsResult> boundsResultVec(regionsLen, Engine::BoundsResult {0, width - 1 , 0, height - 1, 0});
     for (uint_fast32_t y = 0, x = 0, i = 0, p = 0, r = 0; y < height; y++) {
@@ -188,7 +187,6 @@ std::vector<Engine::BoundsResult> Engine::RgbRegionsBounds(const uint_fast32_t w
     }
     return boundsResultVec;
 }
-
 
 // if (x > maxX) maxX = x;
 // if (y > maxY) maxY = y;

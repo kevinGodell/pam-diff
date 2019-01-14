@@ -61,23 +61,20 @@ namespace Engine {
     // rgb all percent
     uint_fast32_t RgbAllPercent(const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
-    //does not need pixCount
     // rgb mask percent
     uint_fast32_t RgbMaskPercent(const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
-    //does not need pixCount
     // rgb regions percent
     std::vector<uint_fast32_t> RgbRegionsPercent(const uint_fast8_t depth, const uint_fast32_t bufLen, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // gray all bounds
     BoundsResult GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
-    //does not need pixCount
     // gray mask bounds
-    BoundsResult GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    BoundsResult GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // gray regions bounds
-    std::vector<BoundsResult> GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<BoundsResult> GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast8_t minDiff, const uint_fast8_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb all bounds
     BoundsResult RgbAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast8_t depth, const uint_fast8_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
