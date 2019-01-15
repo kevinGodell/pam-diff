@@ -27,12 +27,12 @@ uint_fast32_t Engine::GrayMaskPercent(const uint_fast32_t pixCount, const uint_f
 std::vector<uint_fast32_t> Engine::GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t i = 0, r = 0; i < pixCount; i++) {
-         uint_fast32_t diff = GrayDiff(buf0, buf1, i);
-         if (minDiff > diff) continue;
-         for (r = 0; r < regionsLen; r++) {
-             if (regionsVec[r].bitset[i] == 0 || regionsVec[r].pixDiff > diff) continue;
-             percentResultVec[r]++;
-         }
+        uint_fast32_t diff = GrayDiff(buf0, buf1, i);
+        if (minDiff > diff) continue;
+        for (r = 0; r < regionsLen; r++) {
+            if (regionsVec[r].bitset[i] == 0 || regionsVec[r].pixDiff > diff) continue;
+            percentResultVec[r]++;
+        }
     }
     for (uint_fast32_t r = 0; r < regionsLen; r++) {
         percentResultVec[r] = percentResultVec[r] * 100 / regionsVec[r].bitsetCount;

@@ -8,7 +8,7 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercent::GrayAllPercent(const std::string &target, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayAllPercent::Execute() {
@@ -25,7 +25,7 @@ void GrayAllPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayMaskPercent::GrayMaskPercent(const std::string &target, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayMaskPercent::Execute() {
@@ -42,7 +42,7 @@ void GrayMaskPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayRegionsPercent::GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayRegionsPercent::Execute() {
@@ -59,7 +59,7 @@ void GrayRegionsPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbAllPercent::RgbAllPercent(const std::string &target, const uint_fast32_t pixCount, const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDepth_(pixDepth), bufLen_(bufLen), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), pixCount_(pixCount), pixDepth_(pixDepth), bufLen_(bufLen), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbAllPercent::Execute() {
@@ -76,7 +76,7 @@ void RgbAllPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbMaskPercent::RgbMaskPercent(const std::string &target, const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), pixDepth_(pixDepth), bufLen_(bufLen), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), pixDepth_(pixDepth), bufLen_(bufLen), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbMaskPercent::Execute() {
@@ -93,7 +93,7 @@ void RgbMaskPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbRegionsPercent::RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), pixDepth_(pixDepth), bufLen_(bufLen), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), bufLen_(bufLen), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbRegionsPercent::Execute() {
@@ -110,7 +110,7 @@ void RgbRegionsPercent::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllBounds::GrayAllBounds(const std::string &target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayAllBounds::Execute() {
@@ -127,7 +127,7 @@ void GrayAllBounds::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayMaskBounds::GrayMaskBounds(const std::string &target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayMaskBounds::Execute() {
@@ -144,7 +144,7 @@ void GrayMaskBounds::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayRegionsBounds::GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void GrayRegionsBounds::Execute() {
@@ -161,7 +161,7 @@ void GrayRegionsBounds::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbAllBounds::RgbAllBounds(const std::string &target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast32_t pixDepth, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixCount_(pixCount), pixDepth_(pixDepth), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixCount_(pixCount), pixDepth_(pixDepth), pixDiff_(pixDiff), diffsPerc_(diffsPerc), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbAllBounds::Execute() {
@@ -178,7 +178,7 @@ void RgbAllBounds::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbMaskBounds::RgbMaskBounds(const std::string &target, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDepth, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixDepth_(pixDepth), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), target_(target), width_(width), height_(height), pixDepth_(pixDepth), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbMaskBounds::Execute() {
@@ -195,7 +195,7 @@ void RgbMaskBounds::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbRegionsBounds::RgbRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDepth, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-    : Napi::AsyncWorker(cb), width_(width), height_(height), pixDepth_(pixDepth), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
+        : Napi::AsyncWorker(cb), width_(width), height_(height), pixDepth_(pixDepth), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
 }
 
 void RgbRegionsBounds::Execute() {

@@ -11,8 +11,8 @@
 
 void Example::Init(const Napi::Env &env, Napi::Object &exports) {
     Napi::Function func = DefineClass(env, "Example", {
-        InstanceMethod("compare", &Example::Compare),
-        InstanceAccessor("myValue", &Example::GetMyValue, &Example::SetMyValue)
+            InstanceMethod("compare", &Example::Compare),
+            InstanceAccessor("myValue", &Example::GetMyValue, &Example::SetMyValue)
     });
     constructor = Napi::Persistent(func);
     constructor.SuppressDestruct();
@@ -61,85 +61,85 @@ Example::Example(const Napi::CallbackInfo &info) : Napi::ObjectWrap<Example>(inf
     switch (this->engineType_) {
         case GRAY_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::GrayAllPercentSync;
-        break;
+            break;
         case GRAY_MASK_PERCENT_SYNC :
             this->comparePtr_ = &Example::GrayMaskPercentSync;
-        break;
+            break;
         case GRAY_REGIONS_PERCENT_SYNC :
             this->comparePtr_ = &Example::GrayRegionsPercentSync;
-        break;
+            break;
         case GRAY_ALL_PERCENT_ASYNC :
             this->comparePtr_ = &Example::GrayAllPercentAsync;
-        break;
+            break;
         case GRAY_MASK_PERCENT_ASYNC :
             this->comparePtr_ = &Example::GrayMaskPercentAsync;
-        break;
+            break;
         case GRAY_REGIONS_PERCENT_ASYNC :
             this->comparePtr_ = &Example::GrayRegionsPercentAsync;
-        break;
+            break;
 
-        ///////////
+            ///////////
 
         case RGB_ALL_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbAllPercentSync;
-        break;
+            break;
         case RGB_MASK_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbMaskPercentSync;
-        break;
+            break;
         case RGB_REGIONS_PERCENT_SYNC :
             this->comparePtr_ = &Example::RgbRegionsPercentSync;
-        break;
+            break;
         case RGB_ALL_PERCENT_ASYNC :
             this->comparePtr_ = &Example::RgbAllPercentAsync;
-        break;
+            break;
         case RGB_MASK_PERCENT_ASYNC :
             this->comparePtr_ = &Example::RgbMaskPercentAsync;
-        break;
+            break;
         case RGB_REGIONS_PERCENT_ASYNC :
             this->comparePtr_ = &Example::RgbRegionsPercentAsync;
-        break;
+            break;
 
-        ///////////
+            ///////////
 
         case GRAY_ALL_BOUNDS_SYNC :
             this->comparePtr_ = &Example::GrayAllBoundsSync;
-        break;
+            break;
         case GRAY_MASK_BOUNDS_SYNC :
             this->comparePtr_ = &Example::GrayMaskBoundsSync;
-        break;
+            break;
         case GRAY_REGIONS_BOUNDS_SYNC :
             this->comparePtr_ = &Example::GrayRegionsBoundsSync;
-        break;
+            break;
         case GRAY_ALL_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::GrayAllBoundsAsync;
-        break;
+            break;
         case GRAY_MASK_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::GrayMaskBoundsAsync;
-        break;
+            break;
         case GRAY_REGIONS_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::GrayRegionsBoundsAsync;
-        break;
+            break;
 
-        ///////////
+            ///////////
 
         case RGB_ALL_BOUNDS_SYNC :
             this->comparePtr_ = &Example::RgbAllBoundsSync;
-        break;
+            break;
         case RGB_MASK_BOUNDS_SYNC :
             this->comparePtr_ = &Example::RgbMaskBoundsSync;
-        break;
+            break;
         case RGB_REGIONS_BOUNDS_SYNC :
             this->comparePtr_ = &Example::RgbRegionsBoundsSync;
-        break;
+            break;
         case RGB_ALL_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::RgbAllBoundsAsync;
-        break;
+            break;
         case RGB_MASK_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::RgbMaskBoundsAsync;
-        break;
+            break;
         case RGB_REGIONS_BOUNDS_ASYNC :
             this->comparePtr_ = &Example::RgbRegionsBoundsAsync;
-        break;
+            break;
 
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(this->engineType_));
