@@ -166,7 +166,7 @@ Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
 
 /////////////////////////////////////////////////////////////////////
 
-uint_fast32_t Example::EngineType(const uint_fast32_t pixDepth, const std::string target, const std::string response, const bool async) {
+uint_fast32_t Example::EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async) {
     uint_fast32_t value = 0;
     if (pixDepth == 3 || pixDepth == 4) {//dont add for pixDepth == 1
         value += 1;

@@ -5,3 +5,4 @@ examples/out/gray/*.jpeg
 examples/out/rgb24/*.jpeg
 pam-diff.iml
 /src/old/
+cmake*

@@ -67,7 +67,7 @@ class Example : public Napi::ObjectWrap<Example> {
         Napi::Value RgbMaskBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         Napi::Value RgbRegionsBoundsAsync(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
 
-        static uint_fast32_t EngineType(uint_fast32_t pixDepth, std::string target, std::string returns, bool async);
+        static uint_fast32_t EngineType(uint_fast32_t pixDepth, const std::string &target, const std::string &returns, bool async);
 
         static std::vector<Engine::Region> RegionsJsToCpp(uint_fast32_t pixLen, uint_fast32_t regionsLen, const Napi::Array &regionsJs);
 

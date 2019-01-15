@@ -22,7 +22,7 @@ GrayAllPercent = gray pixels, target all, respond with percent
 
 class GrayAllPercent : public Napi::AsyncWorker {
     public:
-        GrayAllPercent(std::string target, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        GrayAllPercent(const std::string &target, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
@@ -39,7 +39,7 @@ class GrayAllPercent : public Napi::AsyncWorker {
 
 class GrayMaskPercent : public Napi::AsyncWorker {
     public:
-        GrayMaskPercent(std::string target, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        GrayMaskPercent(const std::string &target, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
@@ -74,7 +74,7 @@ class GrayRegionsPercent : public Napi::AsyncWorker {
 
 class RgbAllPercent : public Napi::AsyncWorker {
     public:
-        RgbAllPercent(std::string target, uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbAllPercent(const std::string &target, uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
@@ -93,7 +93,7 @@ class RgbAllPercent : public Napi::AsyncWorker {
 
 class RgbMaskPercent : public Napi::AsyncWorker {
     public:
-        RgbMaskPercent(std::string target, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbMaskPercent(const std::string &target, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
@@ -131,7 +131,7 @@ class RgbRegionsPercent : public Napi::AsyncWorker {
 
 class GrayAllBounds : public Napi::AsyncWorker {
     public:
-        GrayAllBounds(std::string target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        GrayAllBounds(const std::string &target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     protected:
@@ -150,7 +150,7 @@ class GrayAllBounds : public Napi::AsyncWorker {
 
 class GrayMaskBounds : public Napi::AsyncWorker {
     public:
-        GrayMaskBounds(std::string target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        GrayMaskBounds(const std::string &target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
@@ -188,7 +188,7 @@ class GrayRegionsBounds : public Napi::AsyncWorker {
 
 class RgbAllBounds : public Napi::AsyncWorker {
     public:
-        RgbAllBounds(std::string target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbAllBounds(const std::string &target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     protected:
@@ -208,7 +208,7 @@ class RgbAllBounds : public Napi::AsyncWorker {
 
 class RgbMaskBounds : public Napi::AsyncWorker {
     public:
-        RgbMaskBounds(std::string target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+        RgbMaskBounds(const std::string &target, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
         void Execute() override;
         void OnOK() override;
     private:
