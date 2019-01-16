@@ -83,10 +83,16 @@ Engine::BoundsResult Engine::GrayAllBounds(const uint_fast32_t width, const uint
     for (uint_fast32_t y = 0, x = 0, i = 0; y < height; y++) {
         for (x = 0; x < width; x++, i++) {
             if (pixDiff > GrayDiff(buf0, buf1, i)) continue;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
+            if (x < minX) {
+                minX = x;
+            } else if (x > maxX) {
+                maxX = x;
+            }
+            if (y < minY) {
+                minY = y;
+            } else if (y > maxY) {
+                maxY = y;
+            }
             //minX = MinUint(minX, x);
             //maxX = MaxUint(maxX, x);
             //minY = MinUint(minY, y);
@@ -103,14 +109,10 @@ Engine::BoundsResult Engine::GrayMaskBounds(const uint_fast32_t width, const uin
     for (uint_fast32_t y = 0, x = 0, i = 0; y < height; y++) {
         for (x = 0; x < width; x++, i++) {
             if (bitsetVec[i] == 0 || pixDiff > GrayDiff(buf0, buf1, i)) continue;
-            if (x > maxX) maxX = x;
-            if (y > maxY) maxY = y;
-            if (x < minX) minX = x;
-            if (y < minY) minY = y;
-            //minX = MinUint(minX, x);
-            //maxX = MaxUint(maxX, x);
-            //minY = MinUint(minY, y);
-            //maxY = MaxUint(maxY, y);
+            minX = MinUint(minX, x);
+            maxX = MaxUint(maxX, x);
+            minY = MinUint(minY, y);
+            maxY = MaxUint(maxY, y);
             diffs++;
         }
     }
