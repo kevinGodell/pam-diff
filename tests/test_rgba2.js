@@ -4,9 +4,11 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
-const async = process.env.ASYNC || false;
+const argv = require('minimist')(process.argv.slice(2));
 
-const response = process.env.RESPONSE || 'percent';
+const async = argv.async || process.env.ASYNC || false;
+
+const response = argv.response || process.env.RESPONSE || 'percent';
 
 const {cpus} = require('os');
 
