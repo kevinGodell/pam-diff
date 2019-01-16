@@ -83,31 +83,10 @@ Engine::BoundsResult Engine::GrayAllBounds(const uint_fast32_t width, const uint
     for (uint_fast32_t y = 0, x = 0, i = 0; y < height; y++) {
         for (x = 0; x < width; x++, i++) {
             if (pixDiff > GrayDiff(buf0, buf1, i)) continue;
-
-
-            SetMin(minX, x);
-            SetMax(maxX, x);
-            SetMin(minY, y);
-            SetMax(maxY, y);
-
-            /*if (x < minX) {
-                minX = x;
-            } else if (x > maxX) {
-                maxX = x;
-            }
-            if (y < minY) {
-                minY = y;
-            } else if (y > maxY) {
-                maxY = y;
-            }*/
-            //minX = MinUint(minX, x);
-            //maxX = MaxUint(maxX, x);
-            //minY = MinUint(minY, y);
-            //maxY = MaxUint(maxY, y);
-            //if (x > maxX) maxX = x;
-            //if (y > maxY) maxY = y;
-            //if (x < minX) minX = x;
-            //if (y < minY) minY = y;
+            minX = MinUint(minX, x);
+            maxX = MaxUint(maxX, x);
+            minY = MinUint(minY, y);
+            maxY = MaxUint(maxY, y);
             diffs++;
         }
     }
@@ -207,8 +186,3 @@ std::vector<Engine::BoundsResult> Engine::RgbRegionsBounds(const uint_fast32_t w
     }
     return boundsResultVec;
 }
-
-// if (x > maxX) maxX = x;
-// if (y > maxY) maxY = y;
-// if (x < minX) minX = x;
-// if (y < minY) minY = y;

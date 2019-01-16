@@ -48,14 +48,6 @@ namespace Engine {
         return (a > b) ? a : b;
     }
 
-    inline void SetMin(uint_fast32_t &a, uint_fast32_t b) {
-        if (b < a) a = b;
-    }
-
-    inline void SetMax(uint_fast32_t &a, uint_fast32_t b) {
-        if (b > a) a = b;
-    }
-
     // gray all percent
     uint_fast32_t GrayAllPercent(uint_fast32_t pixCount, uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
