@@ -9,6 +9,8 @@
        "src/engine.cc",
        "src/results.cc"
      ],
+     "cflags": [ "-Werror", "-Wall", "-Wextra", "-Wpedantic", "-Wunused-parameter" ],
+     "cflags_cc": [ "-Werror", "-Wall", "-Wextra", "-Wpedantic", "-Wunused-parameter" ],
      "cflags!": [ "-fno-exceptions" ],
      "cflags_cc!": [ "-fno-exceptions" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
