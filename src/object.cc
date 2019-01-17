@@ -140,11 +140,11 @@ void Example::Compare(const Napi::CallbackInfo &info) {
     (this->*(this->comparePtr_))(buf0, buf1, cb);
 }
 
-void Example::SetMyValue(const Napi::CallbackInfo &info, const Napi::Value& value) {
+void Example::SetMyValue(const Napi::CallbackInfo &/*info*/, const Napi::Value& value) {
     this->myValue_ = value.As<Napi::String>();
 }
 
-Napi::Value Example::GetMyValue(const Napi::CallbackInfo &info) {
+Napi::Value Example::GetMyValue(const Napi::CallbackInfo &/*info*/) {
     //Napi::Env env = info.Env();
     return Napi::String::New(this->env_, this->myValue_);
 }
