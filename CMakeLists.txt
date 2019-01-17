@@ -4,7 +4,7 @@ project(pam-diff)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror -Wextra -Wpedantic -Wunused-parameter -funroll-loops")
+set(GCC_COVERAGE_COMPILE_FLAGS "-Wall -Werror -Wextra -Wpedantic -Wunused-parameter -funroll-loops -Ofast")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}" )
 
 include_directories(node_modules/node-addon-api)
