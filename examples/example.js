@@ -19,25 +19,26 @@ const params = [
 
     /* use an artificial video input */
     //'-re',
-    '-f',
-    'lavfi',
-    '-i',
-    'testsrc=size=1920x1080:rate=15',
+
+    //'-f',
+    //'lavfi',
+    //'-i',
+    //'testsrc=size=1920x1080:rate=15',
 
     /* use an rtsp ip cam video input */
-    /*'-rtsp_transport',
+    '-rtsp_transport',
     'tcp',
     '-i',
-    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',*/
+    'rtsp://192.168.1.22:554/user=admin_password=pass_channel=1_stream=0.sdp',
 
     /* set output flags */
     '-an',
     '-c:v',
     'pam',
     '-pix_fmt',
-    //'gray',
+    'gray',
     //'rgba',
-    'rgb24',
+    //'rgb24',
     '-f',
     'image2pipe',
     '-vf',
@@ -71,13 +72,13 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1});
+const pamDiff = new PamDiff({difference: 6, percent: 6, response: 'bounds'});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
     
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    if(true){return;}
+    //if(true){return;}
     
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
@@ -85,7 +86,7 @@ pamDiff.on('diff', (data) => {
         name += `(${region.name}=${region.percent})`;
     }
     const jpeg = `${name}.jpeg`;
-    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
+    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
         if (data === 0) {

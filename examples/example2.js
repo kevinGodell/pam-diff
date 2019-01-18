@@ -89,7 +89,7 @@ pamDiff.on('diff', (data) => {
         name += `(${region.name}=${region.percent})`;
     }
     const jpeg = `${name}.jpeg`;
-    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
+    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
         if (data === 0) {
