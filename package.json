@@ -4,7 +4,7 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
-    "install": "node-gyp --silly rebuild",
+    "install": "env V=1 node-gyp rebuild",
     "pretest": "npm install",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm test",
