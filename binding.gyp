@@ -12,7 +12,7 @@
      #"cflags": [ "-Werror", "-Wall", "-Wextra", "-Wpedantic", "-Wunused-parameter", "-funroll-loops", "-Ofast" ],#targets all files, c and c++
      #"cflags_c": [ "-hello" ],# does this do anything?
      #"cflags_cc": [ "-Werror", "-Wall", "-Wextra", "-Wpedantic", "-Wunused-parameter", "-funroll-loops", "-Ofast" ],#target c++ only
-     #"cflags": [ "-O2" ],
+     "cflags": [ "-O2" ],
      "cflags!": [ "-fno-exceptions", "-Wno-unused-parameter", "-O3" ],
      "cflags_cc!": [ "-fno-exceptions", "-Wno-unused-parameter" ],
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
