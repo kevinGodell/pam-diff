@@ -90,7 +90,7 @@ ffmpeg.on('exit', (code, signal) => {
     setTimeout(()=> {
         assert(pamDiffCounter === pamCount - 1, `did not get ${pamCount - 1} pam diffs`);
         console.timeEnd('=====> testing rgba pam diffs with a single region set');
-    }, 100);
+    }, 1000);
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
