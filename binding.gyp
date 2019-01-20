@@ -10,7 +10,7 @@
        "src/results.cc"
      ],
 
-     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter", "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload" ],
+     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter", "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize" ],
 
      "cflags!": [ "-Wno-unused-parameter", "-O3" ],
 
