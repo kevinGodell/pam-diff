@@ -12,13 +12,13 @@ cache:
 #  - node_modules
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-#  - npm cache clean --force
+  - npm cache clean --force
   - npm install
 #  - npm install --cache /tmp/empty-cache
   - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
   - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER"
 before_test:
-#  - npm i -g npm
+  - npm i -g npm
 test_script:
   - node --version
   - npm --version
