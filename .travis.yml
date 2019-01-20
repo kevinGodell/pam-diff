@@ -1,6 +1,3 @@
-before_install:
-  - npm i -g npm
-  - npm --version
 language: node_js
 node_js:
   - 8
@@ -12,6 +9,12 @@ os:
   - osx
 #  - windows
 dist: xenial
+before_script:
+  - npm i -g npm
+script:
+  - node --version
+  - npm --version
+  - npm test
 cache:
   directories:
     - node_modules
