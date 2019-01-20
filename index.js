@@ -429,7 +429,9 @@ class PamDiff extends Transform {
 
         engine += this._async ? '_async' : '_sync';
 
-        this._example = new PC.Example(config);
+        //this._example = new PC.Example(config);
+
+        this._example = PC(config);
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -441,6 +443,11 @@ class PamDiff extends Transform {
 
     }
 
+    /**
+     *
+     * @param chunk
+     * @private
+     */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
         this._example.compare(this._oldPix, this._newPix, (err, results) => {
@@ -461,6 +468,11 @@ class PamDiff extends Transform {
         this._oldPix = this._newPix;
     }
 
+    /**
+     *
+     * @param chunk
+     * @private
+     */
     _parsePixelsDebug(chunk) {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);

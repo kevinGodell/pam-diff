@@ -2,6 +2,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "napi.h"
 
 // gray all percent
 uint_fast32_t Engine::GrayAllPercent(const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
@@ -186,3 +187,42 @@ std::vector<Engine::BoundsResult> Engine::RgbRegionsBounds(const uint_fast32_t w
     }
     return boundsResultVec;
 }
+
+// determine engine type
+uint_fast32_t Engine::EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async) {
+    uint_fast32_t value = 0;
+    if (pixDepth == 3 || pixDepth == 4) {//dont add for pixDepth == 1
+        value += 1;
+    }
+    if (target == "mask") {//dont add for target == "all"
+        value += 10;
+    } else if (target == "regions") {
+        value += 20;
+    }
+    if (response == "bounds") {//dont add for target == "percent"
+        value += 100;
+    } else if (response == "blobs") {
+        value += 200;
+    }
+    if (async) {
+        value += 1000;
+    }
+    return value;
+}
+
+// process js regions to use in cpp
+/*std::vector<Engine::Region> RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast32_t regionsLen, const Napi::Array &regionsJs) {
+    std::vector<Engine::Region> regionVec;
+    regionVec.reserve(regionsLen);
+    for (uint_fast32_t i = 0; i < regionsLen; i++) {
+        const std::string name = regionsJs.Get(i).As<Napi::Object>().Get("name").As<Napi::String>();
+        const uint_fast32_t diff = regionsJs.Get(i).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t percent = regionsJs.Get(i).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t count = regionsJs.Get(i).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
+        const bool *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
+        std::vector<bool> bitsetVec;
+        bitsetVec.assign(bitset, bitset + pixLen);
+        regionVec.push_back(Engine::Region {name, diff, percent, count, bitsetVec});
+    }
+    return regionVec;
+}*/

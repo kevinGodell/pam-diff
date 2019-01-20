@@ -4,8 +4,50 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "napi.h"
 
 namespace Engine {
+
+    enum Engines {
+        GRAY_ALL_PERCENT_SYNC = 0,
+        GRAY_MASK_PERCENT_SYNC = 10,
+        GRAY_REGIONS_PERCENT_SYNC = 20,
+        GRAY_ALL_PERCENT_ASYNC = 1000,
+        GRAY_MASK_PERCENT_ASYNC = 1010,
+        GRAY_REGIONS_PERCENT_ASYNC = 1020,
+        RGB_ALL_PERCENT_SYNC = 1,
+        RGB_MASK_PERCENT_SYNC = 11,
+        RGB_REGIONS_PERCENT_SYNC = 21,
+        RGB_ALL_PERCENT_ASYNC = 1001,
+        RGB_MASK_PERCENT_ASYNC = 1011,
+        RGB_REGIONS_PERCENT_ASYNC = 1021,
+        GRAY_ALL_BOUNDS_SYNC = 100,
+        GRAY_MASK_BOUNDS_SYNC = 110,
+        GRAY_REGIONS_BOUNDS_SYNC = 120,
+        GRAY_ALL_BOUNDS_ASYNC = 1100,
+        GRAY_MASK_BOUNDS_ASYNC = 1110,
+        GRAY_REGIONS_BOUNDS_ASYNC = 1120,
+        RGB_ALL_BOUNDS_SYNC = 101,
+        RGB_MASK_BOUNDS_SYNC = 111,
+        RGB_REGIONS_BOUNDS_SYNC = 121,
+        RGB_ALL_BOUNDS_ASYNC = 1101,
+        RGB_MASK_BOUNDS_ASYNC = 1111,
+        RGB_REGIONS_BOUNDS_ASYNC = 1121,
+        /* not yet implemented
+        GRAY_ALL_BLOBS_SYNC = 200,
+        GRAY_MASK_BLOBS_SYNC = 210,
+        GRAY_REGIONS_BLOBS_SYNC = 220,
+        GRAY_ALL_BLOBS_ASYNC = 1200,
+        GRAY_MASK_BLOBS_ASYNC = 1210,
+        GRAY_REGIONS_BLOBS_ASYNC = 1220,
+        RGB_ALL_BLOBS_SYNC = 201,
+        RGB_MASK_BLOBS_SYNC = 211,
+        RGB_REGIONS_BLOBS_SYNC = 221,
+        RGB_ALL_BLOBS_ASYNC = 1201,
+        RGB_MASK_BLOBS_ASYNC = 1211,
+        RGB_REGIONS_BLOBS_ASYNC = 1221
+         */
+    };
 
     struct Region {
         const std::string name;
@@ -49,41 +91,65 @@ namespace Engine {
     }
 
     // gray all percent
-    uint_fast32_t GrayAllPercent(uint_fast32_t pixCount, uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    uint_fast32_t GrayAllPercent(uint_fast32_t pixCount, uint_fast32_t pixDiff, const uint_fast8_t *buf0,
+                                 const uint_fast8_t *buf1);
 
     // gray mask percent
-    uint_fast32_t GrayMaskPercent(uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    uint_fast32_t GrayMaskPercent(uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t bitsetCount,
+                                  const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0,
+                                  const uint_fast8_t *buf1);
 
     // gray regions percent
-    std::vector<uint_fast32_t> GrayRegionsPercent(uint_fast32_t pixCount, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<uint_fast32_t> GrayRegionsPercent(uint_fast32_t pixCount, uint_fast32_t minDiff,
+                                                  uint_fast32_t regionsLen, const std::vector<Region> &regionsVec,
+                                                  const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb all percent
-    uint_fast32_t RgbAllPercent(uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    uint_fast32_t RgbAllPercent(uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t bufLen,
+                                uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb mask percent
-    uint_fast32_t RgbMaskPercent(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    uint_fast32_t RgbMaskPercent(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff,
+                                 uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec,
+                                 const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb regions percent
-    std::vector<uint_fast32_t> RgbRegionsPercent(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<uint_fast32_t> RgbRegionsPercent(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t minDiff,
+                                                 uint_fast32_t regionsLen, const std::vector<Region> &regionsVec,
+                                                 const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // gray all bounds
-    BoundsResult GrayAllBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    BoundsResult GrayAllBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDiff,
+                               const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // gray mask bounds
-    BoundsResult GrayMaskBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDiff, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    BoundsResult GrayMaskBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDiff,
+                                uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0,
+                                const uint_fast8_t *buf1);
 
     // gray regions bounds
-    std::vector<BoundsResult> GrayRegionsBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<BoundsResult> GrayRegionsBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minDiff,
+                                                uint_fast32_t regionsLen, const std::vector<Region> &regionsVec,
+                                                const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb all bounds
-    BoundsResult RgbAllBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    BoundsResult RgbAllBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDepth,
+                              uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
     // rgb mask bounds
-    BoundsResult RgbMaskBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t pixDiff, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    BoundsResult RgbMaskBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t pixDiff,
+                               uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0,
+                               const uint_fast8_t *buf1);
 
     // rgb regions bounds
-    std::vector<BoundsResult> RgbRegionsBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+    std::vector<BoundsResult> RgbRegionsBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth,
+                                               uint_fast32_t minDiff, uint_fast32_t regionsLen,
+                                               const std::vector<Region> &regionsVec, const uint_fast8_t *buf0,
+                                               const uint_fast8_t *buf1);
 
+    uint_fast32_t EngineType(uint_fast32_t pixDepth, const std::string &target, const std::string &returns, bool async);
+
+    //std::vector<Region> RegionsJsToCpp(uint_fast32_t pixLen, uint_fast32_t regionsLen, const Napi::Array &regionsJs);
 }
 
 #endif
