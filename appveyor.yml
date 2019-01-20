@@ -1,4 +1,4 @@
-before_build:
+before_test:
   - npm i -g npm
   - npm --version
 image: Visual Studio 2017
