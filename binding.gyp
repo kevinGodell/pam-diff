@@ -10,7 +10,7 @@
        "src/results.cc"
      ],
 
-     "cflags": [ "-O2" ],
+     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],
 
      "cflags!": [ "-Wno-unused-parameter", "-O3" ],
 
@@ -70,7 +70,8 @@
 
            # remove defaults passed to both C/C++ files
            "WARNING_CFLAGS!": [
-                "-Wno-unused-parameter"
+                "-Wno-unused-parameter",
+                "-W"
            ]
 
          }
