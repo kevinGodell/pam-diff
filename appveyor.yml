@@ -3,7 +3,7 @@ environment:
   matrix:
 #    - nodejs_version: 8
 #    - nodejs_version: 9
-#    - nodejs_version: LTS
+    - nodejs_version: LTS
     - nodejs_version: Current
 platform:
   - x86
@@ -22,8 +22,6 @@ before_test:
 test_script:
   - node --version
   - npm --version
-#  - npm cache clean
-#  - npm run rgba:4
   - npm test
 #on_success:
 #  - npm run examples
