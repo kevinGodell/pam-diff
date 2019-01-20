@@ -1,5 +1,6 @@
 before_install:
   - npm i -g npm
+  - npm --version
 language: node_js
 node_js:
   - 8

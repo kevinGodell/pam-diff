@@ -1,5 +1,6 @@
 before_build:
   - npm i -g npm
+  - npm --version
 image: Visual Studio 2017
 environment:
   matrix:
