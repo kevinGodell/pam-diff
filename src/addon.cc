@@ -65,33 +65,33 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
 
 }
 
-Napi::Object Init(Napi::Env env, Napi::Object /*exports*/) {
-    Napi::Object new_exports = Napi::Function::New(env, CreateObject, "CreateObject");
-    GrayAllPercentSync::Init(env, new_exports);
-    GrayAllPercentAsync::Init(env, new_exports);
-    GrayMaskPercentSync::Init(env, new_exports);
-    GrayMaskPercentAsync::Init(env, new_exports);
-    GrayRegionsPercentSync::Init(env, new_exports);
-    GrayRegionsPercentAsync::Init(env, new_exports);
-    GrayAllBoundsSync::Init(env, new_exports);
-    GrayAllBoundsAsync::Init(env, new_exports);
-    GrayMaskBoundsSync::Init(env, new_exports);
-    GrayMaskBoundsAsync::Init(env, new_exports);
-    GrayRegionsBoundsSync::Init(env, new_exports);
-    GrayRegionsBoundsAsync::Init(env, new_exports);
-    RgbAllPercentSync::Init(env, new_exports);
-    RgbAllPercentAsync::Init(env, new_exports);
-    RgbMaskPercentSync::Init(env, new_exports);
-    RgbMaskPercentAsync::Init(env, new_exports);
-    RgbRegionsPercentSync::Init(env, new_exports);
-    RgbRegionsPercentAsync::Init(env, new_exports);
-    RgbAllBoundsSync::Init(env, new_exports);
-    RgbAllBoundsAsync::Init(env, new_exports);
-    RgbMaskBoundsSync::Init(env, new_exports);
-    RgbMaskBoundsAsync::Init(env, new_exports);
-    RgbRegionsBoundsSync::Init(env, new_exports);
-    RgbRegionsBoundsAsync::Init(env, new_exports);
-    return new_exports;
+Napi::Object Init(Napi::Env env, Napi::Object exports) {
+    exports = Napi::Function::New(env, CreateObject, "CreateObject");
+    GrayAllPercentSync::Init(env);
+    GrayAllPercentAsync::Init(env);
+    GrayMaskPercentSync::Init(env);
+    GrayMaskPercentAsync::Init(env);
+    GrayRegionsPercentSync::Init(env);
+    GrayRegionsPercentAsync::Init(env);
+    GrayAllBoundsSync::Init(env);
+    GrayAllBoundsAsync::Init(env);
+    GrayMaskBoundsSync::Init(env);
+    GrayMaskBoundsAsync::Init(env);
+    GrayRegionsBoundsSync::Init(env);
+    GrayRegionsBoundsAsync::Init(env);
+    RgbAllPercentSync::Init(env);
+    RgbAllPercentAsync::Init(env);
+    RgbMaskPercentSync::Init(env);
+    RgbMaskPercentAsync::Init(env);
+    RgbRegionsPercentSync::Init(env);
+    RgbRegionsPercentAsync::Init(env);
+    RgbAllBoundsSync::Init(env);
+    RgbAllBoundsAsync::Init(env);
+    RgbMaskBoundsSync::Init(env);
+    RgbMaskBoundsAsync::Init(env);
+    RgbRegionsBoundsSync::Init(env);
+    RgbRegionsBoundsAsync::Init(env);
+    return exports;
 }
 
 NODE_API_MODULE(NODE_GYP_MODULE_NAME, Init)

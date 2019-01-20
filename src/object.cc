@@ -24,14 +24,13 @@ GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayAllPercentSync::constructor;
 
-void GrayAllPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayAllPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayAllPercentSync", {
             InstanceMethod("compare", &GrayAllPercentSync::Compare)
     });
     GrayAllPercentSync::constructor = Napi::Persistent(func);
     GrayAllPercentSync::constructor.SuppressDestruct();
-    exports.Set("GrayAllPercentSync", func);
 }
 
 Napi::Object GrayAllPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -68,14 +67,13 @@ GrayAllPercentAsync::GrayAllPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayAllPercentAsync::constructor;
 
-void GrayAllPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayAllPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayAllPercentAsync", {
             InstanceMethod("compare", &GrayAllPercentAsync::Compare)
     });
     GrayAllPercentAsync::constructor = Napi::Persistent(func);
     GrayAllPercentAsync::constructor.SuppressDestruct();
-    exports.Set("GrayAllPercentAsync", func);
 }
 
 Napi::Object GrayAllPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -114,14 +112,13 @@ GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayMaskPercentSync::constructor;
 
-void GrayMaskPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayMaskPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayMaskPercentSync", {
             InstanceMethod("compare", &GrayMaskPercentSync::Compare)
     });
     GrayMaskPercentSync::constructor = Napi::Persistent(func);
     GrayMaskPercentSync::constructor.SuppressDestruct();
-    exports.Set("GrayMaskPercentSync", func);
 }
 
 Napi::Object GrayMaskPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -161,14 +158,13 @@ GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayMaskPercentAsync::constructor;
 
-void GrayMaskPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayMaskPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayMaskPercentAsync", {
             InstanceMethod("compare", &GrayMaskPercentAsync::Compare)
     });
     GrayMaskPercentAsync::constructor = Napi::Persistent(func);
     GrayMaskPercentAsync::constructor.SuppressDestruct();
-    exports.Set("GrayMaskPercentAsync", func);
 }
 
 Napi::Object GrayMaskPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -205,14 +201,13 @@ GrayRegionsPercentSync::GrayRegionsPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayRegionsPercentSync::constructor;
 
-void GrayRegionsPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayRegionsPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayRegionsPercentSync", {
             InstanceMethod("compare", &GrayRegionsPercentSync::Compare)
     });
     GrayRegionsPercentSync::constructor = Napi::Persistent(func);
     GrayRegionsPercentSync::constructor.SuppressDestruct();
-    exports.Set("GrayRegionsPercentSync", func);
 }
 
 Napi::Object GrayRegionsPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -250,14 +245,13 @@ GrayRegionsPercentAsync::GrayRegionsPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayRegionsPercentAsync::constructor;
 
-void GrayRegionsPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayRegionsPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayRegionsPercentAsync", {
             InstanceMethod("compare", &GrayRegionsPercentAsync::Compare)
     });
     GrayRegionsPercentAsync::constructor = Napi::Persistent(func);
     GrayRegionsPercentAsync::constructor.SuppressDestruct();
-    exports.Set("GrayRegionsPercentAsync", func);
 }
 
 Napi::Object GrayRegionsPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -293,14 +287,13 @@ GrayAllBoundsSync::GrayAllBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayAllBoundsSync::constructor;
 
-void GrayAllBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayAllBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayAllBoundsSync", {
             InstanceMethod("compare", &GrayAllBoundsSync::Compare)
     });
     GrayAllBoundsSync::constructor = Napi::Persistent(func);
     GrayAllBoundsSync::constructor.SuppressDestruct();
-    exports.Set("GrayAllBoundsSync", func);
 }
 
 Napi::Object GrayAllBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -337,14 +330,13 @@ GrayAllBoundsAsync::GrayAllBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayAllBoundsAsync::constructor;
 
-void GrayAllBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayAllBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayAllBoundsAsync", {
             InstanceMethod("compare", &GrayAllBoundsAsync::Compare)
     });
     GrayAllBoundsAsync::constructor = Napi::Persistent(func);
     GrayAllBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("GrayAllBoundsAsync", func);
 }
 
 Napi::Object GrayAllBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -383,14 +375,13 @@ GrayMaskBoundsSync::GrayMaskBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayMaskBoundsSync::constructor;
 
-void GrayMaskBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayMaskBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayMaskBoundsSync", {
             InstanceMethod("compare", &GrayMaskBoundsSync::Compare)
     });
     GrayMaskBoundsSync::constructor = Napi::Persistent(func);
     GrayMaskBoundsSync::constructor.SuppressDestruct();
-    exports.Set("GrayMaskBoundsSync", func);
 }
 
 Napi::Object GrayMaskBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -430,14 +421,13 @@ GrayMaskBoundsAsync::GrayMaskBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayMaskBoundsAsync::constructor;
 
-void GrayMaskBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayMaskBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayMaskBoundsAsync", {
             InstanceMethod("compare", &GrayMaskBoundsAsync::Compare)
     });
     GrayMaskBoundsAsync::constructor = Napi::Persistent(func);
     GrayMaskBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("GrayMaskBoundsAsync", func);
 }
 
 Napi::Object GrayMaskBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -475,14 +465,13 @@ GrayRegionsBoundsSync::GrayRegionsBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayRegionsBoundsSync::constructor;
 
-void GrayRegionsBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayRegionsBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayRegionsBoundsSync", {
             InstanceMethod("compare", &GrayRegionsBoundsSync::Compare)
     });
     GrayRegionsBoundsSync::constructor = Napi::Persistent(func);
     GrayRegionsBoundsSync::constructor.SuppressDestruct();
-    exports.Set("GrayRegionsBoundsSync", func);
 }
 
 Napi::Object GrayRegionsBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -520,14 +509,13 @@ GrayRegionsBoundsAsync::GrayRegionsBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference GrayRegionsBoundsAsync::constructor;
 
-void GrayRegionsBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void GrayRegionsBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "GrayRegionsBoundsAsync", {
             InstanceMethod("compare", &GrayRegionsBoundsAsync::Compare)
     });
     GrayRegionsBoundsAsync::constructor = Napi::Persistent(func);
     GrayRegionsBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("GrayRegionsBoundsAsync", func);
 }
 
 Napi::Object GrayRegionsBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -565,14 +553,13 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbAllPercentSync::constructor;
 
-void RgbAllPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbAllPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbAllPercentSync", {
             InstanceMethod("compare", &RgbAllPercentSync::Compare)
     });
     RgbAllPercentSync::constructor = Napi::Persistent(func);
     RgbAllPercentSync::constructor.SuppressDestruct();
-    exports.Set("RgbAllPercentSync", func);
 }
 
 Napi::Object RgbAllPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -611,14 +598,13 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbAllPercentAsync::constructor;
 
-void RgbAllPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbAllPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbAllPercentAsync", {
             InstanceMethod("compare", &RgbAllPercentAsync::Compare)
     });
     RgbAllPercentAsync::constructor = Napi::Persistent(func);
     RgbAllPercentAsync::constructor.SuppressDestruct();
-    exports.Set("RgbAllPercentAsync", func);
 }
 
 Napi::Object RgbAllPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -659,14 +645,13 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbMaskPercentSync::constructor;
 
-void RgbMaskPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbMaskPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbMaskPercentSync", {
             InstanceMethod("compare", &RgbMaskPercentSync::Compare)
     });
     RgbMaskPercentSync::constructor = Napi::Persistent(func);
     RgbMaskPercentSync::constructor.SuppressDestruct();
-    exports.Set("RgbMaskPercentSync", func);
 }
 
 Napi::Object RgbMaskPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -708,14 +693,13 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbMaskPercentAsync::constructor;
 
-void RgbMaskPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbMaskPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbMaskPercentAsync", {
             InstanceMethod("compare", &RgbMaskPercentAsync::Compare)
     });
     RgbMaskPercentAsync::constructor = Napi::Persistent(func);
     RgbMaskPercentAsync::constructor.SuppressDestruct();
-    exports.Set("RgbMaskPercentAsync", func);
 }
 
 Napi::Object RgbMaskPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -755,14 +739,13 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbRegionsPercentSync::constructor;
 
-void RgbRegionsPercentSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbRegionsPercentSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbRegionsPercentSync", {
             InstanceMethod("compare", &RgbRegionsPercentSync::Compare)
     });
     RgbRegionsPercentSync::constructor = Napi::Persistent(func);
     RgbRegionsPercentSync::constructor.SuppressDestruct();
-    exports.Set("RgbRegionsPercentSync", func);
 }
 
 Napi::Object RgbRegionsPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -802,14 +785,13 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbRegionsPercentAsync::constructor;
 
-void RgbRegionsPercentAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbRegionsPercentAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbRegionsPercentAsync", {
             InstanceMethod("compare", &RgbRegionsPercentAsync::Compare)
     });
     RgbRegionsPercentAsync::constructor = Napi::Persistent(func);
     RgbRegionsPercentAsync::constructor.SuppressDestruct();
-    exports.Set("RgbRegionsPercentAsync", func);
 }
 
 Napi::Object RgbRegionsPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -846,14 +828,13 @@ RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbAllBoundsSync::constructor;
 
-void RgbAllBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbAllBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbAllBoundsSync", {
             InstanceMethod("compare", &RgbAllBoundsSync::Compare)
     });
     RgbAllBoundsSync::constructor = Napi::Persistent(func);
     RgbAllBoundsSync::constructor.SuppressDestruct();
-    exports.Set("RgbAllBoundsSync", func);
 }
 
 Napi::Object RgbAllBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -891,14 +872,13 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbAllBoundsAsync::constructor;
 
-void RgbAllBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbAllBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbAllBoundsAsync", {
             InstanceMethod("compare", &RgbAllBoundsAsync::Compare)
     });
     RgbAllBoundsAsync::constructor = Napi::Persistent(func);
     RgbAllBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("RgbAllBoundsAsync", func);
 }
 
 Napi::Object RgbAllBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -938,14 +918,13 @@ RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbMaskBoundsSync::constructor;
 
-void RgbMaskBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbMaskBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbMaskBoundsSync", {
             InstanceMethod("compare", &RgbMaskBoundsSync::Compare)
     });
     RgbMaskBoundsSync::constructor = Napi::Persistent(func);
     RgbMaskBoundsSync::constructor.SuppressDestruct();
-    exports.Set("RgbMaskBoundsSync", func);
 }
 
 Napi::Object RgbMaskBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -986,14 +965,13 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbMaskBoundsAsync::constructor;
 
-void RgbMaskBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbMaskBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbMaskBoundsAsync", {
             InstanceMethod("compare", &RgbMaskBoundsAsync::Compare)
     });
     RgbMaskBoundsAsync::constructor = Napi::Persistent(func);
     RgbMaskBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("RgbMaskBoundsAsync", func);
 }
 
 Napi::Object RgbMaskBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -1031,14 +1009,13 @@ RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbRegionsBoundsSync::constructor;
 
-void RgbRegionsBoundsSync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbRegionsBoundsSync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbRegionsBoundsSync", {
             InstanceMethod("compare", &RgbRegionsBoundsSync::Compare)
     });
     RgbRegionsBoundsSync::constructor = Napi::Persistent(func);
     RgbRegionsBoundsSync::constructor.SuppressDestruct();
-    exports.Set("RgbRegionsBoundsSync", func);
 }
 
 Napi::Object RgbRegionsBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
@@ -1077,14 +1054,13 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
 
 Napi::FunctionReference RgbRegionsBoundsAsync::constructor;
 
-void RgbRegionsBoundsAsync::Init(const Napi::Env &env, Napi::Object &exports) {
+void RgbRegionsBoundsAsync::Init(const Napi::Env &env) {
     Napi::HandleScope scope(env);
     Napi::Function func = DefineClass(env, "RgbRegionsBoundsAsync", {
             InstanceMethod("compare", &RgbRegionsBoundsAsync::Compare)
     });
     RgbRegionsBoundsAsync::constructor = Napi::Persistent(func);
     RgbRegionsBoundsAsync::constructor.SuppressDestruct();
-    exports.Set("RgbRegionsBoundsAsync", func);
 }
 
 Napi::Object RgbRegionsBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {

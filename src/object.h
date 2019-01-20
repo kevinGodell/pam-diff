@@ -12,7 +12,7 @@
 class GrayAllPercentSync : public Napi::ObjectWrap<GrayAllPercentSync> {
 public:
     explicit GrayAllPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -28,7 +28,7 @@ private:
 class GrayAllPercentAsync : public Napi::ObjectWrap<GrayAllPercentAsync> {
 public:
     explicit GrayAllPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -44,7 +44,7 @@ private:
 class GrayMaskPercentSync : public Napi::ObjectWrap<GrayMaskPercentSync> {
 public:
     explicit GrayMaskPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -62,7 +62,7 @@ private:
 class GrayMaskPercentAsync : public Napi::ObjectWrap<GrayMaskPercentAsync> {
 public:
     explicit GrayMaskPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -80,7 +80,7 @@ private:
 class GrayRegionsPercentSync : public Napi::ObjectWrap<GrayRegionsPercentSync> {
 public:
     explicit GrayRegionsPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -96,7 +96,7 @@ private:
 class GrayRegionsPercentAsync : public Napi::ObjectWrap<GrayRegionsPercentAsync> {
 public:
     explicit GrayRegionsPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -112,7 +112,7 @@ private:
 class GrayAllBoundsSync : public Napi::ObjectWrap<GrayAllBoundsSync> {
 public:
     explicit GrayAllBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -130,7 +130,7 @@ private:
 class GrayAllBoundsAsync : public Napi::ObjectWrap<GrayAllBoundsAsync> {
 public:
     explicit GrayAllBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -148,7 +148,7 @@ private:
 class GrayMaskBoundsSync : public Napi::ObjectWrap<GrayMaskBoundsSync> {
 public:
     explicit GrayMaskBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -168,7 +168,7 @@ private:
 class GrayMaskBoundsAsync : public Napi::ObjectWrap<GrayMaskBoundsAsync> {
 public:
     explicit GrayMaskBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -188,7 +188,7 @@ private:
 class GrayRegionsBoundsSync : public Napi::ObjectWrap<GrayRegionsBoundsSync> {
 public:
     explicit GrayRegionsBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -206,7 +206,7 @@ private:
 class GrayRegionsBoundsAsync : public Napi::ObjectWrap<GrayRegionsBoundsAsync> {
 public:
     explicit GrayRegionsBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -224,7 +224,7 @@ private:
 class RgbAllPercentSync : public Napi::ObjectWrap<RgbAllPercentSync> {
 public:
     explicit RgbAllPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -242,7 +242,7 @@ private:
 class RgbAllPercentAsync : public Napi::ObjectWrap<RgbAllPercentAsync> {
 public:
     explicit RgbAllPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -260,7 +260,7 @@ private:
 class RgbMaskPercentSync : public Napi::ObjectWrap<RgbMaskPercentSync> {
 public:
     explicit RgbMaskPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -280,7 +280,7 @@ private:
 class RgbMaskPercentAsync : public Napi::ObjectWrap<RgbMaskPercentAsync> {
 public:
     explicit RgbMaskPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -300,7 +300,7 @@ private:
 class RgbRegionsPercentSync : public Napi::ObjectWrap<RgbRegionsPercentSync> {
 public:
     explicit RgbRegionsPercentSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -318,7 +318,7 @@ private:
 class RgbRegionsPercentAsync : public Napi::ObjectWrap<RgbRegionsPercentAsync> {
 public:
     explicit RgbRegionsPercentAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -336,7 +336,7 @@ private:
 class RgbAllBoundsSync : public Napi::ObjectWrap<RgbAllBoundsSync> {
 public:
     explicit RgbAllBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -355,7 +355,7 @@ private:
 class RgbAllBoundsAsync : public Napi::ObjectWrap<RgbAllBoundsAsync> {
 public:
     explicit RgbAllBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -374,7 +374,7 @@ private:
 class RgbMaskBoundsSync : public Napi::ObjectWrap<RgbMaskBoundsSync> {
 public:
     explicit RgbMaskBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -395,7 +395,7 @@ private:
 class RgbMaskBoundsAsync : public Napi::ObjectWrap<RgbMaskBoundsAsync> {
 public:
     explicit RgbMaskBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -416,7 +416,7 @@ private:
 class RgbRegionsBoundsSync : public Napi::ObjectWrap<RgbRegionsBoundsSync> {
 public:
     explicit RgbRegionsBoundsSync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -435,7 +435,7 @@ private:
 class RgbRegionsBoundsAsync : public Napi::ObjectWrap<RgbRegionsBoundsAsync> {
 public:
     explicit RgbRegionsBoundsAsync(const Napi::CallbackInfo &info);
-    static void Init(const Napi::Env &env, Napi::Object &exports);
+    static void Init(const Napi::Env &env);
     static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);

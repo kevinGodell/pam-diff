@@ -6,18 +6,6 @@
 #include <vector>
 #include <napi.h>
 
-/*
-
-class naming scheme = TypeTargetResponse
-
-GrayAllPercent = gray pixels, target all, respond with percent
-
-"Mask" sub classes add bitsetCount_ and bitset_
-
-"Rgb" sub classes add pixDepth_ and bufLen_
-
-*/
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GrayAllPercentWorker : public Napi::AsyncWorker {
