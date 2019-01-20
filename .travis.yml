@@ -10,6 +10,7 @@ os:
 #  - windows
 dist: xenial
 before_script:
+  - cat build/addon.target.mk
   - npm i -g npm
 script:
   - node --version
