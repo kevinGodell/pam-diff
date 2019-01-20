@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "install": "node-gyp rebuild",
-    "pretest": "npm install",
+    "__pretest": "npm install",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm test",
     "postversion": "npm run doc && npm run doc:commit",
