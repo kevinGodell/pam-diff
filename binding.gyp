@@ -10,7 +10,7 @@
        "src/results.cc"
      ],
 
-     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],
+     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter", "-finline-functions" ],
 
      "cflags!": [ "-Wno-unused-parameter", "-O3" ],
 
