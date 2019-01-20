@@ -88,7 +88,7 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,7 +104,7 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +198,7 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +310,7 @@ private:
     uint_fast32_t bufLen_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,7 +328,7 @@ private:
     uint_fast32_t bufLen_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -427,7 +427,7 @@ private:
     uint_fast32_t pixDepth_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -446,7 +446,7 @@ private:
     uint_fast32_t pixDepth_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
-    std::vector<Engine::Region> regionVec_;
+    std::vector<Region> regionVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

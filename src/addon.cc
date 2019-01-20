@@ -1,4 +1,5 @@
 #include "object.h"
+#include "engine.h"
 #include <napi.h>
 
 Napi::Object CreateObject(const Napi::CallbackInfo &info) {
@@ -8,55 +9,55 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const std::string target = config.Get("target").As<Napi::String>().Utf8Value();
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
     const bool async = config.Get("async").As<Napi::Boolean>().Value();
-    const uint_fast32_t engineType = Engine::EngineType(pixDepth, target, response, async);
+    const uint_fast32_t engineType = EngineType(pixDepth, target, response, async);
     switch (engineType) {
-        case Engine::GRAY_ALL_PERCENT_SYNC :
+        case GRAY_ALL_PERCENT_SYNC :
             return GrayAllPercentSync::NewInstance(env, config);
-        case Engine::GRAY_ALL_PERCENT_ASYNC :
+        case GRAY_ALL_PERCENT_ASYNC :
             return GrayAllPercentAsync::NewInstance(env, config);
-        case Engine::GRAY_MASK_PERCENT_SYNC :
+        case GRAY_MASK_PERCENT_SYNC :
             return GrayMaskPercentSync::NewInstance(env, config);
-        case Engine::GRAY_MASK_PERCENT_ASYNC :
+        case GRAY_MASK_PERCENT_ASYNC :
             return GrayMaskPercentAsync::NewInstance(env, config);
-        case Engine::GRAY_REGIONS_PERCENT_SYNC :
+        case GRAY_REGIONS_PERCENT_SYNC :
             return GrayRegionsPercentSync::NewInstance(env, config);
-        case Engine::GRAY_REGIONS_PERCENT_ASYNC :
+        case GRAY_REGIONS_PERCENT_ASYNC :
             return GrayRegionsPercentAsync::NewInstance(env, config);
-        case Engine::GRAY_ALL_BOUNDS_SYNC :
+        case GRAY_ALL_BOUNDS_SYNC :
             return GrayAllBoundsSync::NewInstance(env, config);
-        case Engine::GRAY_ALL_BOUNDS_ASYNC :
+        case GRAY_ALL_BOUNDS_ASYNC :
             return GrayAllBoundsAsync::NewInstance(env, config);
-        case Engine::GRAY_MASK_BOUNDS_SYNC :
+        case GRAY_MASK_BOUNDS_SYNC :
             return GrayMaskBoundsSync::NewInstance(env, config);
-        case Engine::GRAY_MASK_BOUNDS_ASYNC :
+        case GRAY_MASK_BOUNDS_ASYNC :
             return GrayMaskBoundsAsync::NewInstance(env, config);
-        case Engine::GRAY_REGIONS_BOUNDS_SYNC :
+        case GRAY_REGIONS_BOUNDS_SYNC :
             return GrayRegionsBoundsSync::NewInstance(env, config);
-        case Engine::GRAY_REGIONS_BOUNDS_ASYNC :
+        case GRAY_REGIONS_BOUNDS_ASYNC :
             return GrayRegionsBoundsAsync::NewInstance(env, config);
-        case Engine::RGB_ALL_PERCENT_SYNC :
+        case RGB_ALL_PERCENT_SYNC :
             return RgbAllPercentSync::NewInstance(env, config);
-        case Engine::RGB_ALL_PERCENT_ASYNC :
+        case RGB_ALL_PERCENT_ASYNC :
             return RgbAllPercentAsync::NewInstance(env, config);
-        case Engine::RGB_MASK_PERCENT_SYNC :
+        case RGB_MASK_PERCENT_SYNC :
             return RgbMaskPercentSync::NewInstance(env, config);
-        case Engine::RGB_MASK_PERCENT_ASYNC :
+        case RGB_MASK_PERCENT_ASYNC :
             return RgbMaskPercentAsync::NewInstance(env, config);
-        case Engine::RGB_REGIONS_PERCENT_SYNC :
+        case RGB_REGIONS_PERCENT_SYNC :
             return RgbRegionsPercentSync::NewInstance(env, config);
-        case Engine::RGB_REGIONS_PERCENT_ASYNC :
+        case RGB_REGIONS_PERCENT_ASYNC :
             return RgbRegionsPercentAsync::NewInstance(env, config);
-        case Engine::RGB_ALL_BOUNDS_SYNC :
+        case RGB_ALL_BOUNDS_SYNC :
             return RgbAllBoundsSync::NewInstance(env, config);
-        case Engine::RGB_ALL_BOUNDS_ASYNC :
+        case RGB_ALL_BOUNDS_ASYNC :
             return RgbAllBoundsAsync::NewInstance(env, config);
-        case Engine::RGB_MASK_BOUNDS_SYNC :
+        case RGB_MASK_BOUNDS_SYNC :
             return RgbMaskBoundsSync::NewInstance(env, config);
-        case Engine::RGB_MASK_BOUNDS_ASYNC :
+        case RGB_MASK_BOUNDS_ASYNC :
             return RgbMaskBoundsAsync::NewInstance(env, config);
-        case Engine::RGB_REGIONS_BOUNDS_SYNC :
+        case RGB_REGIONS_BOUNDS_SYNC :
             return RgbRegionsBoundsSync::NewInstance(env, config);
-        case Engine::RGB_REGIONS_BOUNDS_ASYNC :
+        case RGB_REGIONS_BOUNDS_ASYNC :
             return RgbRegionsBoundsAsync::NewInstance(env, config);
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(engineType));

@@ -58,14 +58,14 @@ private:
 
 class GrayRegionsPercentWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsPercentWorker(uint_fast32_t pixCount, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    GrayRegionsPercentWorker(uint_fast32_t pixCount, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     void Execute() override;
     void OnOK() override;
 private:
     const uint_fast32_t pixCount_;
     const uint_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
-    const std::vector<Engine::Region> &regionVec_;
+    const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     std::vector<uint_fast32_t> percentResultVec_;
@@ -113,7 +113,7 @@ private:
 
 class RgbRegionsPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsPercentWorker(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    RgbRegionsPercentWorker(uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     void Execute() override;
     void OnOK() override;
 private:
@@ -121,7 +121,7 @@ private:
     const uint_fast32_t bufLen_;
     const uint_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
-    const std::vector<Engine::Region> &regionVec_;
+    const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     std::vector<uint_fast32_t> percentResultVec_;
@@ -143,7 +143,7 @@ protected:
     const uint_fast32_t diffsPerc_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    Engine::BoundsResult boundsResult_;
+    BoundsResult boundsResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,14 +163,14 @@ private:
     const std::vector<bool> &bitsetVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    Engine::BoundsResult boundsResult_;
+    BoundsResult boundsResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GrayRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     void Execute() override;
     void OnOK() override;
 private:
@@ -178,10 +178,10 @@ private:
     const uint_fast32_t height_;
     const uint_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
-    const std::vector<Engine::Region> &regionVec_;
+    const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    std::vector<Engine::BoundsResult> boundsResultVec_;
+    std::vector<BoundsResult> boundsResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -201,7 +201,7 @@ protected:
     const uint_fast32_t diffsPerc_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    Engine::BoundsResult boundsResult_;
+    BoundsResult boundsResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -222,14 +222,14 @@ private:
     const std::vector<bool> &bitsetVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    Engine::BoundsResult boundsResult_;
+    BoundsResult boundsResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class RgbRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Engine::Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
+    RgbRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, uint_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb);
     void Execute() override;
     void OnOK() override;
 private:
@@ -238,10 +238,10 @@ private:
     const uint_fast32_t pixDepth_;
     const uint_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
-    const std::vector<Engine::Region> &regionVec_;
+    const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    std::vector<Engine::BoundsResult> boundsResultVec_;
+    std::vector<BoundsResult> boundsResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

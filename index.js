@@ -4,7 +4,7 @@ const {Transform} = require('stream');
 
 const PP = require('polygon-points');
 
-const PC = require('bindings')('addon');
+const addon = require('bindings')('addon');
 
 class PamDiff extends Transform {
     /**
@@ -320,7 +320,7 @@ class PamDiff extends Transform {
      * @return {PamDiff}
      */
     resetCache() {
-        delete this._example;
+        delete this._engine;
         delete this._oldPix;
         delete this._newPix;
         delete this._width;
@@ -429,9 +429,7 @@ class PamDiff extends Transform {
 
         engine += this._async ? '_async' : '_sync';
 
-        //this._example = new PC.Example(config);
-
-        this._example = PC(config);
+        this._engine = addon(config);
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -450,7 +448,7 @@ class PamDiff extends Transform {
      */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
         //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
@@ -477,7 +475,7 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
         //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
