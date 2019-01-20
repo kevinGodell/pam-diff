@@ -11,10 +11,11 @@ os:
 dist: xenial
 before_script:
   - cat build/addon.target.mk
-  - npm i -g npm
-script:
-  - node --version
   - npm --version
+  - npm i -g npm
+  - npm --version
+  - node --version
+script:
   - npm test
 cache:
   directories:
