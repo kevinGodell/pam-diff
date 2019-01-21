@@ -23,13 +23,11 @@ Napi::Array
 ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec,
      const std::vector<uint_fast32_t> &percentResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t r = 0, j = 0, percent = 0; r < regionsLen; r++) {
-        percent = percentResultVec[r];
-        Region region = regionVec[r];
-        if (region.percent > percent) continue;
+    for (uint_fast32_t r = 0, j = 0; r < regionsLen; r++) {
+        if (regionVec[r].percent > percentResultVec[r]) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", region.name);
-        obj.Set("percent", percent);
+        obj.Set("name", regionVec[r].name);
+        obj.Set("percent", percentResultVec[r]);
         resultsJs.Set(j++, obj);
     }
     return resultsJs;
@@ -58,16 +56,14 @@ ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Reg
      const std::vector<BoundsResult> &boundsResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
     for (uint_fast32_t r = 0, j = 0; r < regionsLen; r++) {
-        BoundsResult boundsResult = boundsResultVec[r];
-        Region region = regionVec[r];
-        if (region.percent > boundsResult.percent) continue;
+        if (regionVec[r].percent > boundsResultVec[r].percent) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", region.name);
-        obj.Set("percent", boundsResult.percent);
-        obj.Set("minX", boundsResult.minX);
-        obj.Set("maxX", boundsResult.maxX);
-        obj.Set("minY", boundsResult.minY);
-        obj.Set("maxY", boundsResult.maxY);
+        obj.Set("name", regionVec[r].name);
+        obj.Set("percent", boundsResultVec[r].percent);
+        obj.Set("minX", boundsResultVec[r].minX);
+        obj.Set("maxX", boundsResultVec[r].maxX);
+        obj.Set("minY", boundsResultVec[r].minY);
+        obj.Set("maxY", boundsResultVec[r].maxY);
         resultsJs.Set(j++, obj);
     }
     return resultsJs;
