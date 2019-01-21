@@ -13,6 +13,7 @@ class PamDiff extends Transform {
      * @param [options.async=false] {Boolean} - Pixel change detection will be sent to a libuv worker thread.
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
      * @param [options.percent=5] {Number} - Percent of pixels that exceed difference value.
+     * @param [options.response=percent] {String} - Accepted values: percent or bounds.
      * @param [options.regions] {Array} - Array of regions.
      * @param options.regions[i].name {String} - Name of region.
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
