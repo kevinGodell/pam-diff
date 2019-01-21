@@ -81,7 +81,7 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions});
+const pamDiff = new PamDiff({regions : regions, response: "bounds"});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
@@ -95,7 +95,7 @@ pamDiff.on('diff', (data) => {
         name += `(${region.name}=${region.percent})`;
     }
     const jpeg = `${name}.jpeg`;
-    const ff = execFile('ffmpeg', ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
+    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
     ff.on('exit', (data) => {
         if (data === 0) {
