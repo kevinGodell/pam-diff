@@ -75,7 +75,7 @@ const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y:
 
 const regions = [region1];
 
-const pamDiff = new PamDiff({regions : regions});
+const pamDiff = new PamDiff({regions : regions, response: "bounds"});
 
 pamDiff.on('diff', (data) => {
     console.log(data);

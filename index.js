@@ -4,7 +4,7 @@ const {Transform} = require('stream');
 
 const PP = require('polygon-points');
 
-const PC = require('bindings')('addon');
+const addon = require('bindings')('addon');
 
 class PamDiff extends Transform {
     /**
@@ -13,6 +13,7 @@ class PamDiff extends Transform {
      * @param [options.async=false] {Boolean} - Pixel change detection will be sent to a libuv worker thread.
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
      * @param [options.percent=5] {Number} - Percent of pixels that exceed difference value.
+     * @param [options.response=percent] {String} - Accepted values: percent or bounds.
      * @param [options.regions] {Array} - Array of regions.
      * @param options.regions[i].name {String} - Name of region.
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
@@ -320,7 +321,7 @@ class PamDiff extends Transform {
      * @return {PamDiff}
      */
     resetCache() {
-        delete this._example;
+        delete this._engine;
         delete this._oldPix;
         delete this._newPix;
         delete this._width;
@@ -429,7 +430,7 @@ class PamDiff extends Transform {
 
         engine += this._async ? '_async' : '_sync';
 
-        this._example = new PC.Example(config);
+        this._engine = addon(config);
 
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -441,9 +442,14 @@ class PamDiff extends Transform {
 
     }
 
+    /**
+     *
+     * @param chunk
+     * @private
+     */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
         //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
@@ -461,11 +467,16 @@ class PamDiff extends Transform {
         this._oldPix = this._newPix;
     }
 
+    /**
+     *
+     * @param chunk
+     * @private
+     */
     _parsePixelsDebug(chunk) {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._example.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
         //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};

@@ -4,9 +4,11 @@ examples/
 tests/
 docs/
 build/
+lib/
 .travis.yml
 appveyor.yml
 .jshintrc
 pam-diff.iml
 .env
-cmake*
+cmake-build-debug/
+CMakeLists.txt
