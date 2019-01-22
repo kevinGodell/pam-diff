@@ -1,6 +1,18 @@
 'use strict';
 
-process.env.NODE_ENV = 'development';
+const dotenv = require('dotenv');
+
+dotenv.config();
+
+const argv = require('minimist')(process.argv.slice(2));
+
+const async = argv.async || process.env.ASYNC || false;
+
+const response = argv.response || process.env.RESPONSE || 'percent';
+
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
@@ -83,7 +95,7 @@ const region4 = {name: 'region4', difference: 10, percent: 10, polygon: [{x: 480
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, response: "bounds"});
+const pamDiff = new PamDiff({regions : regions, response: response, async: async});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
