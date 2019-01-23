@@ -7,6 +7,8 @@
 #include <vector>
 #include <napi.h>
 
+#include <iostream>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
@@ -87,8 +89,7 @@ Napi::Value GrayAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayAllPercentWorker = new GrayAllPercentWorker(this->target_, this->pixCount_, this->pixDiff_,
-                                                          this->diffsPerc_, buf0, buf1, cb);
+    auto *grayAllPercentWorker = new GrayAllPercentWorker(this->target_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     grayAllPercentWorker->Queue();
     return env.Undefined();
 }
@@ -109,6 +110,8 @@ GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "gray mask percent sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
 }
 
 Napi::FunctionReference GrayMaskPercentSync::constructor;
@@ -133,8 +136,7 @@ Napi::Value GrayMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_,
-                                                  buf0, buf1);
+    uint_fast32_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -156,6 +158,9 @@ GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "gray mask percent async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference GrayMaskPercentAsync::constructor;
@@ -180,9 +185,7 @@ Napi::Value GrayMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayMaskPercentWorker = new GrayMaskPercentWorker(this->target_, this->pixCount_, this->pixDiff_,
-                                                            this->diffsPerc_, this->bitsetCount_, this->bitsetVec_,
-                                                            buf0, buf1, cb);
+    auto *grayMaskPercentWorker = new GrayMaskPercentWorker(this->target_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     grayMaskPercentWorker->Queue();
     return env.Undefined();
 }
@@ -356,8 +359,7 @@ Napi::Value GrayAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayAllBoundsWorker = new GrayAllBoundsWorker(this->target_, this->width_, this->height_, this->pixCount_,
-                                                        this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
+    auto *grayAllBoundsWorker = new GrayAllBoundsWorker(this->target_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     grayAllBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -374,10 +376,14 @@ GrayMaskBoundsSync::GrayMaskBoundsSync(const Napi::CallbackInfo &info)
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = this->width_ * this->height_;
+    //this->pixCount_ = this->width_ * this->height_;
+    uint_fast32_t pixCount = this->width_ * this->height_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
-    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    this->bitsetVec_.assign(bitset, bitset + pixCount);
+
+    std::cout << "gray mask bounds sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference GrayMaskBoundsSync::constructor;
@@ -402,8 +408,7 @@ Napi::Value GrayMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_,
-                                               this->bitsetVec_, buf0, buf1);
+    BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -421,10 +426,14 @@ GrayMaskBoundsAsync::GrayMaskBoundsAsync(const Napi::CallbackInfo &info)
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = this->width_ * this->height_;
+    //this->pixCount_ = this->width_ * this->height_;
+    uint_fast32_t pixCount = this->width_ * this->height_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
-    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    this->bitsetVec_.assign(bitset, bitset + pixCount);
+
+    std::cout << "gray mask bounds async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference GrayMaskBoundsAsync::constructor;
@@ -449,10 +458,8 @@ Napi::Value GrayMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_,
-                                               this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, boundsResult);
-    cb.Call({env.Null(), resultsJs});
+    auto *grayMaskBoundsWorker = new GrayMaskBoundsWorker(this->target_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_,this->bitsetVec_, buf0, buf1, cb);
+    grayMaskBoundsWorker->Queue();
     return env.Undefined();
 }
 
@@ -466,10 +473,11 @@ GrayRegionsBoundsSync::GrayRegionsBoundsSync(const Napi::CallbackInfo &info)
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = this->width_ * this->height_;
+    //this->pixCount_ = this->width_ * this->height_;
+    uint_fast32_t pixCount = this->width_ * this->height_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
-    this->regionVec_ = RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs);
+    this->regionVec_ = RegionsJsToCpp(pixCount, this->regionsLen_, regionsJs);
 }
 
 Napi::FunctionReference GrayRegionsBoundsSync::constructor;
@@ -494,8 +502,7 @@ Napi::Value GrayRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<BoundsResult> resultsVec = GrayRegionsBounds(this->width_, this->height_, this->minDiff_,
-                                                             this->regionsLen_, this->regionVec_, buf0, buf1);
+    std::vector<BoundsResult> resultsVec = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -511,10 +518,11 @@ GrayRegionsBoundsAsync::GrayRegionsBoundsAsync(const Napi::CallbackInfo &info)
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = this->width_ * this->height_;
+    //this->pixCount_ = this->width_ * this->height_;
+    uint_fast32_t pixCount = this->width_ * this->height_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
-    this->regionVec_ = RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs);
+    this->regionVec_ = RegionsJsToCpp(pixCount, this->regionsLen_, regionsJs);
 }
 
 Napi::FunctionReference GrayRegionsBoundsAsync::constructor;
@@ -584,8 +592,7 @@ Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbAllPercent(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, buf0,
-                                                buf1);
+    uint_fast32_t percentResult = RgbAllPercent(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -654,6 +661,9 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "rgb mask percent sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference RgbMaskPercentSync::constructor;
@@ -678,8 +688,7 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->bufLen_, this->pixDiff_, this->bitsetCount_,
-                                                 this->bitsetVec_, buf0, buf1);
+    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->bufLen_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -703,6 +712,9 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "rgb mask percent async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference RgbMaskPercentAsync::constructor;
@@ -726,11 +738,10 @@ Napi::Value RgbMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->bufLen_, this->pixDiff_, this->bitsetCount_,
-                                                 this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, percentResult);
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Function cb = info[2].As<Napi::Function>();//pixDepth,bufLen, pixDiff, bitsetCount, bitsetVec, buf0, buf1
+    //const std::string &target, uint_fast32_t pixDepth, uint_fast32_t bufLen, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb
+    auto *rbgMaskPercentWorker = new RgbMaskPercentWorker(this->target_, this->pixDepth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
+    rbgMaskPercentWorker->Queue();
     return env.Undefined();
 }
 
@@ -774,8 +785,7 @@ Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_,
-                                                              this->regionsLen_, this->regionVec_, buf0, buf1);
+    std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -821,8 +831,7 @@ Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsPercentWorker = new RgbRegionsPercentWorker(this->pixDepth_, this->bufLen_, this->minDiff_,
-                                                                this->regionsLen_, this->regionVec_, buf0, buf1, cb);
+    auto *rgbRegionsPercentWorker = new RgbRegionsPercentWorker(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1, cb);
     rgbRegionsPercentWorker->Queue();
     return env.Undefined();
 }
@@ -865,8 +874,7 @@ Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = RgbAllBounds(this->width_, this->height_, this->pixCount_, this->pixDepth_,
-                                             this->pixDiff_, buf0, buf1);
+    BoundsResult boundsResult = RgbAllBounds(this->width_, this->height_, this->pixCount_, this->pixDepth_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -910,9 +918,7 @@ Napi::Value RgbAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllBoundsWorker = new RgbAllBoundsWorker(this->target_, this->width_, this->height_, this->pixCount_,
-                                                      this->pixDepth_, this->pixDiff_, this->diffsPerc_, buf0, buf1,
-                                                      cb);
+    auto *rgbAllBoundsWorker = new RgbAllBoundsWorker(this->target_, this->width_, this->height_, this->pixCount_, this->pixDepth_, this->pixDiff_, this->diffsPerc_, buf0, buf1, cb);
     rgbAllBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -934,6 +940,9 @@ RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "rgb mask bounds sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference RgbMaskBoundsSync::constructor;
@@ -958,8 +967,7 @@ Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = RgbMaskBounds(this->width_, this->height_, this->pixDepth_, this->pixDiff_,
-                                              this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    BoundsResult boundsResult = RgbMaskBounds(this->width_, this->height_, this->pixDepth_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->target_, this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -982,6 +990,9 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+
+    std::cout << "rgb mask bounds async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
+
 }
 
 Napi::FunctionReference RgbMaskBoundsAsync::constructor;
@@ -1006,9 +1017,7 @@ Napi::Value RgbMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbMaskBoundsWorker = new RgbMaskBoundsWorker(this->target_, this->width_, this->height_, this->pixDepth_,
-                                                        this->pixDiff_, this->diffsPerc_, this->bitsetCount_,
-                                                        this->bitsetVec_, buf0, buf1, cb);
+    auto *rgbMaskBoundsWorker = new RgbMaskBoundsWorker(this->target_, this->width_, this->height_, this->pixDepth_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     rgbMaskBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -1052,9 +1061,7 @@ Napi::Value RgbRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<BoundsResult> boundsResultVec = RgbRegionsBounds(this->width_, this->height_, this->pixDepth_,
-                                                                 this->minDiff_, this->regionsLen_, this->regionVec_,
-                                                                 buf0, buf1);
+    std::vector<BoundsResult> boundsResultVec = RgbRegionsBounds(this->width_, this->height_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, boundsResultVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -1099,9 +1106,7 @@ Napi::Value RgbRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->width_, this->height_, this->pixDepth_,
-                                                              this->minDiff_, this->regionsLen_, this->regionVec_, buf0,
-                                                              buf1, cb);
+    auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->width_, this->height_, this->pixDepth_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1, cb);
     rgbRegionsBoundsWorker->Queue();
     return env.Undefined();
 }

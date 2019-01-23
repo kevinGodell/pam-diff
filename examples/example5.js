@@ -30,7 +30,7 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use an artificial video input */
-    //'-re',
+    '-re',
     '-f',
     'lavfi',
     '-i',
@@ -49,16 +49,18 @@ const params = [
     'pam',
     '-pix_fmt',
     //'gray',
-    //'rgba',
-    'rgb24',
+    'rgba',
+    //'rgb24',
     //'monob',
     '-f',
     'image2pipe',
     '-vf',
-    'fps=2,scale=640:360',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
+    //'fps=2,scale=1280:720',
+    //'fps=2,scale=1500:800',
+    'fps=2,scale=1920:1080',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
     //'fps=1,scale=iw*1/6:ih*1/6',
     '-frames',
-    '100',
+    '10000',
     'pipe:1'
 ];
 

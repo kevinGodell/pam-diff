@@ -156,7 +156,7 @@ private:
     std::string target_;
     uint_fast32_t width_;
     uint_fast32_t height_;
-    uint_fast32_t pixCount_;
+    //uint_fast32_t pixCount_;//todo????
     uint_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
@@ -176,7 +176,7 @@ private:
     std::string target_;
     uint_fast32_t width_;
     uint_fast32_t height_;
-    uint_fast32_t pixCount_;
+    //uint_fast32_t pixCount_;
     uint_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
@@ -195,7 +195,7 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t width_;
     uint_fast32_t height_;
-    uint_fast32_t pixCount_;
+    //uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
@@ -213,7 +213,7 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t width_;
     uint_fast32_t height_;
-    uint_fast32_t pixCount_;
+    //uint_fast32_t pixCount_;
     uint_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
