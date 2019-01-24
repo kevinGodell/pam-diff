@@ -7,8 +7,6 @@
 #include <vector>
 #include <napi.h>
 
-#include <iostream>
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
@@ -110,8 +108,6 @@ GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "gray mask percent sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
 }
 
 Napi::FunctionReference GrayMaskPercentSync::constructor;
@@ -158,9 +154,6 @@ GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "gray mask percent async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference GrayMaskPercentAsync::constructor;
@@ -381,9 +374,6 @@ GrayMaskBoundsSync::GrayMaskBoundsSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + pixCount);
-
-    std::cout << "gray mask bounds sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference GrayMaskBoundsSync::constructor;
@@ -431,9 +421,6 @@ GrayMaskBoundsAsync::GrayMaskBoundsAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + pixCount);
-
-    std::cout << "gray mask bounds async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference GrayMaskBoundsAsync::constructor;
@@ -458,7 +445,7 @@ Napi::Value GrayMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayMaskBoundsWorker = new GrayMaskBoundsWorker(this->target_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_,this->bitsetVec_, buf0, buf1, cb);
+    auto *grayMaskBoundsWorker = new GrayMaskBoundsWorker(this->target_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, cb);
     grayMaskBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -661,9 +648,6 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "rgb mask percent sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference RgbMaskPercentSync::constructor;
@@ -712,9 +696,6 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "rgb mask percent async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference RgbMaskPercentAsync::constructor;
@@ -785,7 +766,7 @@ Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -828,10 +809,10 @@ Napi::Object RgbRegionsPercentAsync::NewInstance(Napi::Env &env, const Napi::Obj
 
 Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsPercentWorker = new RgbRegionsPercentWorker(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1, cb);
+    auto *rgbRegionsPercentWorker = new RgbRegionsPercentWorker(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, napiBuf0, napiBuf1, cb);
     rgbRegionsPercentWorker->Queue();
     return env.Undefined();
 }
@@ -940,9 +921,6 @@ RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "rgb mask bounds sync bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference RgbMaskBoundsSync::constructor;
@@ -990,9 +968,6 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
-
-    std::cout << "rgb mask bounds async bitset: " << this->bitsetVec_.size() << " - " << this->bitsetVec_.capacity() << " - " << this->bitsetVec_.max_size() << std::endl;
-
 }
 
 Napi::FunctionReference RgbMaskBoundsAsync::constructor;

@@ -450,7 +450,6 @@ class PamDiff extends Transform {
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
         this._engine.compare(this._oldPix, this._newPix, (err, results) => {
-        //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
@@ -477,7 +476,6 @@ class PamDiff extends Transform {
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
         this._engine.compare(this._oldPix, this._newPix, (err, results) => {
-        //this._pixelDiffEngine(this._oldPix, this._newPix, (err, results) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
                 if (this._callback) {
@@ -492,6 +490,8 @@ class PamDiff extends Transform {
             }
             console.timeEnd(`${this._debugEngine}-${debugCount}`);
         });
+
+
         this._oldPix = this._newPix;
     }
 

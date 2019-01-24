@@ -3,15 +3,14 @@
 #include <string>
 #include <vector>
 #include <napi.h>
-#include <iostream>
 
 /*
+ *
  * iterations index
  * r = regions
  * p = pixel
  * b = buffer
  *
- * pixCount preferred to bufLen since we usually need to number of pixels to divide diffds
  */
 
 // gray all percent
@@ -112,12 +111,9 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const u
     return boundsResultVec;
 }
 
-//todo length of buff should not be relevant???????? only pix count
-
 // rgb all percent
 uint_fast32_t
-RgbAllPercent(const uint_fast32_t pixCount, const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t pixDiff,
-              const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+RgbAllPercent(const uint_fast32_t pixCount, const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t pixDiff, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t diffs = 0;
     for (uint_fast32_t i = 0; i < bufLen; i += pixDepth) {
         if (pixDiff > RgbDiff(buf0, buf1, i)) continue;
@@ -139,39 +135,21 @@ RgbMaskPercent(const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const u
 
 // rgb regions percent
 std::vector<uint_fast32_t>
-RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::cout << pixDepth << " - " << bufLen << " - " << minDiff << " - " << regionsLen << " - " << regionsVec.size() << std::endl;
-    std::cout << "pix depth " << pixDepth << std::endl;
-
+RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
-
-    for (uint_fast32_t i = 0, p = 0; i < bufLen; i += pixDepth, p++) {
-
-        uint_fast32_t diff = RgbDiff(buf0, buf1, i);
-
+    for (uint_fast32_t p = 0; p < pixCount; p++) {
+        uint_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
         if (minDiff > diff) continue;
-
         for (uint_fast32_t r = 0; r < regionsLen; r++) {
-
             if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
-
             percentResultVec[r]++;
-
         }
     }
-
     for (uint_fast32_t r = 0; r < regionsLen; r++) {
-
         percentResultVec[r] = percentResultVec[r] * 100 / regionsVec[r].bitsetCount;
-
     }
-
     return percentResultVec;
 }
-
-
-
-
 
 // rgb all bounds
 BoundsResult
@@ -192,8 +170,7 @@ RgbAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_f
 
 // rgb mask bounds
 BoundsResult
-RgbMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDepth, const uint_fast32_t pixDiff,
-              const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+RgbMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDepth, const uint_fast32_t pixDiff, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     uint_fast32_t minX = width - 1, maxX = 0, minY = height - 1, maxY = 0, diffs = 0;
     for (uint_fast32_t y = 0, x = 0, i = 0, p = 0; y < height; y++) {
         for (x = 0; x < width; x++, i += pixDepth, p++) {
@@ -268,10 +245,6 @@ RegionsJsToCpp(const uint_fast32_t pixLen, const uint_fast32_t regionsLen, const
         const bool *bitset = regionsJs.Get(i).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
         std::vector<bool> bitsetVec;
         bitsetVec.assign(bitset, bitset + pixLen);
-
-        std::cout << "region bitset: " << name << " - " << bitsetVec.size() << " - " << bitsetVec.capacity() << " - " << bitsetVec.max_size() << std::endl;
-
-
         regionVec.push_back(Region{name, diff, percent, count, bitsetVec});
     }
     return regionVec;

@@ -143,12 +143,12 @@ void RgbMaskPercentWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsPercentWorker::RgbRegionsPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t bufLen, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), bufLen_(bufLen), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(buf0), buf1_(buf1) {
+RgbRegionsPercentWorker::RgbRegionsPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const uint_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)) {
 }
 
 void RgbRegionsPercentWorker::Execute() {
-    this->percentResultVec_ = RgbRegionsPercent(this->pixDepth_, this->bufLen_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
+    this->percentResultVec_ = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
 }
 
 void RgbRegionsPercentWorker::OnOK() {
