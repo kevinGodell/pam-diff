@@ -10,7 +10,7 @@
        "src/results.cc"
      ],
 
-     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
+     "cflags": [ "-Ofast", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
 
      "cflags!": [ "-Wno-unused-parameter", "-O3" ],
 
@@ -44,7 +44,7 @@
            "GCC_ENABLE_CPP_RTTI" : "YES",
 
            # "fast", "3", "2", "1", "0", "", "s"
-           "GCC_OPTIMIZATION_LEVEL": "2",
+           "GCC_OPTIMIZATION_LEVEL": "fast",
 
            # only passed to C files
            "OTHER_CFLAGS" : [],
