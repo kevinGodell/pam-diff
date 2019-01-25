@@ -32,7 +32,7 @@ void GrayAllPercentSync::Init(const Napi::Env &env) {
     GrayAllPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayAllPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayAllPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayAllPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -74,7 +74,7 @@ void GrayAllPercentAsync::Init(const Napi::Env &env) {
     GrayAllPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayAllPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayAllPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayAllPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -118,7 +118,7 @@ void GrayMaskPercentSync::Init(const Napi::Env &env) {
     GrayMaskPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayMaskPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayMaskPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayMaskPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -163,7 +163,7 @@ void GrayMaskPercentAsync::Init(const Napi::Env &env) {
     GrayMaskPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayMaskPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayMaskPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayMaskPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -206,7 +206,7 @@ void GrayRegionsPercentSync::Init(const Napi::Env &env) {
     GrayRegionsPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayRegionsPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayRegionsPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayRegionsPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -250,7 +250,7 @@ void GrayRegionsPercentAsync::Init(const Napi::Env &env) {
     GrayRegionsPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayRegionsPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayRegionsPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayRegionsPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -291,7 +291,7 @@ void GrayAllBoundsSync::Init(const Napi::Env &env) {
     GrayAllBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayAllBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayAllBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayAllBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -333,7 +333,7 @@ void GrayAllBoundsAsync::Init(const Napi::Env &env) {
     GrayAllBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayAllBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayAllBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayAllBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -377,7 +377,7 @@ void GrayMaskBoundsSync::Init(const Napi::Env &env) {
     GrayMaskBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayMaskBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayMaskBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayMaskBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -422,7 +422,7 @@ void GrayMaskBoundsAsync::Init(const Napi::Env &env) {
     GrayMaskBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayMaskBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayMaskBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayMaskBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -465,7 +465,7 @@ void GrayRegionsBoundsSync::Init(const Napi::Env &env) {
     GrayRegionsBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayRegionsBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayRegionsBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayRegionsBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -510,7 +510,7 @@ void GrayRegionsBoundsAsync::Init(const Napi::Env &env) {
     GrayRegionsBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object GrayRegionsBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object GrayRegionsBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = GrayRegionsBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -552,7 +552,7 @@ void RgbAllPercentSync::Init(const Napi::Env &env) {
     RgbAllPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbAllPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbAllPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbAllPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -595,7 +595,7 @@ void RgbAllPercentAsync::Init(const Napi::Env &env) {
     RgbAllPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbAllPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbAllPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbAllPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -640,7 +640,7 @@ void RgbMaskPercentSync::Init(const Napi::Env &env) {
     RgbMaskPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbMaskPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbMaskPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -686,7 +686,7 @@ void RgbMaskPercentAsync::Init(const Napi::Env &env) {
     RgbMaskPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbMaskPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbMaskPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -730,7 +730,7 @@ void RgbRegionsPercentSync::Init(const Napi::Env &env) {
     RgbRegionsPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbRegionsPercentSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionsPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbRegionsPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -775,7 +775,7 @@ void RgbRegionsPercentAsync::Init(const Napi::Env &env) {
     RgbRegionsPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbRegionsPercentAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionsPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbRegionsPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -817,7 +817,7 @@ void RgbAllBoundsSync::Init(const Napi::Env &env) {
     RgbAllBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbAllBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbAllBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbAllBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -860,7 +860,7 @@ void RgbAllBoundsAsync::Init(const Napi::Env &env) {
     RgbAllBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbAllBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbAllBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbAllBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -905,7 +905,7 @@ void RgbMaskBoundsSync::Init(const Napi::Env &env) {
     RgbMaskBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbMaskBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbMaskBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -951,7 +951,7 @@ void RgbMaskBoundsAsync::Init(const Napi::Env &env) {
     RgbMaskBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbMaskBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbMaskBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -995,7 +995,7 @@ void RgbRegionsBoundsSync::Init(const Napi::Env &env) {
     RgbRegionsBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbRegionsBoundsSync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionsBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbRegionsBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
@@ -1040,7 +1040,7 @@ void RgbRegionsBoundsAsync::Init(const Napi::Env &env) {
     RgbRegionsBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbRegionsBoundsAsync::NewInstance(Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionsBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
     Napi::Object object = RgbRegionsBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
