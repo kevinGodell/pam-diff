@@ -44,7 +44,7 @@
            "GCC_ENABLE_CPP_RTTI" : "YES",
 
            # "fast", "3", "2", "1", "0", "", "s"
-           "GCC_OPTIMIZATION_LEVEL": "2",
+           "GCC_OPTIMIZATION_LEVEL": "fast",
 
            # only passed to C files
            "OTHER_CFLAGS" : [],
