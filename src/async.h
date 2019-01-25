@@ -146,7 +146,7 @@ private:
 
 class RgbAllPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbAllPercentWorker(uint_fast32_t pixCount, uint_fast32_t pixDepth, uint_fast32_t bufLen, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllPercentWorker(uint_fast32_t pixCount, uint_fast32_t pixDepth, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -155,7 +155,6 @@ public:
 private:
     const uint_fast32_t pixCount_;
     const uint_fast32_t pixDepth_;
-    const uint_fast32_t bufLen_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast8_t *buf0_;
@@ -167,9 +166,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbMaskPercentWorker : public Napi::AsyncWorker {//pixDepth, bufLen, pixDiff, bitsetCount, bitsetVec, buf0, buf1
+class RgbMaskPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbMaskPercentWorker(uint_fast32_t pixDepth, uint_fast32_t bufLen, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbMaskPercentWorker(uint_fast32_t pixDepth, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -177,7 +176,7 @@ public:
 
 private:
     const uint_fast32_t pixDepth_;
-    const uint_fast32_t bufLen_;
+    const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast32_t bitsetCount_;

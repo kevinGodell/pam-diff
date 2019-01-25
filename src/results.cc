@@ -22,7 +22,7 @@ ToJs(const Napi::Env &env, const std::string &name, const uint_fast32_t diffsPer
 Napi::Array
 ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const std::vector<uint_fast32_t> &percentResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t r = 0, j = 0; r < regionsLen; r++) {
+    for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
         if (regionVec[r].percent > percentResultVec[r]) continue;
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", regionVec[r].name);
@@ -51,10 +51,9 @@ ToJs(const Napi::Env &env, const std::string &name, const uint_fast32_t diffsPer
 
 // regions bounds to js
 Napi::Array
-ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec,
-     const std::vector<BoundsResult> &boundsResultVec) {
+ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const std::vector<BoundsResult> &boundsResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    for (uint_fast32_t r = 0, j = 0; r < regionsLen; r++) {
+    for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
         if (regionVec[r].percent > boundsResultVec[r].percent) continue;
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", regionVec[r].name);

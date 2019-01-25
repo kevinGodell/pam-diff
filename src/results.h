@@ -13,8 +13,7 @@ ToJs(const Napi::Env &env, const std::string &name, uint_fast32_t diffsPerc, uin
 
 // regions percent to js
 Napi::Array
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec,
-     const std::vector<uint_fast32_t> &percentResultsVec);
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<uint_fast32_t> &percentResultsVec);
 
 // all/mask bounds to js
 Napi::Array

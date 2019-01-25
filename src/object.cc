@@ -539,7 +539,6 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
 }
 
 Napi::FunctionReference RgbAllPercentSync::constructor;
@@ -564,7 +563,7 @@ Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbAllPercent(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, buf0, buf1);
+    uint_fast32_t percentResult = RgbAllPercent(this->pixCount_, this->pixDepth_, this->pixDiff_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -583,7 +582,6 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
 }
 
 Napi::FunctionReference RgbAllPercentAsync::constructor;
@@ -608,7 +606,7 @@ Napi::Value RgbAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllPercentWorker = new RgbAllPercentWorker(this->pixCount_, this->pixDepth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, napiBuf0, napiBuf1, cb);
+    auto *rgbAllPercentWorker = new RgbAllPercentWorker(this->pixCount_, this->pixDepth_, this->pixDiff_, this->diffsPerc_, napiBuf0, napiBuf1, cb);
     rgbAllPercentWorker->Queue();
     return env.Undefined();
 }
@@ -626,7 +624,6 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
@@ -654,7 +651,7 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->bufLen_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
     Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
@@ -673,7 +670,6 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
@@ -701,7 +697,7 @@ Napi::Value RgbMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rbgMaskPercentWorker = new RgbMaskPercentWorker(this->pixDepth_, this->bufLen_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
+    auto *rbgMaskPercentWorker = new RgbMaskPercentWorker(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
     rbgMaskPercentWorker->Queue();
     return env.Undefined();
 }
@@ -718,7 +714,6 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
     this->regionVec_ = RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs);
@@ -764,7 +759,6 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
-    this->bufLen_ = this->pixCount_ * this->pixDepth_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
     this->regionVec_ = RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs);
