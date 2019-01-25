@@ -17,17 +17,17 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.Has("response")) std::cout << "response: " << config.Get("response").As<Napi::String>().Utf8Value() << std::endl;
     if (config.Has("async")) std::cout << "async: " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
     if (config.Has("target")) std::cout << "target: " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
-    if (config.Has("difference")) std::cout << "difference: " << config.Get("difference").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("difference")) std::cout << "difference: " << config.Get("difference").As<Napi::Number>().Int32Value() << std::endl;
     if (config.Has("percent")) std::cout << "percent: " << config.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("bitsetCount")) std::cout << "bitsetCount: " << config.Get("bitsetCount").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("bitset")) std::cout << "bitset length: " << config.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
-    if (config.Has("minDiff")) std::cout << "minDiff: " << config.Get("minDiff").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("minDiff")) std::cout << "minDiff: " << config.Get("minDiff").As<Napi::Number>().Int32Value() << std::endl;
     if (config.Has("regions")) {
         Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
         std::cout << "regions length: " << regionsJs.Length() << std::endl;
         for (uint_fast32_t r = 0; r < regionsJs.Length(); r++) {
             const std::string name = regionsJs.Get(r).As<Napi::Object>().Get("name").As<Napi::String>();
-            const uint_fast32_t diff = regionsJs.Get(r).As<Napi::Object>().Get("diff").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t diff = regionsJs.Get(r).As<Napi::Object>().Get("diff").As<Napi::Number>().Int32Value();
             const uint_fast32_t percent = regionsJs.Get(r).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
             const uint_fast32_t count = regionsJs.Get(r).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
             std::cout << name << " - " << diff << " - " << percent << " - " << count << " - " << regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;

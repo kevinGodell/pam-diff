@@ -22,7 +22,6 @@ ToJs(const Napi::Env &env, const std::string &name, uint_fast32_t diffsPerc, con
 
 // regions bounds to js
 Napi::Array
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec,
-     const std::vector<BoundsResult> &boundsResultsVec);
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<BoundsResult> &boundsResultsVec);
 
 #endif
