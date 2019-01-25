@@ -10,7 +10,7 @@
        "src/results.cc"
      ],
 
-     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
+     "cflags": [ "-Ofast", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
 
      "cflags!": [ "-Wno-unused-parameter", "-O3" ],
 
@@ -20,7 +20,7 @@
 
      "include_dirs": ["<!@(node -p \"require('node-addon-api').include\")"],
      "dependencies": ["<!(node -p \"require('node-addon-api').gyp\")"],
-     "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED", "NAPI_DEBUG" ],
+     "defines": [ "NAPI_CPP_EXCEPTIONS", "NODE_ADDON_API_DISABLE_DEPRECATED" ],
      "conditions": [
        ["OS==\"win\"", {
          "msvs_settings": {
