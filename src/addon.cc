@@ -6,7 +6,6 @@
 #include <iostream>
 #endif
 
-
 Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     const Napi::Object config = info[0].As<Napi::Object>();

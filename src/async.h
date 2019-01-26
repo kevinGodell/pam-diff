@@ -146,15 +146,15 @@ private:
 
 class RgbAllPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbAllPercentWorker(uint_fast32_t pixCount, uint_fast32_t pixDepth, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllPercentWorker(uint_fast32_t pixDepth, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 private:
-    const uint_fast32_t pixCount_;
     const uint_fast32_t pixDepth_;
+    const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast8_t *buf0_;
@@ -215,17 +215,17 @@ private:
 
 class RgbAllBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbAllBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, uint_fast32_t pixDepth, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 protected:
+    const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
     const uint_fast32_t pixCount_;
-    const uint_fast32_t pixDepth_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast8_t *buf0_;
@@ -239,16 +239,16 @@ protected:
 
 class RgbMaskBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbMaskBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbMaskBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 private:
+    const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
-    const uint_fast32_t pixDepth_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast32_t bitsetCount_;
@@ -264,16 +264,16 @@ private:
 
 class RgbRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixDepth, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 private:
+    const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
-    const uint_fast32_t pixDepth_;
     const int_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
