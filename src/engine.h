@@ -1,10 +1,10 @@
 #ifndef SRC_ENGINE_H_
 #define SRC_ENGINE_H_
 
+#include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 enum Engines {
     GRAY_ALL_PERCENT_SYNC = 0,

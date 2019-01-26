@@ -2,17 +2,17 @@
 #include "engine.h"
 #include "async.h"
 #include "results.h"
+#include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayAllPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -24,8 +24,8 @@ GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayAllPercentSync::constructor;
 
 void GrayAllPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayAllPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayAllPercentSync", {
             InstanceMethod("compare", &GrayAllPercentSync::Compare)
     });
     GrayAllPercentSync::constructor = Napi::Persistent(func);
@@ -34,7 +34,7 @@ void GrayAllPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayAllPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayAllPercentSync::constructor.New({config});
+    const Napi::Object object = GrayAllPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -43,8 +43,8 @@ Napi::Value GrayAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = GrayAllPercent(this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
+    const uint_fast32_t percentResult = GrayAllPercent(this->pixCount_, this->pixDiff_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -53,8 +53,8 @@ Napi::Value GrayAllPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayAllPercentAsync::GrayAllPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayAllPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -66,8 +66,8 @@ GrayAllPercentAsync::GrayAllPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayAllPercentAsync::constructor;
 
 void GrayAllPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayAllPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayAllPercentAsync", {
             InstanceMethod("compare", &GrayAllPercentAsync::Compare)
     });
     GrayAllPercentAsync::constructor = Napi::Persistent(func);
@@ -76,7 +76,7 @@ void GrayAllPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayAllPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayAllPercentAsync::constructor.New({config});
+    const Napi::Object object = GrayAllPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -94,8 +94,8 @@ Napi::Value GrayAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayMaskPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -110,8 +110,8 @@ GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayMaskPercentSync::constructor;
 
 void GrayMaskPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayMaskPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskPercentSync", {
             InstanceMethod("compare", &GrayMaskPercentSync::Compare)
     });
     GrayMaskPercentSync::constructor = Napi::Persistent(func);
@@ -120,7 +120,7 @@ void GrayMaskPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayMaskPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayMaskPercentSync::constructor.New({config});
+    const Napi::Object object = GrayMaskPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -129,8 +129,8 @@ Napi::Value GrayMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
+    const uint_fast32_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -139,8 +139,8 @@ Napi::Value GrayMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayMaskPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -155,8 +155,8 @@ GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayMaskPercentAsync::constructor;
 
 void GrayMaskPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayMaskPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskPercentAsync", {
             InstanceMethod("compare", &GrayMaskPercentAsync::Compare)
     });
     GrayMaskPercentAsync::constructor = Napi::Persistent(func);
@@ -165,7 +165,7 @@ void GrayMaskPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayMaskPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayMaskPercentAsync::constructor.New({config});
+    const Napi::Object object = GrayMaskPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -183,8 +183,8 @@ Napi::Value GrayMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 GrayRegionsPercentSync::GrayRegionsPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayRegionsPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
@@ -198,8 +198,8 @@ GrayRegionsPercentSync::GrayRegionsPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayRegionsPercentSync::constructor;
 
 void GrayRegionsPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayRegionsPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayRegionsPercentSync", {
             InstanceMethod("compare", &GrayRegionsPercentSync::Compare)
     });
     GrayRegionsPercentSync::constructor = Napi::Persistent(func);
@@ -208,7 +208,7 @@ void GrayRegionsPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayRegionsPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayRegionsPercentSync::constructor.New({config});
+    const Napi::Object object = GrayRegionsPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -217,8 +217,8 @@ Napi::Value GrayRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<uint_fast32_t> resultsVec = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
+    const std::vector<uint_fast32_t> resultsVec = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -227,8 +227,8 @@ Napi::Value GrayRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayRegionsPercentAsync::GrayRegionsPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayRegionsPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
@@ -242,8 +242,8 @@ GrayRegionsPercentAsync::GrayRegionsPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayRegionsPercentAsync::constructor;
 
 void GrayRegionsPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayRegionsPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayRegionsPercentAsync", {
             InstanceMethod("compare", &GrayRegionsPercentAsync::Compare)
     });
     GrayRegionsPercentAsync::constructor = Napi::Persistent(func);
@@ -252,7 +252,7 @@ void GrayRegionsPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayRegionsPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayRegionsPercentAsync::constructor.New({config});
+    const Napi::Object object = GrayRegionsPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -270,8 +270,8 @@ Napi::Value GrayRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 GrayAllBoundsSync::GrayAllBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayAllBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -283,8 +283,8 @@ GrayAllBoundsSync::GrayAllBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayAllBoundsSync::constructor;
 
 void GrayAllBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayAllBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayAllBoundsSync", {
             InstanceMethod("compare", &GrayAllBoundsSync::Compare)
     });
     GrayAllBoundsSync::constructor = Napi::Persistent(func);
@@ -293,7 +293,7 @@ void GrayAllBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayAllBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayAllBoundsSync::constructor.New({config});
+    const Napi::Object object = GrayAllBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -302,8 +302,8 @@ Napi::Value GrayAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -312,8 +312,8 @@ Napi::Value GrayAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayAllBoundsAsync::GrayAllBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayAllBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -325,8 +325,8 @@ GrayAllBoundsAsync::GrayAllBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayAllBoundsAsync::constructor;
 
 void GrayAllBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayAllBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayAllBoundsAsync", {
             InstanceMethod("compare", &GrayAllBoundsAsync::Compare)
     });
     GrayAllBoundsAsync::constructor = Napi::Persistent(func);
@@ -335,7 +335,7 @@ void GrayAllBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayAllBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayAllBoundsAsync::constructor.New({config});
+    const Napi::Object object = GrayAllBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -353,14 +353,14 @@ Napi::Value GrayAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 GrayMaskBoundsSync::GrayMaskBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayMaskBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    uint_fast32_t pixCount = this->width_ * this->height_;
+    const uint_fast32_t pixCount = this->width_ * this->height_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + pixCount);
@@ -369,8 +369,8 @@ GrayMaskBoundsSync::GrayMaskBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayMaskBoundsSync::constructor;
 
 void GrayMaskBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayMaskBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskBoundsSync", {
             InstanceMethod("compare", &GrayMaskBoundsSync::Compare)
     });
     GrayMaskBoundsSync::constructor = Napi::Persistent(func);
@@ -379,7 +379,7 @@ void GrayMaskBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayMaskBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayMaskBoundsSync::constructor.New({config});
+    const Napi::Object object = GrayMaskBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -388,8 +388,8 @@ Napi::Value GrayMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -398,14 +398,14 @@ Napi::Value GrayMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayMaskBoundsAsync::GrayMaskBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayMaskBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    uint_fast32_t pixCount = this->width_ * this->height_;
+    const uint_fast32_t pixCount = this->width_ * this->height_;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + pixCount);
@@ -414,8 +414,8 @@ GrayMaskBoundsAsync::GrayMaskBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayMaskBoundsAsync::constructor;
 
 void GrayMaskBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayMaskBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskBoundsAsync", {
             InstanceMethod("compare", &GrayMaskBoundsAsync::Compare)
     });
     GrayMaskBoundsAsync::constructor = Napi::Persistent(func);
@@ -424,7 +424,7 @@ void GrayMaskBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayMaskBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayMaskBoundsAsync::constructor.New({config});
+    const Napi::Object object = GrayMaskBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -442,13 +442,13 @@ Napi::Value GrayMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 GrayRegionsBoundsSync::GrayRegionsBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayRegionsBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    uint_fast32_t pixCount = this->width_ * this->height_;
+    const uint_fast32_t pixCount = this->width_ * this->height_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
     this->regionVec_ = RegionsJsToCpp(pixCount, this->regionsLen_, regionsJs);
@@ -457,8 +457,8 @@ GrayRegionsBoundsSync::GrayRegionsBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayRegionsBoundsSync::constructor;
 
 void GrayRegionsBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayRegionsBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayRegionsBoundsSync", {
             InstanceMethod("compare", &GrayRegionsBoundsSync::Compare)
     });
     GrayRegionsBoundsSync::constructor = Napi::Persistent(func);
@@ -467,7 +467,7 @@ void GrayRegionsBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object GrayRegionsBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayRegionsBoundsSync::constructor.New({config});
+    const Napi::Object object = GrayRegionsBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -476,8 +476,8 @@ Napi::Value GrayRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<BoundsResult> resultsVec = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
+    const std::vector<BoundsResult> resultsVec = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -486,14 +486,13 @@ Napi::Value GrayRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 GrayRegionsBoundsAsync::GrayRegionsBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<GrayRegionsBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    //this->pixCount_ = this->width_ * this->height_;
-    uint_fast32_t pixCount = this->width_ * this->height_;
+    const uint_fast32_t pixCount = this->width_ * this->height_;
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
     this->regionVec_ = RegionsJsToCpp(pixCount, this->regionsLen_, regionsJs);
@@ -502,8 +501,8 @@ GrayRegionsBoundsAsync::GrayRegionsBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference GrayRegionsBoundsAsync::constructor;
 
 void GrayRegionsBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "GrayRegionsBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayRegionsBoundsAsync", {
             InstanceMethod("compare", &GrayRegionsBoundsAsync::Compare)
     });
     GrayRegionsBoundsAsync::constructor = Napi::Persistent(func);
@@ -512,7 +511,7 @@ void GrayRegionsBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object GrayRegionsBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = GrayRegionsBoundsAsync::constructor.New({config});
+    const Napi::Object object = GrayRegionsBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -530,8 +529,8 @@ Napi::Value GrayRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbAllPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -544,8 +543,8 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbAllPercentSync::constructor;
 
 void RgbAllPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbAllPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbAllPercentSync", {
             InstanceMethod("compare", &RgbAllPercentSync::Compare)
     });
     RgbAllPercentSync::constructor = Napi::Persistent(func);
@@ -554,7 +553,7 @@ void RgbAllPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbAllPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbAllPercentSync::constructor.New({config});
+    const Napi::Object object = RgbAllPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -563,8 +562,8 @@ Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
+    const uint_fast32_t percentResult = RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -573,8 +572,8 @@ Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbAllPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -587,8 +586,8 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbAllPercentAsync::constructor;
 
 void RgbAllPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbAllPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbAllPercentAsync", {
             InstanceMethod("compare", &RgbAllPercentAsync::Compare)
     });
     RgbAllPercentAsync::constructor = Napi::Persistent(func);
@@ -597,7 +596,7 @@ void RgbAllPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbAllPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbAllPercentAsync::constructor.New({config});
+    const Napi::Object object = RgbAllPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -615,8 +614,8 @@ Napi::Value RgbAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbMaskPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -632,8 +631,8 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbMaskPercentSync::constructor;
 
 void RgbMaskPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbMaskPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbMaskPercentSync", {
             InstanceMethod("compare", &RgbMaskPercentSync::Compare)
     });
     RgbMaskPercentSync::constructor = Napi::Persistent(func);
@@ -642,7 +641,7 @@ void RgbMaskPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbMaskPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbMaskPercentSync::constructor.New({config});
+    const Napi::Object object = RgbMaskPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -651,8 +650,8 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
+    const uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -661,8 +660,8 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbMaskPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -678,8 +677,8 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbMaskPercentAsync::constructor;
 
 void RgbMaskPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbMaskPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbMaskPercentAsync", {
             InstanceMethod("compare", &RgbMaskPercentAsync::Compare)
     });
     RgbMaskPercentAsync::constructor = Napi::Persistent(func);
@@ -688,7 +687,7 @@ void RgbMaskPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbMaskPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbMaskPercentAsync::constructor.New({config});
+    const Napi::Object object = RgbMaskPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -706,8 +705,8 @@ Napi::Value RgbMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbRegionsPercentSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->pixDepth_ = config.Get("depth").As<Napi::Number>().Uint32Value();
@@ -722,8 +721,8 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbRegionsPercentSync::constructor;
 
 void RgbRegionsPercentSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbRegionsPercentSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbRegionsPercentSync", {
             InstanceMethod("compare", &RgbRegionsPercentSync::Compare)
     });
     RgbRegionsPercentSync::constructor = Napi::Persistent(func);
@@ -732,7 +731,7 @@ void RgbRegionsPercentSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbRegionsPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbRegionsPercentSync::constructor.New({config});
+    const Napi::Object object = RgbRegionsPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -741,8 +740,8 @@ Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
+    const std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -751,8 +750,8 @@ Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbRegionsPercentAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->pixDepth_ = config.Get("depth").As<Napi::Number>().Uint32Value();
@@ -767,8 +766,8 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbRegionsPercentAsync::constructor;
 
 void RgbRegionsPercentAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbRegionsPercentAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbRegionsPercentAsync", {
             InstanceMethod("compare", &RgbRegionsPercentAsync::Compare)
     });
     RgbRegionsPercentAsync::constructor = Napi::Persistent(func);
@@ -777,7 +776,7 @@ void RgbRegionsPercentAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbRegionsPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbRegionsPercentAsync::constructor.New({config});
+    const Napi::Object object = RgbRegionsPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -795,8 +794,8 @@ Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {//d
 
 RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbAllBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -809,8 +808,8 @@ RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbAllBoundsSync::constructor;
 
 void RgbAllBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbAllBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbAllBoundsSync", {
             InstanceMethod("compare", &RgbAllBoundsSync::Compare)
     });
     RgbAllBoundsSync::constructor = Napi::Persistent(func);
@@ -819,7 +818,7 @@ void RgbAllBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbAllBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbAllBoundsSync::constructor.New({config});
+    const Napi::Object object = RgbAllBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -828,8 +827,8 @@ Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -838,8 +837,8 @@ Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbAllBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -852,8 +851,8 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbAllBoundsAsync::constructor;
 
 void RgbAllBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbAllBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbAllBoundsAsync", {
             InstanceMethod("compare", &RgbAllBoundsAsync::Compare)
     });
     RgbAllBoundsAsync::constructor = Napi::Persistent(func);
@@ -862,7 +861,7 @@ void RgbAllBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbAllBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbAllBoundsAsync::constructor.New({config});
+    const Napi::Object object = RgbAllBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -880,8 +879,8 @@ Napi::Value RgbAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbMaskBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -897,8 +896,8 @@ RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbMaskBoundsSync::constructor;
 
 void RgbMaskBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbMaskBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbMaskBoundsSync", {
             InstanceMethod("compare", &RgbMaskBoundsSync::Compare)
     });
     RgbMaskBoundsSync::constructor = Napi::Persistent(func);
@@ -907,7 +906,7 @@ void RgbMaskBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbMaskBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbMaskBoundsSync::constructor.New({config});
+    const Napi::Object object = RgbMaskBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -916,8 +915,8 @@ Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    BoundsResult boundsResult = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -926,8 +925,8 @@ Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbMaskBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
@@ -943,8 +942,8 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbMaskBoundsAsync::constructor;
 
 void RgbMaskBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbMaskBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbMaskBoundsAsync", {
             InstanceMethod("compare", &RgbMaskBoundsAsync::Compare)
     });
     RgbMaskBoundsAsync::constructor = Napi::Persistent(func);
@@ -953,7 +952,7 @@ void RgbMaskBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbMaskBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbMaskBoundsAsync::constructor.New({config});
+    const Napi::Object object = RgbMaskBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -971,8 +970,8 @@ Napi::Value RgbMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbRegionsBoundsSync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->pixDepth_ = config.Get("depth").As<Napi::Number>().Uint32Value();
@@ -987,8 +986,8 @@ RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbRegionsBoundsSync::constructor;
 
 void RgbRegionsBoundsSync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbRegionsBoundsSync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbRegionsBoundsSync", {
             InstanceMethod("compare", &RgbRegionsBoundsSync::Compare)
     });
     RgbRegionsBoundsSync::constructor = Napi::Persistent(func);
@@ -997,7 +996,7 @@ void RgbRegionsBoundsSync::Init(const Napi::Env &env) {
 
 Napi::Object RgbRegionsBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbRegionsBoundsSync::constructor.New({config});
+    const Napi::Object object = RgbRegionsBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
@@ -1006,8 +1005,8 @@ Napi::Value RgbRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    std::vector<BoundsResult> boundsResultVec = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, boundsResultVec);
+    const std::vector<BoundsResult> boundsResultVec = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, boundsResultVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -1016,8 +1015,8 @@ Napi::Value RgbRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
         : Napi::ObjectWrap<RgbRegionsBoundsAsync>(info) {
-    Napi::Env env = info.Env();
-    Napi::HandleScope scope(env);
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
     this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
     this->pixDepth_ = config.Get("depth").As<Napi::Number>().Uint32Value();
@@ -1032,8 +1031,8 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
 Napi::FunctionReference RgbRegionsBoundsAsync::constructor;
 
 void RgbRegionsBoundsAsync::Init(const Napi::Env &env) {
-    Napi::HandleScope scope(env);
-    Napi::Function func = DefineClass(env, "RgbRegionsBoundsAsync", {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "RgbRegionsBoundsAsync", {
             InstanceMethod("compare", &RgbRegionsBoundsAsync::Compare)
     });
     RgbRegionsBoundsAsync::constructor = Napi::Persistent(func);
@@ -1042,7 +1041,7 @@ void RgbRegionsBoundsAsync::Init(const Napi::Env &env) {
 
 Napi::Object RgbRegionsBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    Napi::Object object = RgbRegionsBoundsAsync::constructor.New({config});
+    const Napi::Object object = RgbRegionsBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 

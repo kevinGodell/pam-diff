@@ -1,13 +1,12 @@
 #include "object.h"
 #include "engine.h"
-#include <napi.h>
-
+#include "napi.h"
 #ifdef NAPI_DEBUG
 #include <iostream>
 #endif
 
 Napi::Object CreateObject(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
+    const Napi::Env env = info.Env();
     const Napi::Object config = info[0].As<Napi::Object>();
 #ifdef NAPI_DEBUG
     if (config.Has("depth")) std::cout << "depth: " << config.Get("depth").As<Napi::Number>().Uint32Value() << std::endl;

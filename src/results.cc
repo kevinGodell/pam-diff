@@ -1,9 +1,9 @@
 #include "results.h"
 #include "engine.h"
+#include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 // all/mask percent to js
 Napi::Array

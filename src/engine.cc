@@ -1,8 +1,8 @@
 #include "engine.h"
+#include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 // determine engine type
 uint_fast32_t
