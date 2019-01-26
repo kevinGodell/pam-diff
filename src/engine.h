@@ -77,7 +77,7 @@ GrayDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const uint_fast32_t
 
 // measure difference of rgb(a) bytes using average
 inline int_fast32_t
-RgbDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const uint_fast32_t &i) {
+RgbDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const uint_fast32_t i) {
     return AbsInt(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3;
 }
 
@@ -120,7 +120,7 @@ inline std::vector<uint_fast32_t>
 GrayRegionsPercent(const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t p = 0, r = 0; p < pixCount; ++p) {
-        int_fast32_t diff = GrayDiff(buf0, buf1, p);
+        const int_fast32_t diff = GrayDiff(buf0, buf1, p);
         if (minDiff > diff) continue;
         for (r = 0; r < regionsLen; ++r) {
             if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
@@ -173,7 +173,7 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const i
     std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
         for (x = 0; x < width; ++x, ++i) {
-            int_fast32_t diff = GrayDiff(buf0, buf1, i);
+            const int_fast32_t diff = GrayDiff(buf0, buf1, i);
             if (minDiff > diff) continue;
             for (r = 0; r < regionsLen; ++r) {
                 if (regionsVec[r].bitset[i] == 0 || regionsVec[r].pixDiff > diff) continue;
@@ -218,7 +218,7 @@ inline std::vector<uint_fast32_t>
 RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     std::vector<uint_fast32_t> percentResultVec(regionsLen, 0);
     for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
+        const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
         if (minDiff > diff) continue;
         for (uint_fast32_t r = 0; r < regionsLen; ++r) {
             if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
@@ -271,7 +271,7 @@ RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const 
     std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0});
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
+            const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
             if (minDiff > diff) continue;
             for (uint_fast32_t r = 0; r < regionsLen; ++r) {
                 if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
