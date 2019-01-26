@@ -17,8 +17,8 @@ void GrayAllPercentWorker::Execute() {
 
 void GrayAllPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->percentResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->percentResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -34,8 +34,8 @@ void GrayMaskPercentWorker::Execute() {
 
 void GrayMaskPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->percentResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->percentResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -51,8 +51,8 @@ void GrayRegionsPercentWorker::Execute() {
 
 void GrayRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -68,8 +68,8 @@ void GrayAllBoundsWorker::Execute() {
 
 void GrayAllBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -85,8 +85,8 @@ void GrayMaskBoundsWorker::Execute() {
 
 void GrayMaskBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -102,8 +102,8 @@ void GrayRegionsBoundsWorker::Execute() {
 
 void GrayRegionsBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -119,8 +119,8 @@ void RgbAllPercentWorker::Execute() {
 
 void RgbAllPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->percentResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->percentResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -136,8 +136,8 @@ void RgbMaskPercentWorker::Execute() {
 
 void RgbMaskPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->percentResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->percentResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -153,8 +153,8 @@ void RgbRegionsPercentWorker::Execute() {
 
 void RgbRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -170,8 +170,8 @@ void RgbAllBoundsWorker::Execute() {
 
 void RgbAllBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -187,8 +187,8 @@ void RgbMaskBoundsWorker::Execute() {
 
 void RgbMaskBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -204,8 +204,8 @@ void RgbRegionsBoundsWorker::Execute() {
 
 void RgbRegionsBoundsWorker::OnOK() {
     const Napi::Env env = Env();
-    Napi::HandleScope scope(env);
-    Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
+    const Napi::HandleScope scope(env);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_);
     Callback().Call({env.Null(), resultsJs});
 }
 
