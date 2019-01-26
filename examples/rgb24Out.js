@@ -4,14 +4,22 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const argv = require('minimist')(process.argv.slice(2));
+
+const async = argv.async || process.env.ASYNC || false;
+
+const response = argv.response || process.env.RESPONSE || 'percent';
+
+const {cpus} = require('os');
+
+console.log(`cpu cores available: ${cpus().length}`);
+
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
 const ffmpegPath = require('ffmpeg-static').path;
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;
-
-const async = process.env.ASYNC|| false;
 
 const params = [
     '-loglevel',
@@ -24,7 +32,7 @@ const params = [
     /* use a pre-recorded mp4 video as input */
     //'-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
-    `${__dirname}/in/bbb.mp4`,
+    `${__dirname}/in/circle_star.mp4`,
 
     /* set output flags */
     '-an',
@@ -64,17 +72,17 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 15, percent: 15, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 10, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
 
-const region2 = {name: 'region2', difference: 15, percent: 15, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 10, percent: 9, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
 
-const region3 = {name: 'region3', difference: 15, percent: 15, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 10, percent: 9, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
 
-const region4 = {name: 'region4', difference: 15, percent: 15, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, async: async});
+const pamDiff = new PamDiff({regions : regions, response: response, async: async});
 
 let diffCount = 0;
 
@@ -85,15 +93,20 @@ pamDiff.on('diff', (data) => {
     //if(true){return;}
 
     const date = new Date();
-    let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
+    //let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
+    let name = counter;
     for (const region of data.trigger) {
-        name += `(${region.name}=${region.percent})`;
+        if (response === 'bounds') {
+            name += `--${region.name}-percent${region.percent}-minX${region.minX}-maxX${region.maxX}-minY${region.minY}-maxY${region.maxY}`;
+        } else {
+            name += `--${region.name}-percent${region.percent}`;
+        }
     }
     const jpeg = `${name}.jpeg`;
     const pathToJpeg = `${__dirname}/out/rgb24/${jpeg}`;
-    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
+    const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
     ff.stdin.end(data.pam);
-    ff.on('exit', (data) => {
+    ff.on('exit', (data, other) => {
         if (data === 0) {
             console.log(`FFMPEG clean exit after creating ${jpeg}`);
         } else {
