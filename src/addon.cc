@@ -1,14 +1,12 @@
 #include "object.h"
 #include "engine.h"
-#include <napi.h>
-
+#include "napi.h"
 #ifdef NAPI_DEBUG
 #include <iostream>
 #endif
 
-
 Napi::Object CreateObject(const Napi::CallbackInfo &info) {
-    Napi::Env env = info.Env();
+    const Napi::Env env = info.Env();
     const Napi::Object config = info[0].As<Napi::Object>();
 #ifdef NAPI_DEBUG
     if (config.Has("depth")) std::cout << "depth: " << config.Get("depth").As<Napi::Number>().Uint32Value() << std::endl;
@@ -23,7 +21,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.Has("bitset")) std::cout << "bitset length: " << config.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
     if (config.Has("minDiff")) std::cout << "minDiff: " << config.Get("minDiff").As<Napi::Number>().Int32Value() << std::endl;
     if (config.Has("regions")) {
-        Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
+        const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
         std::cout << "regions length: " << regionsJs.Length() << std::endl;
         for (uint_fast32_t r = 0; r < regionsJs.Length(); r++) {
             const std::string name = regionsJs.Get(r).As<Napi::Object>().Get("name").As<Napi::String>();

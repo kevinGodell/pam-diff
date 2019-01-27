@@ -23,7 +23,7 @@ test_script:
   - node --version
   - npm --version
   - npm test
-#on_success:
+on_success:
 #  - npm run examples
-#  - npm run out
+  - npm run out
 build: off

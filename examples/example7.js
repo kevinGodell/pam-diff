@@ -40,10 +40,18 @@ const params = [
     'pam',
     '-pix_fmt',
     'gray',
+    //'rgba',
+    //'rgb24',
+    //'monob',
     '-f',
     'image2pipe',
     '-vf',
-    'fps=2,scale=640:360',
+    //'fps=2,scale=1280:720',
+    //'fps=2,scale=1500:800',
+    'fps=2,scale=1920:1080',//1920:1080 scaled down = 640:360, 400:225, 384:216, 368:207, 352:198, 336:189, 320:180
+    //'fps=1,scale=iw*1/6:ih*1/6',
+    //'-frames',
+    //'10000',
     'pipe:1'
 ];
 
@@ -59,8 +67,6 @@ ffmpeg.on('error', (error) => {
 
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
-    console.log(diffCount);
-    console.timeEnd('grayOut.js');
 });
 
 const p2p = new P2P();
@@ -72,23 +78,21 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 10, percent: 9, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 1080}, {x: 480, y: 1080}, {x: 480, y: 0}]};
 
-const region2 = {name: 'region2', difference: 10, percent: 9, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 480, y: 0}, {x: 480, y: 1080}, {x: 960, y: 1080}, {x: 960, y: 0}]};
 
-const region3 = {name: 'region3', difference: 10, percent: 9, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 960, y: 0}, {x: 960, y: 1080}, {x: 1440, y: 1080}, {x: 1440, y: 0}]};
 
-const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 1440, y: 0}, {x: 1440, y: 1080}, {x: 1920, y: 1080}, {x: 1920, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({regions : regions, response: response, async: async});
 
-let diffCount = 0;
-
 pamDiff.on('diff', (data) => {
-    //console.log(data);
-    diffCount++;
+    console.log(data);
+
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
     //if(true){return;}
 
@@ -102,11 +106,10 @@ pamDiff.on('diff', (data) => {
             name += `--${region.name}-percent${region.percent}`;
         }
     }
-    const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `${__dirname}/out/gray/${jpeg}`;
-    const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
+    const jpeg = `${__dirname}/out/${name}.jpeg`;
+    const ff = execFile(ffmpegPath, ['-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', jpeg]);
     ff.stdin.end(data.pam);
-    ff.on('exit', (data, other) => {
+    ff.on('exit', (data) => {
         if (data === 0) {
             console.log(`FFMPEG clean exit after creating ${jpeg}`);
         } else {
@@ -115,5 +118,4 @@ pamDiff.on('diff', (data) => {
     });
 });
 
-console.time('grayOut.js');
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

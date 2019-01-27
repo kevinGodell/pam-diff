@@ -48,8 +48,8 @@ const params = [
     '-c:v',
     'pam',
     '-pix_fmt',
-    //'gray',
-    'rgba',
+    'gray',
+    //'rgba',
     //'rgb24',
     //'monob',
     '-f',
@@ -87,13 +87,13 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 10, percent: 10, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 1080}, {x: 480, y: 1080}, {x: 480, y: 0}]};
 
-const region2 = {name: 'region2', difference: 10, percent: 10, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 480, y: 0}, {x: 480, y: 1080}, {x: 960, y: 1080}, {x: 960, y: 0}]};
 
-const region3 = {name: 'region3', difference: 10, percent: 10, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
+const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 960, y: 0}, {x: 960, y: 1080}, {x: 1440, y: 1080}, {x: 1440, y: 0}]};
 
-const region4 = {name: 'region4', difference: 10, percent: 10, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 1440, y: 0}, {x: 1440, y: 1080}, {x: 1920, y: 1080}, {x: 1920, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 

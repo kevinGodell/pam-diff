@@ -2,10 +2,10 @@
 #define SRC_DIFF_OBJECT_H_
 
 #include "engine.h"
+#include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <napi.h>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -15,7 +15,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -34,7 +34,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -53,7 +53,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -74,7 +74,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -95,7 +95,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -115,7 +115,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -135,7 +135,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -156,7 +156,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -177,7 +177,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -200,7 +200,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -222,7 +222,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -243,7 +243,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -264,7 +264,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -272,7 +272,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
 };
@@ -285,7 +284,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -293,7 +292,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
 };
@@ -306,7 +304,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -314,7 +312,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
@@ -329,7 +326,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -337,7 +334,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
@@ -352,7 +348,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -360,7 +356,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
@@ -374,7 +369,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -382,7 +377,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
-    uint_fast32_t bufLen_;
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
@@ -396,7 +390,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -418,7 +412,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -440,7 +434,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -464,7 +458,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -488,7 +482,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
@@ -511,7 +505,7 @@ public:
 
     static void Init(const Napi::Env &env);
 
-    static Napi::Object NewInstance(Napi::Env &env, const Napi::Object &config);
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
 
 private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
