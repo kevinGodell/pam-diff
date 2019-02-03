@@ -1,6 +1,6 @@
 {
   "name": "pam-diff",
-  "version": "0.13.2",
+  "version": "0.13.3",
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
@@ -101,5 +101,9 @@
     "minimist": "^1.2.0",
     "pipe2pam": "^0.6.2"
   },
-  "private": false
+  "private": false,
+  "files": [
+    "binding.gyp",
+    "src"
+  ]
 }
