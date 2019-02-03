@@ -67,7 +67,8 @@
     "rgba:16": "node tests/test_rgba4 --async true --response bounds",
     "pub": "npm publish -tag latest",
     "__pub": "npm publish",
-    "exp": "npm install && node tests/test_gray5 && node tests/test_gray6"
+    "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
+    "exp2": "node examples/grayOut2 --async false --response bounds"
   },
   "repository": {
     "type": "git",

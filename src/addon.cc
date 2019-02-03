@@ -13,6 +13,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.Has("width")) std::cout << "width: " << config.Get("width").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("height")) std::cout << "height: " << config.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("response")) std::cout << "response: " << config.Get("response").As<Napi::String>().Utf8Value() << std::endl;
+    if (config.Has("draw")) std::cout << "draw: " << config.Get("draw").As<Napi::Boolean>().Value() << std::endl;
     if (config.Has("async")) std::cout << "async: " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
     if (config.Has("target")) std::cout << "target: " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
     if (config.Has("difference")) std::cout << "difference: " << config.Get("difference").As<Napi::Number>().Int32Value() << std::endl;

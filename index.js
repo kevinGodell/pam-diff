@@ -14,6 +14,7 @@ class PamDiff extends Transform {
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
      * @param [options.percent=5] {Number} - Percent of pixels that exceed difference value.
      * @param [options.response=percent] {String} - Accepted values: percent or bounds.
+     * @param [options.draw=false] {Boolean} - Return a pixel buffer with drawn bounding box. Must also set {response: 'bounds'}.
      * @param [options.regions] {Array} - Array of regions.
      * @param options.regions[i].name {String} - Name of region.
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
@@ -27,6 +28,7 @@ class PamDiff extends Transform {
         super(options);
         Transform.call(this, {objectMode: true});
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
+        this.draw = options.draw || false;
         this.async = PamDiff._parseOptions('async', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
@@ -429,6 +431,8 @@ class PamDiff extends Transform {
         engine += `_${this._response}`;
 
         engine += this._async ? '_async' : '_sync';
+
+        config.draw = this.draw;
 
         this._engine = addon(config);
 

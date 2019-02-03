@@ -6,6 +6,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -278,6 +279,11 @@ GrayAllBoundsSync::GrayAllBoundsSync(const Napi::CallbackInfo &info)
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = this->width_ * this->height_;
+    if (config.Has("draw")) {
+        this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    } else {
+        this->draw_ = false;
+    }
 }
 
 Napi::FunctionReference GrayAllBoundsSync::constructor;
@@ -303,6 +309,9 @@ Napi::Value GrayAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     const BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
+
+    std::cout << " should draw bounding box " << this->draw_ << std::endl;
+
     const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
