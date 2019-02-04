@@ -28,7 +28,7 @@ class PamDiff extends Transform {
         super(options);
         Transform.call(this, {objectMode: true});
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
-        this.draw = options.draw || false;
+        this.draw = PamDiff._validateBoolean(options.draw);
         this.async = PamDiff._parseOptions('async', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
@@ -453,9 +453,13 @@ class PamDiff extends Transform {
      */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam};
+                if (pixels) {
+                    data.headers = chunk.headers;
+                    data.pixels = pixels;
+                }
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -479,14 +483,13 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results, bc) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
             if (results.length) {
-
-                //if (bc) {
-                //    console.log('have bc of length ', bc.length);
-                //}
-
-                const data = {trigger: results, pam: chunk.pam, bc: bc};
+                const data = {trigger: results, pam: chunk.pam};
+                if (pixels) {
+                    data.headers = chunk.headers;
+                    data.pixels = pixels;
+                }
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -496,12 +499,9 @@ class PamDiff extends Transform {
                 if (this.listenerCount('diff') > 0) {
                     this.emit('diff', data);
                 }
-
             }
             console.timeEnd(`${this._debugEngine}-${debugCount}`);
         });
-
-
         this._oldPix = this._newPix;
     }
 
