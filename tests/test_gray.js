@@ -68,7 +68,7 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, response: response});
+const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, response: response, draw: true});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);

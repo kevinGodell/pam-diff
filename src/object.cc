@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-#include <iostream>
+//#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -309,10 +309,53 @@ Napi::Value GrayAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     const BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-
-    std::cout << " should draw bounding box " << this->draw_ << std::endl;
-
     const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
+
+    /*
+     *
+    struct BoundsResult {
+    uint_fast32_t minX;
+    uint_fast32_t maxX;
+    uint_fast32_t minY;
+    uint_fast32_t maxY;
+    uint_fast32_t percent;
+    };
+     */
+
+    if (this->draw_ == true && resultsJs.Length() > 0) {
+        //std::cout << " should draw bounding box " << this->draw_ << " with length " << resultsJs.Length() << std::endl;
+        Napi::Buffer<uint_fast8_t> bc = Napi::Buffer<uint_fast8_t >::Copy(env, buf1, this->pixCount_);
+
+        uint_fast8_t *drawn = bc.Data();
+
+        /*drawn[boundsResult.minY * this->width_ + boundsResult.minX] = 0x00;
+        drawn[boundsResult.minY * this->width_ + boundsResult.maxX] = 0x00;
+        drawn[boundsResult.maxY * this->width_ + boundsResult.minX] = 0x00;
+        drawn[boundsResult.maxY * this->width_ + boundsResult.maxX] = 0x00;*/
+
+        uint_fast32_t indexMinY = boundsResult.minY * this->width_;
+        uint_fast32_t indexMaxY = boundsResult.maxY * this->width_;
+
+        for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
+            drawn[indexMinY + x] = 0x00;
+            drawn[indexMaxY + x] = 0x00;
+        }
+
+        for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
+            uint_fast32_t indexY = y * this->width_;
+
+            drawn[indexY + boundsResult.minX] = 0x00;
+            drawn[indexY + boundsResult.maxX] = 0x00;
+        }
+
+
+
+
+        //resultsJs.Set("bc", bc);
+        cb.Call({env.Null(), resultsJs, bc});
+        return env.Undefined();
+    }
+
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }

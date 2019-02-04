@@ -479,9 +479,14 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results, bc) => {
             if (results.length) {
-                const data = {trigger: results, pam: chunk.pam};
+
+                //if (bc) {
+                //    console.log('have bc of length ', bc.length);
+                //}
+
+                const data = {trigger: results, pam: chunk.pam, bc: bc};
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -491,6 +496,7 @@ class PamDiff extends Transform {
                 if (this.listenerCount('diff') > 0) {
                     this.emit('diff', data);
                 }
+
             }
             console.timeEnd(`${this._debugEngine}-${debugCount}`);
         });

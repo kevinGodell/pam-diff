@@ -4,7 +4,7 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
-    "install": "node-gyp rebuild",
+    "__install": "node-gyp rebuild",
     "__pretest": "npm install",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm install && npm test",
@@ -68,7 +68,7 @@
     "pub": "npm publish -tag latest",
     "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
-    "exp2": "node examples/grayOut2 --async false --response bounds"
+    "draw": "node examples/grayOutDraw --async false --response bounds"
   },
   "repository": {
     "type": "git",
