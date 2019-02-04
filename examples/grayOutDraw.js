@@ -1,6 +1,6 @@
 'use strict';
 
-const {config:dotenvConfig,} = require('dotenv');
+const {config:dotenvConfig} = require('dotenv');
 
 dotenvConfig();
 
@@ -9,6 +9,8 @@ const argv = require('minimist')(process.argv.slice(2));
 const async = argv.async || process.env.ASYNC || false;
 
 const response = argv.response || process.env.RESPONSE || 'percent';
+
+const draw = argv.draw || process.env.DRAW || false;
 
 const {cpus} = require('os');
 
@@ -80,16 +82,13 @@ const region4 = {name: 'region4', difference: 10, percent: 9, polygon: [{x: 480,
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({/*regions : regions, */response: response, async: async, draw: true});
+const pamDiff = new PamDiff({/*regions : regions, */response: response, async: async, draw: draw});
 
 let diffCount = 0;
 
 pamDiff.on('diff', (data) => {
-    console.log(data);
+    //console.log(data);
 
-    if (data.bc) {
-        console.log(data.bc.length);
-    }
     diffCount++;
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
     //if(true){return;}
@@ -107,20 +106,24 @@ pamDiff.on('diff', (data) => {
     const jpeg = `${name}.jpeg`;
     const pathToJpeg = `${__dirname}/out/gray/${jpeg}`;
 
-    console.log(data.bc.length === 640 * 360);
+    //console.log(data.bc.length === 640 * 360);
 
-    const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
+    //const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
-    ff.stdin.end(data.bc);
+    //ff.stdin.end(data.bc);
 
+    const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj420p', '-q:v', 1, '-huffman', 1, pathToJpeg]);
 
     ff.stderr.on('data', data => {
-        console.log('ffmpeg stderr data', data);
-    })
+        //console.log('ffmpeg stderr data', data);
+    });
 
-    //const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
-
-    //ff.stdin.end(data.pam);
+    if (data.headers && data.pixels) {
+        ff.stdin.write(data.headers);
+        ff.stdin.end(data.pixels);
+    } else {
+        ff.stdin.end(data.pam);
+    }
 
     ff.on('exit', (data, other) => {
         if (data === 0) {
