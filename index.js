@@ -433,9 +433,12 @@ class PamDiff extends Transform {
 
         engine += `_${this._response}`;
 
-        engine += this._async ? '_async' : '_sync';
+        if (this._response === 'bounds' && this.draw) {
+            config.draw = this.draw;
+            engine += '_draw';
+        }
 
-        config.draw = this.draw;
+        engine += this._async ? '_async' : '_sync';
 
         this._engine = addon(config);
 

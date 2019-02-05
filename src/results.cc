@@ -70,7 +70,7 @@ ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Reg
 // draw bounding box in gray pixels
 void
 DrawGrayBounds(const Napi::Array &resultsJs, const uint_fast32_t width, uint_fast8_t *pixels) {
-    for(uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
+    for (uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
         Napi::Object obj = resultsJs.Get(i).As<Napi::Object>();
         uint_fast32_t minX = obj.Get("minX").As<Napi::Number>().Uint32Value();
         uint_fast32_t maxX = obj.Get("maxX").As<Napi::Number>().Uint32Value();
@@ -93,7 +93,7 @@ DrawGrayBounds(const Napi::Array &resultsJs, const uint_fast32_t width, uint_fas
 // draw bounding box in rgb pixels
 void
 DrawRgbBounds(const Napi::Array &resultsJs, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
-    for(uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
+    for (uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
         Napi::Object obj = resultsJs.Get(i).As<Napi::Object>();
         uint_fast32_t minX = obj.Get("minX").As<Napi::Number>().Uint32Value();
         uint_fast32_t maxX = obj.Get("maxX").As<Napi::Number>().Uint32Value();

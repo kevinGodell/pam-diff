@@ -10,6 +10,8 @@ const async = argv.async || process.env.ASYNC || false;
 
 const response = argv.response || process.env.RESPONSE || 'percent';
 
+const draw = argv.draw || process.env.DRAW || false;
+
 const {cpus} = require('os');
 
 console.log(`cpu cores available: ${cpus().length}`);
@@ -74,7 +76,7 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async, response: response});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async, response: response, draw: draw});
 
 pamDiff.on('diff', data => {
     //console.log(data);
