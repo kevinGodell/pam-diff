@@ -366,6 +366,9 @@ class PamDiff extends Transform {
                     count++;
                 }
             }
+            if (count === 0) {
+                throw new Error('Bitset count must be greater than 0');
+            }
             this._maskObj = {count: count, bitset: buffer};
         } else {
             const regions = [];

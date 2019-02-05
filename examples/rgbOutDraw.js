@@ -39,7 +39,7 @@ const params = [
     '-c:v',
     'pam',
     '-pix_fmt',
-    'gray',
+    'rgba',
     '-f',
     'image2pipe',
     '-vf',
@@ -60,7 +60,7 @@ ffmpeg.on('error', (error) => {
 ffmpeg.on('exit', (code, signal) => {
     console.log('exit', code, signal);
     console.log(diffCount);
-    console.timeEnd('grayOut.js');
+    console.timeEnd('rgbOutDraw.js');
 });
 
 const p2p = new P2P();
@@ -86,7 +86,7 @@ const regions = [region1, region2, region3, region4];
 
 //const regions = [regionMask];
 
-const pamDiff = new PamDiff({regions : regions, mask: false, response: response, async: async, draw: draw});
+const pamDiff = new PamDiff({/*regions : regions, */mask: false, response: response, async: async, draw: draw});
 
 let diffCount = 0;
 
@@ -108,7 +108,7 @@ pamDiff.on('diff', (data) => {
         }
     }
     const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `${__dirname}/out/gray/${jpeg}`;
+    const pathToJpeg = `${__dirname}/out/rgb24/${jpeg}`;
 
     //console.log(data.bc.length === 640 * 360);
 
@@ -138,5 +138,5 @@ pamDiff.on('diff', (data) => {
     });
 });
 
-console.time('grayOut.js');
+console.time('rgbOutDraw.js');
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

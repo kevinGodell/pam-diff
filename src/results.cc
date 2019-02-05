@@ -66,3 +66,49 @@ ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Reg
     }
     return resultsJs;
 }
+
+// draw bounding box in gray pixels
+void
+DrawGrayBounds(const Napi::Array &resultsJs, const uint_fast32_t width, uint_fast8_t *pixels) {
+    for(uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
+        Napi::Object obj = resultsJs.Get(i).As<Napi::Object>();
+        uint_fast32_t minX = obj.Get("minX").As<Napi::Number>().Uint32Value();
+        uint_fast32_t maxX = obj.Get("maxX").As<Napi::Number>().Uint32Value();
+        uint_fast32_t minY = obj.Get("minY").As<Napi::Number>().Uint32Value();
+        uint_fast32_t maxY = obj.Get("maxY").As<Napi::Number>().Uint32Value();
+        uint_fast32_t indexMinY = minY * width;
+        uint_fast32_t indexMaxY = maxY * width;
+        for (uint_fast32_t x = minX; x < maxX; ++x) {
+            pixels[indexMinY + x] = 0x00;
+            pixels[indexMaxY + x] = 0x00;
+        }
+        for (uint_fast32_t y = minY; y < maxY; ++y) {
+            uint_fast32_t indexY = y * width;
+            pixels[indexY + minX] = 0x00;
+            pixels[indexY + maxX] = 0x00;
+        }
+    }
+}
+
+// draw bounding box in rgb pixels
+void
+DrawRgbBounds(const Napi::Array &resultsJs, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+    for(uint_fast32_t i = 0; i < resultsJs.Length(); ++i) {
+        Napi::Object obj = resultsJs.Get(i).As<Napi::Object>();
+        uint_fast32_t minX = obj.Get("minX").As<Napi::Number>().Uint32Value();
+        uint_fast32_t maxX = obj.Get("maxX").As<Napi::Number>().Uint32Value();
+        uint_fast32_t minY = obj.Get("minY").As<Napi::Number>().Uint32Value();
+        uint_fast32_t maxY = obj.Get("maxY").As<Napi::Number>().Uint32Value();
+        uint_fast32_t indexMinY = minY * width;
+        uint_fast32_t indexMaxY = maxY * width;
+        for (uint_fast32_t x = minX; x < maxX; ++x) {
+            pixels[(indexMinY + x) * pixDepth] = 0x00;
+            pixels[(indexMaxY + x) * pixDepth] = 0x00;
+        }
+        for (uint_fast32_t y = minY; y < maxY; ++y) {
+            uint_fast32_t indexY = y * width;
+            pixels[(indexY + minX) * pixDepth] = 0x00;
+            pixels[(indexY + maxX) * pixDepth] = 0x00;
+        }
+    }
+}

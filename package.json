@@ -68,7 +68,10 @@
     "pub": "npm publish -tag latest",
     "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
-    "draw": "node examples/grayOutDraw --async false --response bounds --draw true"
+    "draw": "npm run draw:gray && npm run draw:rgb && npm run draw:rgba",
+    "draw:gray": "node examples/grayOutDraw --async false --response bounds --draw true",
+    "draw:rgb": "node examples/rgbOutDraw --async false --response bounds --draw true",
+    "draw:rgba": "node examples/rgbOutDraw --async false --response bounds --draw true"
   },
   "repository": {
     "type": "git",
