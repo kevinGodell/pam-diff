@@ -6,7 +6,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
-//#include <iostream>
+#include <iostream>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -497,16 +497,28 @@ Napi::Value GrayRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<BoundsResult> resultsVec = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+
+    uint_fast32_t resultsCount = 0;
+
+    const std::vector<BoundsResult> resultsVec = GrayRegionsBounds2(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1, resultsCount);
+
     const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
-    if (this->draw_ && resultsJs.Length() > 0) {
+
+    std::cout << "results count " << resultsCount << std::endl;
+
+    if (this->draw_ && resultsCount > 0) {
+
+        std::vector<uint_fast8_t> myVec = {buf1, buf1 + this->pixCount_};
+
         const Napi::Buffer<uint_fast8_t> buf1Copy = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
         uint_fast8_t *pixels = buf1Copy.Data();
         DrawGrayBounds(resultsJs, this->width_, pixels);
         cb.Call({env.Null(), resultsJs, buf1Copy});
         return env.Undefined();
     }
+
     cb.Call({env.Null(), resultsJs, env.Null()});
+
     return env.Undefined();
 }
 

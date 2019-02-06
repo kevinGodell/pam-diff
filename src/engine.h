@@ -57,6 +57,7 @@ struct Region {
 
 struct PercentResult {
     uint_fast32_t percent;
+    //std::string name;
     bool flagged;
 };
 
@@ -66,6 +67,7 @@ struct BoundsResult {
     uint_fast32_t minY;
     uint_fast32_t maxY;
     uint_fast32_t percent;
+    //std::string name;
     bool flagged;
     // todo maybe include pointer to copied and edited pixels
 };
@@ -200,6 +202,34 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const i
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
         boundsResultVec[r].flagged = boundsResultVec[r].percent >= regionsVec[r].percent;
+    }
+    return boundsResultVec;
+}
+
+// gray regions bounds
+inline std::vector<BoundsResult>
+GrayRegionsBounds2(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t &resultsCount) {
+    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false});
+    for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
+        for (x = 0; x < width; ++x, ++i) {
+            const int_fast32_t diff = GrayDiff(buf0, buf1, i);
+            if (minDiff > diff) continue;
+            for (r = 0; r < regionsLen; ++r) {
+                if (regionsVec[r].bitset[i] == 0 || regionsVec[r].pixDiff > diff) continue;
+                SetMin(x, boundsResultVec[r].minX);
+                SetMax(x, boundsResultVec[r].maxX);
+                SetMin(y, boundsResultVec[r].minY);
+                SetMax(y, boundsResultVec[r].maxY);
+                ++boundsResultVec[r].percent;
+            }
+        }
+    }
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
+        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
+            boundsResultVec[r].flagged = true;
+            ++resultsCount;
+        }
     }
     return boundsResultVec;
 }
