@@ -305,8 +305,8 @@ Napi::Value GrayAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", boundsResult);
     if (this->draw_ && resultsJs.Length() > 0) {
         const Napi::Buffer<uint_fast8_t> buf1Copy = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
         uint_fast8_t *pixels = buf1Copy.Data();
@@ -400,8 +400,8 @@ Napi::Value GrayMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", boundsResult);
     if (this->draw_ && resultsJs.Length() > 0) {
         const Napi::Buffer<uint_fast8_t> buf1Copy = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
         uint_fast8_t *pixels = buf1Copy.Data();
@@ -808,7 +808,7 @@ Napi::Object RgbRegionsPercentAsync::NewInstance(const Napi::Env &env, const Nap
     return scope.Escape(napi_value(object)).ToObject();
 }
 
-Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {//done
+Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
@@ -857,8 +857,8 @@ Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", boundsResult);
     if (this->draw_ && resultsJs.Length() > 0) {
         const Napi::Buffer<uint_fast8_t> buf1Copy = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_ * this->pixDepth_);
         uint_fast8_t *pixels = buf1Copy.Data();
@@ -954,8 +954,8 @@ Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, boundsResult);
+    const BoundsResult boundsResult = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", boundsResult);
     if (this->draw_ && resultsJs.Length() > 0) {
         const Napi::Buffer<uint_fast8_t> buf1Copy = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_ * this->pixDepth_);
         uint_fast8_t *pixels = buf1Copy.Data();

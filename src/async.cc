@@ -63,13 +63,13 @@ GrayAllBoundsWorker::GrayAllBoundsWorker(const uint_fast32_t width, const uint_f
 }
 
 void GrayAllBoundsWorker::Execute() {
-    this->boundsResult_ = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->buf0_, this->buf1_);
+    this->boundsResult_ = GrayAllBounds(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_);
 }
 
 void GrayAllBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
+    const Napi::Array resultsJs = ToJs(env, "all", this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -80,13 +80,13 @@ GrayMaskBoundsWorker::GrayMaskBoundsWorker(const uint_fast32_t width, const uint
 }
 
 void GrayMaskBoundsWorker::Execute() {
-    this->boundsResult_ = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    this->boundsResult_ = GrayMaskBounds(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
 }
 
 void GrayMaskBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -165,13 +165,13 @@ RgbAllBoundsWorker::RgbAllBoundsWorker(const uint_fast32_t pixDepth, const uint_
 }
 
 void RgbAllBoundsWorker::Execute() {
-    this->boundsResult_ = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->buf0_, this->buf1_);
+    this->boundsResult_ = RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_);
 }
 
 void RgbAllBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, this->boundsResult_);
+    const Napi::Array resultsJs = ToJs(env, "all", this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -182,13 +182,13 @@ RgbMaskBoundsWorker::RgbMaskBoundsWorker(const uint_fast32_t pixDepth, const uin
 }
 
 void RgbMaskBoundsWorker::Execute() {
-    this->boundsResult_ = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    this->boundsResult_ = RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
 }
 
 void RgbMaskBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, this->boundsResult_);
+    const Napi::Array resultsJs = ToJs(env, "mask", this->boundsResult_);
     Callback().Call({env.Null(), resultsJs});
 }
 
