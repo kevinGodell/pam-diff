@@ -44,8 +44,8 @@ Napi::Value GrayAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const uint_fast32_t percentResult = GrayAllPercent(this->pixCount_, this->pixDiff_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
+    const PercentResult percentResult = GrayAllPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -130,8 +130,8 @@ Napi::Value GrayMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const uint_fast32_t percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
+    const PercentResult percentResult = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -218,8 +218,8 @@ Napi::Value GrayRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<uint_fast32_t> resultsVec = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
+    const std::vector<PercentResult> percentResultVec = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, percentResultVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -590,8 +590,8 @@ Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const uint_fast32_t percentResult = RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "all", this->diffsPerc_, percentResult);
+    const PercentResult percentResult = RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "all", percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -678,8 +678,8 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const uint_fast32_t percentResult = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->diffsPerc_, percentResult);
+    const PercentResult percentResult = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1);
+    const Napi::Array resultsJs = ToJs(env, "mask", percentResult);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();
 }
@@ -768,7 +768,7 @@ Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<uint_fast32_t> resultsVec = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
+    const std::vector<PercentResult> resultsVec = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, buf0, buf1);
     const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, resultsVec);
     cb.Call({env.Null(), resultsJs});
     return env.Undefined();

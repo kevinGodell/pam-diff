@@ -24,7 +24,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    uint_fast32_t percentResult_;
+    PercentResult percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +47,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    uint_fast32_t percentResult_;
+    PercentResult percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +69,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    std::vector<uint_fast32_t> percentResultVec_;
+    std::vector<PercentResult> percentResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -161,7 +161,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    uint_fast32_t percentResult_;
+    PercentResult percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    uint_fast32_t percentResult_;
+    PercentResult percentResult_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,7 +208,7 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
-    std::vector<uint_fast32_t> percentResultVec_;
+    std::vector<PercentResult> percentResultVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

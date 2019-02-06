@@ -7,12 +7,12 @@
 
 // all/mask percent to js
 Napi::Array
-ToJs(const Napi::Env &env, const std::string &name, const uint_fast32_t diffsPerc, const uint_fast32_t percentResult) {
+ToJs(const Napi::Env &env, const std::string &name, const PercentResult percentResult) {
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResult >= diffsPerc) {
+    if (percentResult.flagged) {
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", name);
-        obj.Set("percent", percentResult);
+        obj.Set("percent", percentResult.percent);
         resultsJs.Set(0u, obj);
     }
     return resultsJs;
@@ -20,13 +20,13 @@ ToJs(const Napi::Env &env, const std::string &name, const uint_fast32_t diffsPer
 
 // regions percent to js
 Napi::Array
-ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const std::vector<uint_fast32_t> &percentResultVec) {
+ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const std::vector<PercentResult> &percentResultVec) {
     Napi::Array resultsJs = Napi::Array::New(env);
     for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
-        if (regionVec[r].percent > percentResultVec[r]) continue;
+        if (!percentResultVec[r].flagged) continue;
         Napi::Object obj = Napi::Object::New(env);
         obj.Set("name", regionVec[r].name);
-        obj.Set("percent", percentResultVec[r]);
+        obj.Set("percent", percentResultVec[r].percent);
         resultsJs.Set(j++, obj);
     }
     return resultsJs;
