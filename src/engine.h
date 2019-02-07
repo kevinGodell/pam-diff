@@ -67,8 +67,19 @@ struct BoundsResult {
     uint_fast32_t minY;
     uint_fast32_t maxY;
     uint_fast32_t percent;
-    //std::string name;
     bool flagged;
+    //std::string name;
+    // todo maybe include pointer to copied and edited pixels
+};
+
+struct BoundsResult2 {
+    uint_fast32_t minX;
+    uint_fast32_t maxX;
+    uint_fast32_t minY;
+    uint_fast32_t maxY;
+    uint_fast32_t percent;
+    bool flagged;
+    std::string name;
     // todo maybe include pointer to copied and edited pixels
 };
 
@@ -383,10 +394,10 @@ GrayMaskBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const 
 }
 
 // gray regions bounds
-inline bool
-GrayRegionsBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
-    bool flagged = false;
-    boundsResultVec = std::vector<BoundsResult>(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false});
+inline uint_fast32_t
+GrayRegionsBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult2> &boundsResultVec) {
+    uint_fast32_t flaggedCount = 0;
+    boundsResultVec = std::vector<BoundsResult2>(regionsLen, BoundsResult2{width - 1, 0, height - 1, 0, 0, false, std::string()});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
         for (x = 0; x < width; ++x, ++i) {
             const int_fast32_t diff = GrayDiff(buf0, buf1, i);
@@ -402,12 +413,15 @@ GrayRegionsBoundsTest(const uint_fast32_t width, const uint_fast32_t height, con
         }
     }
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        // todo pass name here so we dont need regionsVec later
+        boundsResultVec[r].name = regionsVec[r].name;
         boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
         if (boundsResultVec[r].percent >= regionsVec[r].percent) {
-            flagged = boundsResultVec[r].flagged = true;
+            boundsResultVec[r].flagged = true;
+            ++flaggedCount;
         }
     }
-    return flagged;
+    return flaggedCount;
 }
 
 #endif

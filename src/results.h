@@ -37,7 +37,7 @@ ToJs(const Napi::Env &env, const std::string &name, const BoundsResult &boundsRe
 
 // regions bounds to js
 void
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<BoundsResult> &boundsResultsVec, Napi::Array &resultsJs);
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<BoundsResult2> &boundsResultsVec, Napi::Array &resultsJs);
 
 // draw bounding box in gray pixels for all/mask
 void
@@ -45,6 +45,6 @@ DrawGrayBounds2(const BoundsResult &boundsResult, const uint_fast32_t width, uin
 
 // draw bounding box in gray pixels for regions
 void
-DrawGrayBounds2(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels);
+DrawGrayBounds2(const uint_fast32_t regionsLen, const std::vector<BoundsResult2> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels);
 
 #endif

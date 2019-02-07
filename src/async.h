@@ -157,8 +157,8 @@ private:
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
 
     // out
-    bool flagged_;
-    std::vector<BoundsResult> boundsResultVec_;
+    uint_fast32_t flaggedCount_;
+    std::vector<BoundsResult2> boundsResultVec_;
     std::vector<uint_fast8_t> pixels_;
 };
 

@@ -127,8 +127,8 @@ GrayRegionsBoundsWorker::GrayRegionsBoundsWorker(const uint_fast32_t width, cons
 }
 
 void GrayRegionsBoundsWorker::Execute() {
-    this->flagged_ = GrayRegionsBoundsTest(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
-    if (this->flagged_ && this->draw_) {
+    this->flaggedCount_ = GrayRegionsBoundsTest(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
+    if (this->flaggedCount_ > 0 && this->draw_) {
         std::cout << "draw bounds in pixels" << std::endl;
         this->pixels_ = std::vector<uint_fast8_t>{this->buf1_, this->buf1_ + this->pixCount_};
         DrawGrayBounds2(this->regionsLen_, this->boundsResultVec_, this->width_, this->pixels_.data());
@@ -139,8 +139,8 @@ void GrayRegionsBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->flagged_) {
-        ToJs(env, this->regionsLen_, this->regionVec_, this->boundsResultVec_, resultsJs);
+    if (this->flaggedCount_ > 0) {
+        ToJs(env, this->regionsLen_, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, this->pixels_.data(), this->pixCount_);
             Callback().Call({env.Null(), resultsJs, pixels});

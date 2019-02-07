@@ -130,11 +130,11 @@ ToJs(const Napi::Env &env, const std::string &name, const BoundsResult &boundsRe
 
 // regions bounds to js
 void
-ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs) {
+ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<BoundsResult2> &boundsResultVec, Napi::Array &resultsJs) {
     for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
         if (!boundsResultVec[r].flagged) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", regionVec[r].name);
+        obj.Set("name", boundsResultVec[r].name);
         obj.Set("percent", boundsResultVec[r].percent);
         obj.Set("minX", boundsResultVec[r].minX);
         obj.Set("maxX", boundsResultVec[r].maxX);
@@ -167,7 +167,7 @@ DrawGrayBounds2(const BoundsResult &boundsResult, const uint_fast32_t width, uin
 
 // draw bounding box in gray pixels for regions
 void
-DrawGrayBounds2(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
+DrawGrayBounds2(const uint_fast32_t regionsLen, const std::vector<BoundsResult2> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
     for (uint_fast32_t i = 0; i < regionsLen; ++i) {
         if (!boundsResultVec[i].flagged) continue;
         uint_fast32_t minX = boundsResultVec[i].minX;
