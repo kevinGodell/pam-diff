@@ -68,10 +68,15 @@
     "pub": "npm publish -tag latest",
     "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
-    "draw": "npm run draw:gray && npm run draw:rgb && npm run draw:rgba",
-    "draw:gray": "node examples/grayOutDraw --async false --response bounds --draw true",
-    "draw:rgb": "node examples/rgbOutDraw --async false --response bounds --draw true",
-    "draw:rgba": "node examples/rgbOutDraw --async false --response bounds --draw true"
+    "draw": "npm run draw:async && npm run draw:sync",
+    "draw:async": "npm run draw:gray:async && npm run draw:rgb:async && npm run draw:rgba:async",
+    "draw:gray:async": "node examples/createJpegs --async true --response bounds --draw true --pixfmt gray",
+    "draw:rgb:async": "node examples/createJpegs --async true --response bounds --draw true --pixfmt rgb24",
+    "draw:rgba:async": "node examples/createJpegs --async true --response bounds --draw true --pixfmt rgba",
+    "draw:sync": "npm run draw:gray:sync && npm run draw:rgb:sync && npm run draw:rgba:sync",
+    "draw:gray:sync": "node examples/createJpegs --async false --response bounds --draw true --pixfmt gray",
+    "draw:rgb:sync": "node examples/createJpegs --async false --response bounds --draw true --pixfmt rgb24",
+    "draw:rgba:sync": "node examples/createJpegs --async false --response bounds --draw true --pixfmt rgba"
   },
   "repository": {
     "type": "git",
