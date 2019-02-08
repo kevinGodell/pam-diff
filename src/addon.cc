@@ -1,6 +1,7 @@
 #include "object.h"
 #include "engine.h"
 #include "napi.h"
+
 #ifdef NAPI_DEBUG
 #include <iostream>
 #endif
