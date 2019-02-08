@@ -92,11 +92,11 @@ protected:
     const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
 
     // out
-    //bool flagged_;
     BoundsResult boundsResult_;
     std::vector<uint_fast8_t> pixels_;
 };
@@ -105,7 +105,7 @@ protected:
 
 class GrayMaskBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayMaskBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayMaskBoundsWorker(uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -115,7 +115,6 @@ private:
     // in
     const uint_fast32_t width_;
     const uint_fast32_t height_;
-    const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast32_t bitsetCount_;
@@ -123,11 +122,11 @@ private:
     const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
 
     // out
-    //bool flagged_;
     BoundsResult boundsResult_;
     std::vector<uint_fast8_t> pixels_;
 };
@@ -136,7 +135,7 @@ private:
 
 class GrayRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -146,19 +145,19 @@ private:
     // in
     const uint_fast32_t width_;
     const uint_fast32_t height_;
-    const uint_fast32_t pixCount_;
     const int_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
     const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
 
     // out
     uint_fast32_t flaggedCount_;
-    std::vector<BoundsResult2> boundsResultVec_;
+    std::vector<BoundsResult> boundsResultVec_;
     std::vector<uint_fast8_t> pixels_;
 };
 
@@ -235,37 +234,44 @@ private:
 
 class RgbAllBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbAllBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 protected:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
     const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
+    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
+
+    // out
     BoundsResult boundsResult_;
+    std::vector<uint_fast8_t> pixels_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class RgbMaskBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbMaskBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbMaskBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
@@ -273,35 +279,47 @@ private:
     const uint_fast32_t diffsPerc_;
     const uint_fast32_t bitsetCount_;
     const std::vector<bool> &bitsetVec_;
+    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
+
+    // out
     BoundsResult boundsResult_;
+    std::vector<uint_fast8_t> pixels_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class RgbRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t width_;
     const uint_fast32_t height_;
     const int_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
+    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
+
+    // out
+    uint_fast32_t flaggedCount_;
     std::vector<BoundsResult> boundsResultVec_;
+    std::vector<uint_fast8_t> pixels_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

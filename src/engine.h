@@ -68,17 +68,6 @@ struct BoundsResult {
     uint_fast32_t maxY;
     uint_fast32_t percent;
     bool flagged;
-    //std::string name;
-    // todo maybe include pointer to copied and edited pixels
-};
-
-struct BoundsResult2 {
-    uint_fast32_t minX;
-    uint_fast32_t maxX;
-    uint_fast32_t minY;
-    uint_fast32_t maxY;
-    uint_fast32_t percent;
-    bool flagged;
     std::string name;
     // todo maybe include pointer to copied and edited pixels
 };
@@ -171,7 +160,7 @@ GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_
         }
     }
     uint_fast32_t percent = 100 * diffs / pixCount;
-    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc};
+    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc, "all"};
 }
 
 // gray mask bounds
@@ -189,13 +178,13 @@ GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const int_
         }
     }
     uint_fast32_t percent = 100 * diffs / bitsetCount;
-    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc};
+    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc, "mask"};
 }
 
 // gray regions bounds
 inline std::vector<BoundsResult>
 GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false});
+    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false, std::string()});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
         for (x = 0; x < width; ++x, ++i) {
             const int_fast32_t diff = GrayDiff(buf0, buf1, i);
@@ -220,7 +209,7 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const i
 // gray regions bounds
 inline std::vector<BoundsResult>
 GrayRegionsBounds2(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t &resultsCount) {
-    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false});
+    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false, std::string()});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
         for (x = 0; x < width; ++x, ++i) {
             const int_fast32_t diff = GrayDiff(buf0, buf1, i);
@@ -303,7 +292,7 @@ RgbAllBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint
         }
     }
     uint_fast32_t percent = 100 * diffs / pixCount;
-    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc};
+    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc, "all"};
 }
 
 // rgb mask bounds
@@ -321,13 +310,13 @@ RgbMaskBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uin
         }
     }
     uint_fast32_t percent = 100 * diffs / bitsetCount;
-    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc};
+    return BoundsResult{minX, maxX, minY, maxY, percent, percent >= diffsPerc, "mask"};
 }
 
 // rgb regions bounds
 inline std::vector<BoundsResult>
 RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false});
+    std::vector<BoundsResult> boundsResultVec(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false, std::string()});
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
             const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
@@ -355,12 +344,12 @@ EngineType(uint_fast32_t pixDepth, const std::string &target, const std::string 
 
 // convert js regions to cpp
 std::vector<Region>
-RegionsJsToCpp(uint_fast32_t pixLen, uint_fast32_t regionsLen, const Napi::Array &regionsJs);
+RegionsJsToCpp(uint_fast32_t pixCount, uint_fast32_t regionsLen, const Napi::Array &regionsJs);
 
 // gray all bounds
 inline void
-GrayAllBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false};
+GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false, "all"};
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
             if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
@@ -377,8 +366,8 @@ GrayAllBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const u
 
 // gray mask bounds
 inline void
-GrayMaskBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false};
+GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false, "mask"};
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
             if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
@@ -395,9 +384,9 @@ GrayMaskBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const 
 
 // gray regions bounds
 inline uint_fast32_t
-GrayRegionsBoundsTest(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult2> &boundsResultVec) {
+GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
     uint_fast32_t flaggedCount = 0;
-    boundsResultVec = std::vector<BoundsResult2>(regionsLen, BoundsResult2{width - 1, 0, height - 1, 0, 0, false, std::string()});
+    boundsResultVec = std::vector<BoundsResult>(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false, std::string()});
     for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
         for (x = 0; x < width; ++x, ++i) {
             const int_fast32_t diff = GrayDiff(buf0, buf1, i);
@@ -413,7 +402,72 @@ GrayRegionsBoundsTest(const uint_fast32_t width, const uint_fast32_t height, con
         }
     }
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        // todo pass name here so we dont need regionsVec later
+        boundsResultVec[r].name = regionsVec[r].name;
+        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
+        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
+            boundsResultVec[r].flagged = true;
+            ++flaggedCount;
+        }
+    }
+    return flaggedCount;
+}
+
+// rgb all bounds
+inline void
+RgbAllBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false, "all"};
+    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+            if (pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
+            SetMin(x, boundsResult.minX);
+            SetMax(x, boundsResult.maxX);
+            SetMin(y, boundsResult.minY);
+            SetMax(y, boundsResult.maxY);
+            ++boundsResult.percent;
+        }
+    }
+    boundsResult.percent = 100 * boundsResult.percent / pixCount;
+    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+}
+
+// rgb mask bounds
+inline void
+RgbMaskBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    boundsResult = BoundsResult{width - 1, 0, height - 1, 0, 0, false, "mask"};
+    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+            if (bitsetVec[p] == 0 || pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
+            SetMin(x, boundsResult.minX);
+            SetMax(x, boundsResult.maxX);
+            SetMin(y, boundsResult.minY);
+            SetMax(y, boundsResult.maxY);
+            ++boundsResult.percent;
+        }
+    }
+    boundsResult.percent = 100 * boundsResult.percent / bitsetCount;
+    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+}
+
+// rgb regions bounds
+inline uint_fast32_t
+RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
+    uint_fast32_t flaggedCount = 0;
+    boundsResultVec = std::vector<BoundsResult>(regionsLen, BoundsResult{width - 1, 0, height - 1, 0, 0, false, std::string()});
+    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+            const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
+            if (minDiff > diff) continue;
+            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+                if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
+                SetMin(x, boundsResultVec[r].minX);
+                SetMax(x, boundsResultVec[r].maxX);
+                SetMin(y, boundsResultVec[r].minY);
+                SetMax(y, boundsResultVec[r].maxY);
+                ++boundsResultVec[r].percent;
+            }
+        }
+    }
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         boundsResultVec[r].name = regionsVec[r].name;
         boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
         if (boundsResultVec[r].percent >= regionsVec[r].percent) {

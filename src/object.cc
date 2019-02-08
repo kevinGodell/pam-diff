@@ -456,7 +456,7 @@ Napi::Value GrayMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayMaskBoundsWorker = new GrayMaskBoundsWorker(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
+    auto *grayMaskBoundsWorker = new GrayMaskBoundsWorker(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
     grayMaskBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -578,7 +578,7 @@ Napi::Value GrayRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayRegionsBoundsWorker = new GrayRegionsBoundsWorker(this->width_, this->height_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->draw_, napiBuf0, napiBuf1, cb);
+    auto *grayRegionsBoundsWorker = new GrayRegionsBoundsWorker(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->draw_, napiBuf0, napiBuf1, cb);
     grayRegionsBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -913,6 +913,8 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = this->width_ * this->height_;
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
 }
 
 Napi::FunctionReference RgbAllBoundsAsync::constructor;
@@ -937,7 +939,7 @@ Napi::Value RgbAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllBoundsWorker = new RgbAllBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, napiBuf0, napiBuf1, cb);
+    auto *rgbAllBoundsWorker = new RgbAllBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->draw_, napiBuf0, napiBuf1, cb);
     rgbAllBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -1013,6 +1015,8 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
 }
 
 Napi::FunctionReference RgbMaskBoundsAsync::constructor;
@@ -1037,7 +1041,7 @@ Napi::Value RgbMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbMaskBoundsWorker = new RgbMaskBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
+    auto *rgbMaskBoundsWorker = new RgbMaskBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
     rgbMaskBoundsWorker->Queue();
     return env.Undefined();
 }
@@ -1111,6 +1115,8 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionsLen_ = regionsJs.Length();
     this->regionVec_ = RegionsJsToCpp(this->pixCount_, this->regionsLen_, regionsJs);
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
 }
 
 Napi::FunctionReference RgbRegionsBoundsAsync::constructor;
@@ -1135,7 +1141,7 @@ Napi::Value RgbRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, napiBuf0, napiBuf1, cb);
+    auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->draw_, napiBuf0, napiBuf1, cb);
     rgbRegionsBoundsWorker->Queue();
     return env.Undefined();
 }
