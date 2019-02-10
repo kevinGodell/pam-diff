@@ -1,8 +1,8 @@
 'use strict';
 
-const dotenvConfig = require('dotenv').config();
+const {config: dotenvConfig} = require('dotenv');
 
-//dotenvConfig();
+dotenvConfig();
 
 const argv = require('minimist')(process.argv.slice(2));
 
