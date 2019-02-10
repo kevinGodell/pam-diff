@@ -1,1 +1,0 @@
-rgb24 jpegs output location (47)
