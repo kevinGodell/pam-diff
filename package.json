@@ -68,7 +68,7 @@
     "pub": "npm publish -tag latest",
     "__pub": "npm publish",
     "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
-
+    "jpeg": "npm run pam && npm run draw",
     "pam": "npm run pam:async && npm run pam:sync",
     "pam:async": "npm run pam:gray:async && npm run pam:rgb:async && npm run pam:rgba:async",
     "pam:gray:async": "node examples/createJpegs --async true --response bounds --draw false --pixfmt gray",
@@ -78,7 +78,6 @@
     "pam:gray:sync": "node examples/createJpegs --async false --response bounds --draw false --pixfmt gray",
     "pam:rgb:sync": "node examples/createJpegs --async false --response bounds --draw false --pixfmt rgb24",
     "pam:rgba:sync": "node examples/createJpegs --async false --response bounds --draw false --pixfmt rgba",
-
     "draw": "npm run draw:async && npm run draw:sync",
     "draw:async": "npm run draw:gray:async && npm run draw:rgb:async && npm run draw:rgba:async",
     "draw:gray:async": "node examples/createJpegs --async true --response bounds --draw true --pixfmt gray",
