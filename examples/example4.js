@@ -72,7 +72,7 @@ p2p.on('pam', (data) => {
     console.log(`received pam ${++counter}`);
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 360}, {x: 160, y: 360}, {x: 160, y: 0}]};
 
 const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
 
@@ -82,13 +82,15 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 480, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, response: "bounds"});
+const pamDiff = new PamDiff({regions: regions, response: "bounds"});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
 
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    if(true){return;}
+    if (true) {
+        return;
+    }
 
     const date = new Date();
     let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;

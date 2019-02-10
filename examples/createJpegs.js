@@ -1,8 +1,8 @@
 'use strict';
 
-const {config:dotenvConfig} = require('dotenv');
+const dotenvConfig = require('dotenv').config();
 
-dotenvConfig();
+//dotenvConfig();
 
 const argv = require('minimist')(process.argv.slice(2));
 
@@ -18,6 +18,8 @@ const pixFmt = argv.pixfmt || process.env.PIXFMT || 'gray';// gray or rgb24 or r
 
 const {cpus} = require('os');
 
+const basePathToJpeg = `${__dirname}/out/${response === 'bounds' && toBool(draw) ? 'draw' : 'pam'}/`;
+
 function toBool(val) {
     return val === true || val === 'true' || val === 1 || val === '1';
 }
@@ -26,7 +28,7 @@ console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const {path:ffmpegPath} = require('ffmpeg-static');
+const {path: ffmpegPath} = require('ffmpeg-static');
 const {spawn, execFile} = require('child_process');
 
 const params = [
@@ -86,20 +88,20 @@ p2p.on('pam', (data) => {
 let regions, mask;
 
 if (target === 'regions') {
-    const region1 = {name: 'region1', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 0, y:360}, {x: 160, y: 360}, {x: 160, y: 0}]};
+    const region1 = {name: 'region1', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 0, y: 360}, {x: 160, y: 360}, {x: 160, y: 0}]};
     const region2 = {name: 'region2', difference: 10, percent: 7, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
     const region3 = {name: 'region3', difference: 10, percent: 7, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
     const region4 = {name: 'region4', difference: 10, percent: 7, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
     regions = [region1, region2, region3, region4];
 } else if (target === 'mask') {
-    const region1 = {name: 'myMask', polygon: [{x:0, y:0}, {x:0, y:360}, {x:320, y:360}, {x:320, y:0}]};
+    const region1 = {name: 'myMask', polygon: [{x: 0, y: 0}, {x: 0, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
     regions = [region1];
     mask = true;
 } else {
     regions = mask = null;
 }
 
-const pamDiff = new PamDiff({regions : regions, mask: mask, response: response, async: async, draw: draw});
+const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, async: async, draw: draw});
 
 pamDiff.on('diff', (data) => {
     //console.log(data);
@@ -109,7 +111,6 @@ pamDiff.on('diff', (data) => {
     //if(true){return;}
 
     const date = new Date();
-    //let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
     let name = `${pixFmt}-${toBool(async) ? 'async' : 'sync'}-${diffCounter}`;
     for (const region of data.trigger) {
         if (response === 'bounds') {
@@ -119,9 +120,7 @@ pamDiff.on('diff', (data) => {
         }
     }
     const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `${__dirname}/out/draw/${jpeg}`;
-
-    //console.log(data.bc.length === 640 * 360);
+    const pathToJpeg = `${basePathToJpeg}${jpeg}`;
 
     //const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
