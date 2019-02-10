@@ -40,7 +40,7 @@ RegionsJsToCpp(const uint_fast32_t pixCount, const uint_fast32_t regionsLen, con
         const bool *bitset = regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
         std::vector<bool> bitsetVec;
         bitsetVec.assign(bitset, bitset + pixCount);
-        regionVec.push_back(Region{bitsetVec, diff, count, percent, name});
+        regionVec.push_back(Region{name, bitsetVec, diff, count, percent});
     }
     return regionVec;
 }

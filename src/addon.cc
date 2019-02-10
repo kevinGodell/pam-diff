@@ -10,6 +10,11 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const Napi::Object config = info[0].As<Napi::Object>();
 #ifdef NAPI_DEBUG
+
+    std::cout << "size of Region struct " << sizeof(Region) << std::endl;
+    std::cout << "size of PercentResult struct " << sizeof(PercentResult) << std::endl;
+    std::cout << "size of BoundsResult struct " << sizeof(BoundsResult) << std::endl;
+
     if (config.Has("depth")) std::cout << "depth: " << config.Get("depth").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("width")) std::cout << "width: " << config.Get("width").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.Has("height")) std::cout << "height: " << config.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
