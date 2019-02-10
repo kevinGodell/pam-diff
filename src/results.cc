@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+/*
 // all/mask percent to js
 void
 ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs) {
@@ -140,3 +141,4 @@ DrawRgbBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &b
         }
     }
 }
+ */
