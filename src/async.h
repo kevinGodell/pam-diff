@@ -17,6 +17,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
@@ -24,6 +25,8 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
     PercentResult percentResult_;
 };
 
@@ -38,6 +41,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
@@ -47,6 +51,8 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
     PercentResult percentResult_;
 };
 
@@ -61,6 +67,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixCount_;
     const int_fast32_t minDiff_;
     const uint_fast32_t regionsLen_;
@@ -69,6 +76,9 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
+    uint_fast32_t flaggedCount_;
     std::vector<PercentResult> percentResultVec_;
 };
 
@@ -172,6 +182,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
@@ -180,6 +191,8 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
     PercentResult percentResult_;
 };
 
@@ -194,6 +207,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t pixCount_;
     const int_fast32_t pixDiff_;
@@ -204,6 +218,8 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
     PercentResult percentResult_;
 };
 
@@ -218,6 +234,7 @@ public:
     void OnOK() override;
 
 private:
+    // in
     const uint_fast32_t pixDepth_;
     const uint_fast32_t pixCount_;
     const int_fast32_t minDiff_;
@@ -227,6 +244,9 @@ private:
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
+    uint_fast32_t flaggedCount_;
     std::vector<PercentResult> percentResultVec_;
 };
 

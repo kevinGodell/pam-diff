@@ -12,13 +12,16 @@ GrayAllPercentWorker::GrayAllPercentWorker(const uint_fast32_t pixCount, const i
 }
 
 void GrayAllPercentWorker::Execute() {
-    this->percentResult_ = GrayAllPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_);
+    GrayAllPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
 void GrayAllPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "all", this->percentResult_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->percentResult_.flagged) {
+        ToJs(env, this->percentResult_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -29,13 +32,16 @@ GrayMaskPercentWorker::GrayMaskPercentWorker(const uint_fast32_t pixCount, const
 }
 
 void GrayMaskPercentWorker::Execute() {
-    this->percentResult_ = GrayMaskPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    GrayMaskPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
 void GrayMaskPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->percentResult_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->percentResult_.flagged) {
+        ToJs(env, this->percentResult_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -46,13 +52,16 @@ GrayRegionsPercentWorker::GrayRegionsPercentWorker(const uint_fast32_t pixCount,
 }
 
 void GrayRegionsPercentWorker::Execute() {
-    this->percentResultVec_ = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
+    this->flaggedCount_ = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
 }
 
 void GrayRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->flaggedCount_ > 0) {
+        ToJs(env, this->regionsLen_, this->percentResultVec_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -150,13 +159,16 @@ RgbAllPercentWorker::RgbAllPercentWorker(const uint_fast32_t pixDepth, const uin
 }
 
 void RgbAllPercentWorker::Execute() {
-    this->percentResult_ = RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_);
+    RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
 void RgbAllPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "all", this->percentResult_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->percentResult_.flagged) {
+        ToJs(env, this->percentResult_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -167,13 +179,16 @@ RgbMaskPercentWorker::RgbMaskPercentWorker(const uint_fast32_t pixDepth, const u
 }
 
 void RgbMaskPercentWorker::Execute() {
-    this->percentResult_ = RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_);
+    RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
 void RgbMaskPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, "mask", this->percentResult_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->percentResult_.flagged) {
+        ToJs(env, this->percentResult_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 
@@ -184,13 +199,16 @@ RgbRegionsPercentWorker::RgbRegionsPercentWorker(const uint_fast32_t pixDepth, c
 }
 
 void RgbRegionsPercentWorker::Execute() {
-    this->percentResultVec_ = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_);
+    this->flaggedCount_ = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
 }
 
 void RgbRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
-    const Napi::Array resultsJs = ToJs(env, this->regionsLen_, this->regionVec_, this->percentResultVec_);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->flaggedCount_ > 0) {
+        ToJs(env, this->regionsLen_, this->percentResultVec_, resultsJs);
+    }
     Callback().Call({env.Null(), resultsJs});
 }
 

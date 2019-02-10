@@ -8,12 +8,12 @@
 #include <vector>
 
 // all/mask percent to js
-Napi::Array
-ToJs(const Napi::Env &env, const std::string &name, const PercentResult &percentResult);
+void
+ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs);
 
 // regions percent to js
-Napi::Array
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<PercentResult> &percentResultsVec);
+void
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<PercentResult> &percentResultsVec, Napi::Array &resultsJs);
 
 // all/mask bounds to js
 void
