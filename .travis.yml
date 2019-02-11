@@ -22,4 +22,4 @@ cache:
     - node_modules
 after_success:
 #  - npm run examples
-  - npm run out
+  - npm run jpeg
