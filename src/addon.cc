@@ -11,25 +11,32 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const Napi::Object config = info[0].As<Napi::Object>();
 #ifdef NAPI_DEBUG
 
-    std::cout << "size of Region struct " << sizeof(Region) << std::endl;
-    std::cout << "size of PercentResult struct " << sizeof(PercentResult) << std::endl;
-    std::cout << "size of BoundsResult struct " << sizeof(BoundsResult) << std::endl;
+    // show system size values for types being used
+    std::cout << "size of bool : " << sizeof(bool) << std::endl;
+    std::cout << "size of std::string : " << sizeof(std::string) << std::endl;
+    std::cout << "size of int_fast32_t : " << sizeof(int_fast32_t) << std::endl;
+    std::cout << "size of uint_fast32_t : " << sizeof(uint_fast32_t) << std::endl;
+    std::cout << "size of std::vector<bool> : " << sizeof(std::vector<bool>) << std::endl;
+    std::cout << "size of std::vector<uint_fast8_t> : " << sizeof(std::vector<uint_fast8_t>) << std::endl;
+    std::cout << "size of Region struct : " << sizeof(Region) << std::endl;
+    std::cout << "size of PercentResult struct : " << sizeof(PercentResult) << std::endl;
+    std::cout << "size of BoundsResult struct : " << sizeof(BoundsResult) << std::endl;
 
-    if (config.Has("depth")) std::cout << "depth: " << config.Get("depth").As<Napi::Number>().Uint32Value() << std::endl;
-    if (config.Has("width")) std::cout << "width: " << config.Get("width").As<Napi::Number>().Uint32Value() << std::endl;
-    if (config.Has("height")) std::cout << "height: " << config.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
-    if (config.Has("response")) std::cout << "response: " << config.Get("response").As<Napi::String>().Utf8Value() << std::endl;
-    if (config.Has("draw")) std::cout << "draw: " << config.Get("draw").As<Napi::Boolean>().Value() << std::endl;
-    if (config.Has("async")) std::cout << "async: " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
-    if (config.Has("target")) std::cout << "target: " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
-    if (config.Has("difference")) std::cout << "difference: " << config.Get("difference").As<Napi::Number>().Int32Value() << std::endl;
-    if (config.Has("percent")) std::cout << "percent: " << config.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
-    if (config.Has("bitsetCount")) std::cout << "bitsetCount: " << config.Get("bitsetCount").As<Napi::Number>().Uint32Value() << std::endl;
-    if (config.Has("bitset")) std::cout << "bitset length: " << config.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
-    if (config.Has("minDiff")) std::cout << "minDiff: " << config.Get("minDiff").As<Napi::Number>().Int32Value() << std::endl;
+    if (config.Has("depth")) std::cout << "depth : " << config.Get("depth").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("width")) std::cout << "width : " << config.Get("width").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("height")) std::cout << "height : " << config.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("response")) std::cout << "response : " << config.Get("response").As<Napi::String>().Utf8Value() << std::endl;
+    if (config.Has("draw")) std::cout << "draw : " << config.Get("draw").As<Napi::Boolean>().Value() << std::endl;
+    if (config.Has("async")) std::cout << "async : " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
+    if (config.Has("target")) std::cout << "target : " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
+    if (config.Has("difference")) std::cout << "difference : " << config.Get("difference").As<Napi::Number>().Int32Value() << std::endl;
+    if (config.Has("percent")) std::cout << "percent : " << config.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("bitsetCount")) std::cout << "bitsetCount : " << config.Get("bitsetCount").As<Napi::Number>().Uint32Value() << std::endl;
+    if (config.Has("bitset")) std::cout << "bitset length : " << config.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
+    if (config.Has("minDiff")) std::cout << "minDiff : " << config.Get("minDiff").As<Napi::Number>().Int32Value() << std::endl;
     if (config.Has("regions")) {
         const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
-        std::cout << "regions length: " << regionsJs.Length() << std::endl;
+        std::cout << "regions length : " << regionsJs.Length() << std::endl;
         for (uint_fast32_t r = 0; r < regionsJs.Length(); r++) {
             const std::string name = regionsJs.Get(r).As<Napi::Object>().Get("name").As<Napi::String>();
             const uint_fast32_t diff = regionsJs.Get(r).As<Napi::Object>().Get("diff").As<Napi::Number>().Int32Value();
