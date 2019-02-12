@@ -94,20 +94,16 @@ ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<Bou
 // draw bounding box in gray pixels for all/mask
 inline void
 DrawGrayBounds(const BoundsResult &boundsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
-    uint_fast32_t minX = boundsResult.minX;
-    uint_fast32_t maxX = boundsResult.maxX;
-    uint_fast32_t minY = boundsResult.minY;
-    uint_fast32_t maxY = boundsResult.maxY;
-    uint_fast32_t indexMinY = minY * width;
-    uint_fast32_t indexMaxY = maxY * width;
-    for (uint_fast32_t x = minX; x < maxX; ++x) {
+    uint_fast32_t indexMinY = boundsResult.minY * width;
+    uint_fast32_t indexMaxY = boundsResult.maxY * width;
+    for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
         pixels[indexMinY + x] = 0x00;
         pixels[indexMaxY + x] = 0x00;
     }
-    for (uint_fast32_t y = minY; y < maxY; ++y) {
+    for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
         uint_fast32_t indexY = y * width;
-        pixels[indexY + minX] = 0x00;
-        pixels[indexY + maxX] = 0x00;
+        pixels[indexY + boundsResult.minX] = 0x00;
+        pixels[indexY + boundsResult.maxX] = 0x00;
     }
 }
 
@@ -116,20 +112,16 @@ inline void
 DrawGrayBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
     for (uint_fast32_t i = 0; i < regionsLen; ++i) {
         if (!boundsResultVec[i].flagged) continue;
-        uint_fast32_t minX = boundsResultVec[i].minX;
-        uint_fast32_t maxX = boundsResultVec[i].maxX;
-        uint_fast32_t minY = boundsResultVec[i].minY;
-        uint_fast32_t maxY = boundsResultVec[i].maxY;
-        uint_fast32_t indexMinY = minY * width;
-        uint_fast32_t indexMaxY = maxY * width;
-        for (uint_fast32_t x = minX; x < maxX; ++x) {
+        uint_fast32_t indexMinY = boundsResultVec[i].minY * width;
+        uint_fast32_t indexMaxY = boundsResultVec[i].maxY * width;
+        for (uint_fast32_t x = boundsResultVec[i].minX; x < boundsResultVec[i].maxX; ++x) {
             pixels[indexMinY + x] = 0x00;
             pixels[indexMaxY + x] = 0x00;
         }
-        for (uint_fast32_t y = minY; y < maxY; ++y) {
+        for (uint_fast32_t y = boundsResultVec[i].minY; y < boundsResultVec[i].maxY; ++y) {
             uint_fast32_t indexY = y * width;
-            pixels[indexY + minX] = 0x00;
-            pixels[indexY + maxX] = 0x00;
+            pixels[indexY + boundsResultVec[i].minX] = 0x00;
+            pixels[indexY + boundsResultVec[i].maxX] = 0x00;
         }
     }
 }
@@ -137,20 +129,16 @@ DrawGrayBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &
 // draw bounding box in rgb pixels for all/mask
 inline void
 DrawRgbBounds(const BoundsResult &boundsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
-    uint_fast32_t minX = boundsResult.minX;
-    uint_fast32_t maxX = boundsResult.maxX;
-    uint_fast32_t minY = boundsResult.minY;
-    uint_fast32_t maxY = boundsResult.maxY;
-    uint_fast32_t indexMinY = minY * width;
-    uint_fast32_t indexMaxY = maxY * width;
-    for (uint_fast32_t x = minX; x < maxX; ++x) {
+    uint_fast32_t indexMinY = boundsResult.minY * width;
+    uint_fast32_t indexMaxY = boundsResult.maxY * width;
+    for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
         pixels[(indexMinY + x) * pixDepth] = 0x00;
         pixels[(indexMaxY + x) * pixDepth] = 0x00;
     }
-    for (uint_fast32_t y = minY; y < maxY; ++y) {
+    for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
         uint_fast32_t indexY = y * width;
-        pixels[(indexY + minX) * pixDepth] = 0x00;
-        pixels[(indexY + maxX) * pixDepth] = 0x00;
+        pixels[(indexY + boundsResult.minX) * pixDepth] = 0x00;
+        pixels[(indexY + boundsResult.maxX) * pixDepth] = 0x00;
     }
 }
 
@@ -159,20 +147,16 @@ inline void
 DrawRgbBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
     for (uint_fast32_t i = 0; i < regionsLen; ++i) {
         if (!boundsResultVec[i].flagged) continue;
-        uint_fast32_t minX = boundsResultVec[i].minX;
-        uint_fast32_t maxX = boundsResultVec[i].maxX;
-        uint_fast32_t minY = boundsResultVec[i].minY;
-        uint_fast32_t maxY = boundsResultVec[i].maxY;
-        uint_fast32_t indexMinY = minY * width;
-        uint_fast32_t indexMaxY = maxY * width;
-        for (uint_fast32_t x = minX; x < maxX; ++x) {
+        uint_fast32_t indexMinY = boundsResultVec[i].minY * width;
+        uint_fast32_t indexMaxY = boundsResultVec[i].maxY * width;
+        for (uint_fast32_t x = boundsResultVec[i].minX; x < boundsResultVec[i].maxX; ++x) {
             pixels[(indexMinY + x) * pixDepth] = 0x00;
             pixels[(indexMaxY + x) * pixDepth] = 0x00;
         }
-        for (uint_fast32_t y = minY; y < maxY; ++y) {
+        for (uint_fast32_t y = boundsResultVec[i].minY; y < boundsResultVec[i].maxY; ++y) {
             uint_fast32_t indexY = y * width;
-            pixels[(indexY + minX) * pixDepth] = 0x00;
-            pixels[(indexY + maxX) * pixDepth] = 0x00;
+            pixels[(indexY + boundsResultVec[i].minX) * pixDepth] = 0x00;
+            pixels[(indexY + boundsResultVec[i].maxX) * pixDepth] = 0x00;
         }
     }
 }
