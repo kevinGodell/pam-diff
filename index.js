@@ -28,7 +28,7 @@ class PamDiff extends Transform {
         super(options);
         Transform.call(this, {objectMode: true});
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
-        this.draw = PamDiff._validateBoolean(options.draw);
+        this.draw = PamDiff._parseOptions('draw', options);// return pixels with bounding box if response is bounds
         this.async = PamDiff._parseOptions('async', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
@@ -151,6 +151,34 @@ class PamDiff extends Transform {
      */
     setAsync(bool) {
         this.async = bool;
+        return this;
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     */
+    set draw(bool) {
+        this._draw = PamDiff._validateBoolean(bool);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    /**
+     *
+     * @return {Boolean}
+     */
+    get draw() {
+        return this._draw || false;
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     * @return {PamDiff}
+     */
+    setDraw(bool) {
+        this.draw = bool;
         return this;
     }
 
@@ -394,7 +422,6 @@ class PamDiff extends Transform {
             }
             this._regionObj = {minDiff: minDiff, length: regions.length, regions: regions};
         }
-
     }
 
     /**
@@ -405,13 +432,9 @@ class PamDiff extends Transform {
         if (!this._tupltype || !this._width || !this._height) {
             return;
         }
-
         let engine = this._tupltype;
-
         engine += `_${this._width}_x_${this._height}`;
-
         const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
-
         if (this._regionObj) {
             engine += '_regions';
             config.target = 'regions';
@@ -430,18 +453,13 @@ class PamDiff extends Transform {
             config.difference = this._difference;
             config.percent = this._percent;
         }
-
         engine += `_${this._response}`;
-
-        if (this._response === 'bounds' && this.draw) {
-            config.draw = this.draw;
+        if (this._response === 'bounds' && this._draw) {
+            config.draw = this._draw;
             engine += '_draw';
         }
-
         engine += this._async ? '_async' : '_sync';
-
         this._engine = addon(config);
-
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
             this._debugEngine = engine;
@@ -449,7 +467,6 @@ class PamDiff extends Transform {
         } else {
             this._parseChunk = this._parsePixels;
         }
-
     }
 
     /**
