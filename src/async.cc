@@ -91,7 +91,7 @@ void GrayAllBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -120,7 +120,7 @@ void GrayMaskBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +149,7 @@ void GrayRegionsBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ void RgbAllBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +267,7 @@ void RgbMaskBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,7 +296,7 @@ void RgbRegionsBoundsWorker::OnOK() {
             return;
         }
     }
-    Callback().Call({env.Null(), resultsJs, env.Null()});
+    Callback().Call({env.Null(), resultsJs});
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
