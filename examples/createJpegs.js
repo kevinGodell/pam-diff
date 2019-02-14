@@ -40,9 +40,15 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use a pre-recorded mp4 video as input */
-    //'-re',//comment out to have ffmpeg read video as fast as possible
+    '-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
     `${__dirname}/in/circle_star.mp4`,
+
+    /*'-re',
+    '-f',
+    'lavfi',
+    '-i',
+    'testsrc=size=1920x1080:rate=2',*/
 
     /* set output flags */
     '-an',
@@ -147,6 +153,9 @@ pamDiff.on('diff', (data) => {
             throw new Error('FFMPEG is not working with current parameters');
         }
     });
+    if (global.gc) {
+        global.gc();
+    }
 });
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);

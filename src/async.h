@@ -339,7 +339,7 @@ private:
     // out
     uint_fast32_t flaggedCount_;
     std::vector<BoundsResult> boundsResultVec_;
-    std::vector<uint_fast8_t> pixels_;
+    uint_fast8_t *pixels_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

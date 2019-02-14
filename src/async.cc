@@ -273,14 +273,15 @@ void RgbMaskBoundsWorker::OnOK() {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionsLen, BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})) {
+        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionsLen, BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})), pixels_(nullptr) {
 }
 
 void RgbRegionsBoundsWorker::Execute() {
     this->flaggedCount_ = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
     if (this->flaggedCount_ > 0 && this->draw_) {
-        this->pixels_ = std::vector<uint_fast8_t>{this->buf1_, this->buf1_ + this->buf1Size_};
-        DrawRgbBounds(this->regionsLen_, this->boundsResultVec_, this->width_, this->pixDepth_, this->pixels_.data());
+        this->pixels_ = new uint_fast8_t[this->buf1Size_]();
+        std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
+        DrawRgbBounds(this->regionsLen_, this->boundsResultVec_, this->width_, this->pixDepth_, this->pixels_);
     }
 }
 
@@ -291,7 +292,7 @@ void RgbRegionsBoundsWorker::OnOK() {
     if (this->flaggedCount_ > 0) {
         ToJs(env, this->regionsLen_, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, this->pixels_.data(), this->buf1Size_);
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->buf1Size_, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
         }
