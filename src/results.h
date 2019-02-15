@@ -39,6 +39,8 @@ DrawRgbBounds(const BoundsResult &boundsResult, uint_fast32_t width, uint_fast32
 void
 DrawRgbBounds(uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
 
-void DeleteExternalData(Napi::Env env, const uint_fast8_t *finalizeData);
+// free memory from heap allocated array used as Buffer data
+void
+DeleteExternalData(Napi::Env env, const uint_fast8_t *finalizeData);
 
 #endif

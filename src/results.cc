@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 // all/mask percent to js
 void
 ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs) {
@@ -127,8 +125,8 @@ DrawRgbBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &b
     }
 }
 
+// free memory from heap allocated array used as Buffer data
 void
 DeleteExternalData(Napi::Env /*&env*/, const uint_fast8_t *finalizeData) {
     delete[] finalizeData;
-    std::cout << "deleted data" << std::endl;
 }
