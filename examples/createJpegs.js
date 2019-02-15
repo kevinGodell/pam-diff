@@ -109,7 +109,7 @@ if (target === 'regions') {
 
 const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, async: async, draw: draw});
 
-pamDiff.on('diff', (data) => {
+pamDiff.on('diff', data => {
     //console.log(data);
 
     ++diffCounter;
@@ -138,12 +138,9 @@ pamDiff.on('diff', (data) => {
         //console.log('ffmpeg stderr data', data);
     });
 
-    if (data.headers && data.pixels) {
-        ff.stdin.write(data.headers);
-        ff.stdin.end(data.pixels);
-    } else {
-        ff.stdin.end(data.pam);
-    }
+    ff.stdin.write(data.headers);
+    ff.stdin.end(data.pixels);
+
 
     ff.on('exit', (data, other) => {
         if (data === 0) {
