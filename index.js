@@ -14,6 +14,7 @@ class PamDiff extends Transform {
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
      * @param [options.percent=5] {Number} - Percent of pixels that exceed difference value.
      * @param [options.response=percent] {String} - Accepted values: percent or bounds.
+     * @param [options.draw=false] {Boolean} - Return a pixel buffer with drawn bounding box. Must also set {response: 'bounds'}.
      * @param [options.regions] {Array} - Array of regions.
      * @param options.regions[i].name {String} - Name of region.
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
@@ -27,6 +28,7 @@ class PamDiff extends Transform {
         super(options);
         Transform.call(this, {objectMode: true});
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
+        this.draw = PamDiff._parseOptions('draw', options);// return pixels with bounding box if response is bounds
         this.async = PamDiff._parseOptions('async', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
@@ -149,6 +151,34 @@ class PamDiff extends Transform {
      */
     setAsync(bool) {
         this.async = bool;
+        return this;
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     */
+    set draw(bool) {
+        this._draw = PamDiff._validateBoolean(bool);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    /**
+     *
+     * @return {Boolean}
+     */
+    get draw() {
+        return this._draw || false;
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     * @return {PamDiff}
+     */
+    setDraw(bool) {
+        this.draw = bool;
         return this;
     }
 
@@ -364,6 +394,9 @@ class PamDiff extends Transform {
                     count++;
                 }
             }
+            if (count === 0) {
+                throw new Error('Bitset count must be greater than 0');
+            }
             this._maskObj = {count: count, bitset: buffer};
         } else {
             const regions = [];
@@ -389,7 +422,6 @@ class PamDiff extends Transform {
             }
             this._regionObj = {minDiff: minDiff, length: regions.length, regions: regions};
         }
-
     }
 
     /**
@@ -400,13 +432,9 @@ class PamDiff extends Transform {
         if (!this._tupltype || !this._width || !this._height) {
             return;
         }
-
         let engine = this._tupltype;
-
         engine += `_${this._width}_x_${this._height}`;
-
         const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
-
         if (this._regionObj) {
             engine += '_regions';
             config.target = 'regions';
@@ -425,13 +453,13 @@ class PamDiff extends Transform {
             config.difference = this._difference;
             config.percent = this._percent;
         }
-
         engine += `_${this._response}`;
-
+        if (this._response === 'bounds' && this._draw) {
+            config.draw = this._draw;
+            engine += '_draw';
+        }
         engine += this._async ? '_async' : '_sync';
-
         this._engine = addon(config);
-
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
             this._debugEngine = engine;
@@ -439,7 +467,6 @@ class PamDiff extends Transform {
         } else {
             this._parseChunk = this._parsePixels;
         }
-
     }
 
     /**
@@ -449,9 +476,14 @@ class PamDiff extends Transform {
      */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
             if (results.length) {
-                const data = {trigger: results, pam: chunk.pam};
+                const data = {trigger: results, pam: chunk.pam, headers: chunk.headers};
+                if (pixels) {
+                    data.pixels = pixels;
+                } else {
+                    data.pixels = chunk.pixels;
+                }
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -475,9 +507,14 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results) => {
+        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
             if (results.length) {
-                const data = {trigger: results, pam: chunk.pam};
+                const data = {trigger: results, pam: chunk.pam, headers: chunk.headers};
+                if (pixels) {
+                    data.pixels = pixels;
+                } else {
+                    data.pixels = chunk.pixels;
+                }
                 if (this._callback) {
                     this._callback(data);
                 }
@@ -490,8 +527,6 @@ class PamDiff extends Transform {
             }
             console.timeEnd(`${this._debugEngine}-${debugCount}`);
         });
-
-
         this._oldPix = this._newPix;
     }
 

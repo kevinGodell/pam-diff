@@ -27,7 +27,7 @@ const params = [
     '-loglevel',
     'quiet',
     //'-stats',
-    
+
     /* use an artificial video input */
     '-re',
     '-f',
@@ -62,7 +62,7 @@ const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, 
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({mask: true, regions : regions});
+const pamDiff = new PamDiff({mask: true, regions: regions});
 
 pamDiff.on('diff', (data) => {
     console.log(data);
@@ -84,18 +84,18 @@ ffmpeg.on('exit', (code, signal) => {
 
 ffmpeg.stdout.pipe(p2p).pipe(pamDiff);
 
-setTimeout(()=>{
+setTimeout(() => {
     console.log(1);
     pamDiff.resetCache();
 
 }, 10000);
 
-setTimeout(()=>{
+setTimeout(() => {
     console.log(2);
     pamDiff.mask = false;
 }, 20000);
 
-setTimeout(()=>{
+setTimeout(() => {
     console.log(3);
     pamDiff.regions = null;
 }, 30000);

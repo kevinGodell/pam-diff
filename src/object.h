@@ -146,6 +146,7 @@ private:
     uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,6 +168,7 @@ private:
     uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,10 +188,12 @@ private:
 
     uint_fast32_t width_;
     uint_fast32_t height_;
+    uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
     std::vector<bool> bitsetVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,10 +212,12 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t width_;
     uint_fast32_t height_;
+    uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
     std::vector<bool> bitsetVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -230,9 +236,11 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t width_;
     uint_fast32_t height_;
+    uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -251,9 +259,11 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t width_;
     uint_fast32_t height_;
+    uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -402,6 +412,8 @@ private:
     uint_fast32_t pixDepth_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    uint_fast32_t buf1Size_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,6 +436,7 @@ private:
     uint_fast32_t pixDepth_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -448,6 +461,8 @@ private:
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
     std::vector<bool> bitsetVec_;
+    uint_fast32_t buf1Size_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -472,6 +487,7 @@ private:
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
     std::vector<bool> bitsetVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -495,6 +511,8 @@ private:
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
+    uint_fast32_t buf1Size_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -518,6 +536,7 @@ private:
     int_fast32_t minDiff_;
     uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
+    bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

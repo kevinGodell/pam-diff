@@ -8,19 +8,39 @@
 #include <vector>
 
 // all/mask percent to js
-Napi::Array
-ToJs(const Napi::Env &env, const std::string &name, uint_fast32_t diffsPerc, uint_fast32_t percentResult);
+void
+ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs);
 
 // regions percent to js
-Napi::Array
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<uint_fast32_t> &percentResultsVec);
+void
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<PercentResult> &percentResultVec, Napi::Array &resultsJs);
 
 // all/mask bounds to js
-Napi::Array
-ToJs(const Napi::Env &env, const std::string &name, uint_fast32_t diffsPerc, const BoundsResult &boundsResult);
+void
+ToJs(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs);
 
 // regions bounds to js
-Napi::Array
-ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const std::vector<BoundsResult> &boundsResultsVec);
+void
+ToJs(const Napi::Env &env, uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs);
+
+// draw bounding box in gray pixels for all/mask
+void
+DrawGrayBounds(const BoundsResult &boundsResult, uint_fast32_t width, uint_fast8_t *pixels);
+
+// draw bounding box in gray pixels for regions
+void
+DrawGrayBounds(uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, uint_fast32_t width, uint_fast8_t *pixels);
+
+// draw bounding box in rgb pixels for all/mask
+void
+DrawRgbBounds(const BoundsResult &boundsResult, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
+
+// draw bounding box in rgb pixels for regions
+void
+DrawRgbBounds(uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
+
+// free memory from heap allocated array used as Buffer data
+void
+DeleteExternalData(Napi::Env env, const uint_fast8_t *finalizeData);
 
 #endif
