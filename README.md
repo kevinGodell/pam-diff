@@ -8,6 +8,7 @@ npm install pam-diff@latest --save
 #### *Important Note:* The js-only version will no longer receive any updates. All future work will be dedicated to the n-api version because it is much more efficient.
 #### *New Feature:* Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.2, the option to get x y bounding box coordinates can be set by passing `{response: "bounds"}` to the pam-diff constructor.
+#### *New Feature:* Starting with version 0.13.5, the option to get the pixel buffer containing the drawn x y bounding box can be set by passing `{draw: true}` to the pam-diff constructor.
 ### Usage Options:
 ##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
 1. all (default)
