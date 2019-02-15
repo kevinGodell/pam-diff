@@ -107,4 +107,6 @@ View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](ht
 ### Future Plans:
 - [ ] Add node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
 - [x] Include option to return coordinates for bounding box of changed pixels.
+- [x] Include option to return pixel buffer containing bounding boxes.
 - [ ] Introduce blob filtering to group changed pixels with their neighbors.
+- [ ] Include option to return pixel buffer containing bounding boxes around blobs.
