@@ -16,11 +16,10 @@ before_script:
   - npm --version
   - node --version
 script:
-#  - npm test
-  - npm run gray:1
+  - npm test
 cache:
   directories:
     - node_modules
 after_success:
 #  - npm run examples
-#  - npm run jpeg
+  - npm run jpeg
