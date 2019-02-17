@@ -56,6 +56,26 @@ GrayAllPercent(const uint_fast32_t pixCount, const int_fast32_t pixDiff, const u
     percentResult.flagged = percentResult.percent >= diffsPerc;
 }
 
+// gray all percent
+void
+GrayAllPercent(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
+    /*for (uint_fast32_t p = 0; p < pixCount; ++p) {
+        if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
+        ++percentResult.percent;
+    }
+    percentResult.percent = 100 * percentResult.percent / pixCount;
+    percentResult.flagged = percentResult.percent >= diffsPerc;*/
+    for (uint_fast32_t y = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x) {
+            //if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
+            if (pixDiff > AbsInt(*(++buf0) - *(++buf1))) continue;
+            ++percentResult.percent;
+        }
+    }
+    percentResult.percent = 100 * percentResult.percent / pixCount;
+    percentResult.flagged = percentResult.percent >= diffsPerc;
+}
+
 // gray mask percent
 void
 GrayMaskPercent(const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {

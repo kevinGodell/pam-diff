@@ -109,28 +109,40 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports = Napi::Function::New(env, CreateObject, "CreateObject");
     GrayAllPercentSync::Init(env);
     GrayAllPercentAsync::Init(env);
+
     GrayMaskPercentSync::Init(env);
     GrayMaskPercentAsync::Init(env);
+
     GrayRegionsPercentSync::Init(env);
     GrayRegionsPercentAsync::Init(env);
+
     GrayAllBoundsSync::Init(env);
     GrayAllBoundsAsync::Init(env);
+
     GrayMaskBoundsSync::Init(env);
     GrayMaskBoundsAsync::Init(env);
+
     GrayRegionsBoundsSync::Init(env);
     GrayRegionsBoundsAsync::Init(env);
+
     RgbAllPercentSync::Init(env);
     RgbAllPercentAsync::Init(env);
+
     RgbMaskPercentSync::Init(env);
     RgbMaskPercentAsync::Init(env);
+
     RgbRegionsPercentSync::Init(env);
     RgbRegionsPercentAsync::Init(env);
+
     RgbAllBoundsSync::Init(env);
     RgbAllBoundsAsync::Init(env);
+
     RgbMaskBoundsSync::Init(env);
     RgbMaskBoundsAsync::Init(env);
+
     RgbRegionsBoundsSync::Init(env);
     RgbRegionsBoundsAsync::Init(env);
+
     return exports;
 }
 

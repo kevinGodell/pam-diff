@@ -18,6 +18,8 @@ GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
 }
 
@@ -44,7 +46,7 @@ Napi::Value GrayAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     PercentResult percentResult = PercentResult{"all", 0, false};
-    GrayAllPercent(this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, percentResult);
+    GrayAllPercent(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, buf0, buf1, percentResult);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (percentResult.flagged) {
         ToJs(env, percentResult, resultsJs);

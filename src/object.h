@@ -21,6 +21,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
+    uint_fast32_t width_;
+    uint_fast32_t height_;
     uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
