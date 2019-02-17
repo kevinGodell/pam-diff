@@ -9,8 +9,8 @@
        "src/engine.cc",
        "src/results.cc"
      ],
-     "cflags": [ "-O2", "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
-     "cflags!": [ "-Wno-unused-parameter", "-O3" ],
+     "cflags": [ "-Wendif-labels", "-Werror", "-Wpedantic", "-Wunused-parameter" ],# removed for now "-finline-functions", "-funswitch-loops", "-fpredictive-commoning", "-fgcse-after-reload", "-ftree-vectorize", "-fvect-cost-model", "-ftree-partial-pre", "-fipa-cp-clone"
+     "cflags!": [ "-Wno-unused-parameter" ],
      "cflags_cc": [ "-std=gnu++11" ],
      "cflags_cc!": [ "-fno-exceptions", "-fno-rtti", "-std=gnu++1y", "-std=gnu++0x" ],
      "include_dirs": [ "<!@(node -p \"require('node-addon-api').include\")" ],
@@ -32,7 +32,7 @@
            "MACOSX_DEPLOYMENT_TARGET": "10.7",
            "GCC_ENABLE_CPP_RTTI" : "YES",
            # "fast", "3", "2", "1", "0", "", "s"
-           "GCC_OPTIMIZATION_LEVEL": "fast",
+           "GCC_OPTIMIZATION_LEVEL": "3",
            # only passed to C files
            "OTHER_CFLAGS" : [],
            # remove defaults passed to C files
