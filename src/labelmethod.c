@@ -28,14 +28,14 @@
 
 #define Y (STACK[SP-2])
 
-void LabelComponent(uint_fast16_t *STACK, unsigned int width, unsigned int height, /*const unsigned char *input, */ int labelNo, unsigned short x, unsigned short y, int *output) {
+void LabelComponent(uint_fast32_t *STACK, uint_fast32_t width, uint_fast32_t height, /*const unsigned char *input, */ int_fast32_t labelNo, uint_fast32_t x, uint_fast32_t y, int_fast32_t *output) {
     //std::cout << "label component " << width << " " << height << " " << x << " " << y << std::endl;
 
     STACK[0] = x;
     STACK[1] = y;
     STACK[2] = 0;  /* return - component is labelled */
-    int SP = 3;
-    int index;
+    int_fast32_t SP = 3;
+    int_fast32_t index;
 
     START: /* Recursive routine starts here */
 

@@ -338,7 +338,7 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
 
         //for (uint_fast32_t i = 1; i < highLabel + 1; ++i) {
 
-          //  std::cout << "label " << i << " has percent " << blobsResult.blobs[i].percent << " minX " << blobsResult.blobs[i].minX << " maxX " << blobsResult.blobs[i].maxX << " minY " << blobsResult.blobs[i].minY << " maxY " << blobsResult.blobs[i].maxY << " flagged " << blobsResult.blobs[i].flagged << std::endl;
+        //  std::cout << "label " << i << " has percent " << blobsResult.blobs[i].percent << " minX " << blobsResult.blobs[i].minX << " maxX " << blobsResult.blobs[i].maxX << " minY " << blobsResult.blobs[i].minY << " maxY " << blobsResult.blobs[i].maxY << " flagged " << blobsResult.blobs[i].flagged << std::endl;
         //}
 
     }
@@ -352,7 +352,7 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, std::vector<in
 
     //std::vector<uint_fast16_t> stackVec = std::vector<uint_fast16_t>(3 * /*sizeof(uint_fast16_t) * */(width * height + 1));
 
-    std::unique_ptr<uint_fast16_t[]> stack(new uint_fast16_t[3 * /*sizeof(uint_fast16_t) * */(width * height + 1)]);
+    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * /*sizeof(uint_fast16_t) * */(width * height + 1)]);
 
     // label number
     int_fast32_t labelNumber = 0;
@@ -360,9 +360,9 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, std::vector<in
     // pixel index
     uint_fast32_t p = 0;
 
-    for (uint_fast16_t y = 0; y < height; ++y) {
+    for (uint_fast32_t y = 0; y < height; ++y) {
 
-        for (uint_fast16_t x = 0; x < width; ++x, ++p) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
 
             // ignored == -1, unlabeled == 0, labeled > 0
             if (labelsVec[p] != 0) continue;   /* This pixel has already been labelled  */
