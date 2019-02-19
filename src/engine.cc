@@ -349,7 +349,9 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, std::vector<in
 
     //unsigned short* STACK = (unsigned short*) malloc(3*sizeof(unsigned short)*(width*height + 1));
 
-    std::vector<uint_fast16_t> stackVec = std::vector<uint_fast16_t>(3 * /*sizeof(uint_fast16_t) * */(width * height + 1));
+    //std::vector<uint_fast16_t> stackVec = std::vector<uint_fast16_t>(3 * /*sizeof(uint_fast16_t) * */(width * height + 1));
+
+    std::unique_ptr<uint_fast16_t[]> stack(new uint_fast16_t[3 * /*sizeof(uint_fast16_t) * */(width * height + 1)]);
 
     // label number
     int_fast32_t labelNumber = 0;
@@ -369,7 +371,7 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, std::vector<in
 
             // send to C function for recursive labelling
             // todo may send min and max x y for bounds
-            LabelComponent(stackVec.data(), width, height, labelNumber, x, y, labelsVec.data());
+            LabelComponent(stack.get(), width, height, labelNumber, x, y, labelsVec.data());
             //LabelComponent(STACK, width, height, labelNumber, x, y, labelsVec.data());
 
         }
