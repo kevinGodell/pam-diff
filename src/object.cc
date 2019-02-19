@@ -7,6 +7,8 @@
 #include <string>
 #include <vector>
 
+#include <iostream>
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
@@ -1163,6 +1165,77 @@ Napi::Value RgbRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Function cb = info[2].As<Napi::Function>();
     auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->draw_, napiBuf0, napiBuf1, cb);
     rgbRegionsBoundsWorker->Queue();
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayAllBlobsSync::GrayAllBlobsSync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<GrayAllBlobsSync>(info) {
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
+    const Napi::Object config = info[0].As<Napi::Object>();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
+    //this->blobPerc_ = config.Get("blob").As<Napi::Number>().Uint32Value();// should use percent for blob size
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixCount_ = this->width_ * this->height_;
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
+}
+
+Napi::FunctionReference GrayAllBlobsSync::constructor;
+
+void GrayAllBlobsSync::Init(const Napi::Env &env) {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayAllBlobsSync", {
+            InstanceMethod("compare", &GrayAllBlobsSync::Compare)
+    });
+    GrayAllBlobsSync::constructor = Napi::Persistent(func);
+    GrayAllBlobsSync::constructor.SuppressDestruct();
+}
+
+Napi::Object GrayAllBlobsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+    Napi::EscapableHandleScope scope(env);
+    const Napi::Object object = GrayAllBlobsSync::constructor.New({config});
+    return scope.Escape(napi_value(object)).ToObject();
+}
+
+Napi::Value GrayAllBlobsSync::Compare(const Napi::CallbackInfo &info) {
+    const Napi::Env env = info.Env();
+    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const Napi::Function cb = info[2].As<Napi::Function>();
+
+    BlobsResult blobsResult = BlobsResult{"all", this->width_ - 1, 0, this->height_ - 1, 0, 0, false, std::vector<Blob>()};
+
+    GrayAllBlobs(this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, /*this->blobPerc_,*/ buf0, buf1, blobsResult);
+
+    Napi::Array resultsJs = Napi::Array::New(env);
+
+    if (blobsResult.flagged) {
+
+        //std::cout << "blobs result flagged for having a blob " << std::endl;
+
+        ToJs(env, blobsResult, resultsJs);
+
+        if (this->draw_) {
+
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
+
+            DrawGrayBounds(blobsResult, this->width_, pixels.Data());
+
+            cb.Call({env.Null(), resultsJs, pixels});
+
+            return env.Undefined();
+
+        }
+
+    }
+
+    cb.Call({env.Null(), resultsJs});
+
     return env.Undefined();
 }
 

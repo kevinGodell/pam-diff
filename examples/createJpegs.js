@@ -30,6 +30,7 @@ const P2P = require('pipe2pam');
 const PamDiff = require('../index');
 const {path: ffmpegPath} = require('ffmpeg-static');
 const {spawn, execFile} = require('child_process');
+const {createWriteStream} = require('fs');
 
 const params = [
     '-loglevel',
@@ -40,7 +41,7 @@ const params = [
     'auto',//vda, videotoolbox, none, auto
 
     /* use a pre-recorded mp4 video as input */
-    '-re',//comment out to have ffmpeg read video as fast as possible
+    //'-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
     `${__dirname}/in/circle_star.mp4`,
 
@@ -132,15 +133,7 @@ pamDiff.on('diff', data => {
 
     //ff.stdin.end(data.bc);
 
-    const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj420p', '-q:v', 1, '-huffman', 1, pathToJpeg]);
-
-    ff.stderr.on('data', data => {
-        //console.log('ffmpeg stderr data', data);
-    });
-
-    ff.stdin.write(data.headers);
-    ff.stdin.end(data.pixels);
-
+    /*const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj420p', '-q:v', 1, '-huffman', 1, pathToJpeg]);
 
     ff.on('exit', (data, other) => {
         if (data === 0) {
@@ -150,6 +143,18 @@ pamDiff.on('diff', data => {
             throw new Error('FFMPEG is not working with current parameters');
         }
     });
+
+    ff.stderr.on('data', data => {
+        //console.log('ffmpeg stderr data', data);
+    });
+
+    ff.stdin.write(data.headers);
+    ff.stdin.end(data.pixels);*/
+
+    const writeStream = createWriteStream(`${pathToJpeg}.pam`);
+    writeStream.write(data.headers);
+    writeStream.end(data.pixels);
+
     if (global.gc) {
         global.gc();
     }

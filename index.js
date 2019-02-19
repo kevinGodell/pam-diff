@@ -454,7 +454,7 @@ class PamDiff extends Transform {
             config.percent = this._percent;
         }
         engine += `_${this._response}`;
-        if (this._response === 'bounds' && this._draw) {
+        if ((this._response === 'bounds' || this._response === 'blobs') && this._draw) {
             config.draw = this._draw;
             engine += '_draw';
         }

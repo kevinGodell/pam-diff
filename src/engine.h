@@ -31,8 +31,9 @@ enum Engines {
     RGB_ALL_BOUNDS_ASYNC = 1101,
     RGB_MASK_BOUNDS_ASYNC = 1111,
     RGB_REGIONS_BOUNDS_ASYNC = 1121,
-    /* not yet implemented
+
     GRAY_ALL_BLOBS_SYNC = 200,
+    /* not yet implemented
     GRAY_MASK_BLOBS_SYNC = 210,
     GRAY_REGIONS_BLOBS_SYNC = 220,
     GRAY_ALL_BLOBS_ASYNC = 1200,
@@ -69,6 +70,27 @@ struct BoundsResult {
     uint_fast32_t maxY;// 4
     uint_fast32_t percent;// 4
     bool flagged;// 1
+};
+
+struct Blob {
+    std::string label;
+    uint_fast32_t minX;
+    uint_fast32_t maxX;
+    uint_fast32_t minY;
+    uint_fast32_t maxY;
+    uint_fast32_t percent;//todo convert to percent
+    bool flagged;
+};
+
+struct BlobsResult {
+    std::string name;// 24
+    uint_fast32_t minX;// 4
+    uint_fast32_t maxX;// 4
+    uint_fast32_t minY;// 4
+    uint_fast32_t maxY;// 4
+    uint_fast32_t percent;// 4
+    bool flagged;// 1
+    std::vector<Blob> blobs;
 };
 
 // absolute value
@@ -156,5 +178,12 @@ RgbMaskBounds(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height,
 // rgb regions bounds
 uint_fast32_t
 RgbRegionsBounds(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec);
+
+// gray all blobs
+void
+GrayAllBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, /*uint_fast32_t blobSize,*/ const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
+
+uint_fast32_t
+LabelImage(uint_fast32_t width, uint_fast32_t height, std::vector<int_fast32_t> &labelsVec);
 
 #endif

@@ -43,4 +43,12 @@ DrawRgbBounds(uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsR
 void
 DeleteExternalData(Napi::Env env, const uint_fast8_t *finalizeData);
 
+// all/mask bounds to js
+void
+ToJs(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJs);
+
+// draw bounding box in gray pixels for all/mask
+void
+DrawGrayBounds(const BlobsResult &blobsResult, uint_fast32_t width, uint_fast8_t *pixels);
+
 #endif
