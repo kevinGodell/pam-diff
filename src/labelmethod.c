@@ -3,6 +3,8 @@
 //<stdint.h>
 //#include <cstdint>
 
+#include <stdint.h>
+
 #define CALL_LabelComponent(x, y, returnLabel) {\
     STACK[SP] = x;\
     STACK[SP+1] = y;\
@@ -26,7 +28,7 @@
 
 #define Y (STACK[SP-2])
 
-void LabelComponent(unsigned short *STACK, unsigned int width, unsigned int height, /*const unsigned char *input, */ int labelNo, unsigned short x, unsigned short y, int *output) {
+void LabelComponent(uint_fast16_t *STACK, unsigned int width, unsigned int height, /*const unsigned char *input, */ int labelNo, unsigned short x, unsigned short y, int *output) {
     //std::cout << "label component " << width << " " << height << " " << x << " " << y << std::endl;
 
     STACK[0] = x;
