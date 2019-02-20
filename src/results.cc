@@ -165,7 +165,6 @@ ToJs(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJ
 // draw bounding box in gray pixels for all/mask
 void
 DrawGrayBounds(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
-
     for (uint_fast32_t i = 0; i < blobsResult.blobs.size(); ++i) {
         if (!blobsResult.blobs[i].flagged) continue;
         uint_fast32_t indexMinY = blobsResult.blobs[i].minY * width;

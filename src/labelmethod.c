@@ -1,66 +1,52 @@
-//#include <stdlib.h>
-//#include <iostream>
-//<stdint.h>
-//#include <cstdint>
-
 #include <stdint.h>
 
 #define CALL_LabelComponent(x, y, returnLabel) {\
-    STACK[SP] = x;\
-    STACK[SP+1] = y;\
-    STACK[SP+2] = returnLabel;\
-    SP += 3;\
-    goto START;\
-}
+            stack[stackPointer] = x;\
+            stack[stackPointer+1] = y;\
+            stack[stackPointer+2] = returnLabel;\
+            stackPointer += 3;\
+            goto START;\
+        }
 
 #define RETURN {\
-    SP -= 3;\
-    switch (STACK[SP+2]) {\
-        case 1 : goto RETURN1;\
-        case 2 : goto RETURN2;\
-        case 3 : goto RETURN3;\
-        case 4 : goto RETURN4;\
-        default: return;\
-    }\
-}
+            stackPointer -= 3;\
+            switch (stack[stackPointer+2]) {\
+                case 1 : goto RETURN1;\
+                case 2 : goto RETURN2;\
+                case 3 : goto RETURN3;\
+                case 4 : goto RETURN4;\
+                default: return;\
+            }\
+        }
 
-#define X (STACK[SP-3])
+#define X (stack[stackPointer-3])
 
-#define Y (STACK[SP-2])
+#define Y (stack[stackPointer-2])
 
-void LabelComponent(uint_fast32_t *STACK, uint_fast32_t width, uint_fast32_t height, /*const unsigned char *input, */ int_fast32_t labelNo, uint_fast32_t x, uint_fast32_t y, int_fast32_t *output) {
-    //std::cout << "label component " << width << " " << height << " " << x << " " << y << std::endl;
-
-    STACK[0] = x;
-    STACK[1] = y;
-    STACK[2] = 0;  /* return - component is labelled */
-    int_fast32_t SP = 3;
+void LabelComponent(uint_fast32_t *stack, uint_fast32_t width, /*uint_fast32_t height,*/ const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, int_fast32_t labelNumber, uint_fast32_t x, uint_fast32_t y, int_fast32_t *labels) {
+    // todo mins and maxs will eventually be set with params
+    //const uint_fast32_t minX = 0, maxX = width -1, minY = 0, maxY = height - 1;
+    stack[0] = x;
+    stack[1] = y;
+    stack[2] = 0;
+    int_fast32_t stackPointer = 3;
     int_fast32_t index;
 
-    START: /* Recursive routine starts here */
+    START:// recursive routine starts here
+    index = width * Y + X;
+    if (labels[index] != 0) RETURN;// pixel is ignored(-1) or already labelled(> 0)
+    labels[index] = labelNumber;
+    if (X > minX) CALL_LabelComponent(X - 1, Y, 1);// left  pixel
 
-    //std::cout << "START" << std::endl;
-
-    index = X + width * Y;
-
-    //if (input[index] == 0) RETURN;   /* This pixel is not part of a component */
-    //if (output[index] == -1) RETURN;//todo might not need this
-
-    if (output[index] != 0) RETURN;   /* This pixel has already been labelled  */
-
-    output[index] = labelNo;
-
-    if (X > 0) CALL_LabelComponent(X - 1, Y, 1);   /* left  pixel */
     RETURN1:
+    if (X < maxX) CALL_LabelComponent(X + 1, Y, 2);// right pixel
 
-    if (X < width - 1) CALL_LabelComponent(X + 1, Y, 2);   /* rigth pixel */
     RETURN2:
+    if (Y > minY) CALL_LabelComponent(X, Y - 1, 3);// top pixel
 
-    if (Y > 0) CALL_LabelComponent(X, Y - 1, 3);   /* upper pixel */
     RETURN3:
+    if (Y < maxY) CALL_LabelComponent(X, Y + 1, 4);// bottom pixel
 
-    if (Y < height - 1) CALL_LabelComponent(X, Y + 1, 4);   /* lower pixel */
     RETURN4:
-
     RETURN;
 }

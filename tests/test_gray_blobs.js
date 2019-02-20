@@ -32,7 +32,7 @@ const {spawn, execFile} = require('child_process');
 
 const {createWriteStream} = require('fs');
 
-const pamCount = 10;
+const pamCount = 100;
 
 let pamCounter = 0;
 
@@ -67,7 +67,7 @@ const params = [
     '-f',
     'image2pipe',
     '-vf',
-    'fps=1,scale=400:225',
+    'fps=6,scale=640:360',
     '-frames',
     pamCount,
     'pipe:1'
@@ -83,7 +83,7 @@ const pamDiff = new PamDiff({difference: 1, percent: 1, /*blobPercent: 2,*/ asyn
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);
-    //console.log(data.trigger[0].blobs);
+    console.log(data.trigger[0].blobs);
     //assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     //assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 
@@ -107,6 +107,8 @@ pamDiff.on('diff', data => {
     const jpeg = `${name}.jpeg`;
     //const pathToJpeg = `${basePathToJpeg}${jpeg}`;
     const pathToJpeg = jpeg;
+
+    console.log(pathToJpeg);
 
     //const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
