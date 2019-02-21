@@ -1,4 +1,5 @@
 #include "engine.h"
+#include "ccl.h"
 #include "napi.h"
 #include <cstdint>
 #include <string>
@@ -6,9 +7,6 @@
 #include <memory>
 
 #include <iostream>
-
-//#include "ccl.c"
-#include "labelmethod.c"
 
 // determine engine type
 uint_fast32_t
@@ -333,33 +331,3 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
     }
 }
 
-// assign label value to each pixel, return number of labels (highest label number +1)
-uint_fast32_t
-LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, std::vector<int_fast32_t> &labelsVec) {
-
-    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (width * height + 1)]);
-
-    // label number
-    int_fast32_t labelNumber = -1;
-
-    /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
-
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
-        for (uint_fast32_t x = minX; x <= maxX; ++x) {
-            uint_fast32_t p = width * y + x;
-
-            // ignored == -2, unlabeled == -1, labeled >= 0
-            if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
-
-            // increment label for next blob
-            ++labelNumber;
-
-            // send to C function for recursive labelling
-            LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
-
-        }
-    }
-
-    return static_cast<uint_fast32_t>(labelNumber + 1);
-}

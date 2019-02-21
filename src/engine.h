@@ -183,8 +183,4 @@ RgbRegionsBounds(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t heig
 void
 GrayAllBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, /*uint_fast32_t blobSize,*/ const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
 
-// assign label value to each pixel
-uint_fast32_t
-LabelImage(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minX, uint_fast32_t maxX, uint_fast32_t minY, uint_fast32_t maxY, std::vector<int_fast32_t> &labelsVec);
-
 #endif

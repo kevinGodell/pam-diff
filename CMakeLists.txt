@@ -12,7 +12,7 @@ include_directories(node_modules/node-addon-api)
 include_directories(node_modules/node-addon-api/src)
 include_directories(node_modules/node-addon-api/external-napi)
 
-file(GLOB SOURCES "src/*.cc" "src/*.c")
+file(GLOB SOURCES "src/*.cc")
 
 add_executable(addon ${SOURCES})
 
