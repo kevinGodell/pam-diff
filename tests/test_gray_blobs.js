@@ -68,6 +68,7 @@ const params = [
     'image2pipe',
     '-vf',
     'fps=6,scale=640:360',
+    //'fps=6,scale=400:225',
     '-frames',
     pamCount,
     'pipe:1'
@@ -83,7 +84,7 @@ const pamDiff = new PamDiff({difference: 1, percent: 1, /*blobPercent: 2,*/ asyn
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);
-    console.log(data.trigger[0].blobs);
+    //console.log(data.trigger[0].blobs);
     //assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     //assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 
@@ -108,7 +109,7 @@ pamDiff.on('diff', data => {
     //const pathToJpeg = `${basePathToJpeg}${jpeg}`;
     const pathToJpeg = jpeg;
 
-    console.log(pathToJpeg);
+    //console.log(pathToJpeg);
 
     //const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
