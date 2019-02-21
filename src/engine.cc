@@ -276,15 +276,15 @@ RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const 
 void
 GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, /*const uint_fast32_t blobSize,*/ const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
 
-    // fill with -1
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(pixCount, -1);
+    // fill with -2
+    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(pixCount, -2);
 
-    // all elements changed to 0 will be labelled while -1 will be ignored
+    // all elements changed to -1 will be labelled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
             if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
-            //change from -1 to 0 to mark as pixel of interest
-            labelsVec[p] = 0;
+            //change from -2 to -1 to mark as pixel of interest
+            labelsVec[p] = -1;
             SetMin(x, blobsResult.minX);
             SetMax(x, blobsResult.maxX);
             SetMin(y, blobsResult.minY);
@@ -303,20 +303,16 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
         //todo carry on to label and blob
 
         // assign label to each indexed pixel that has a 0 instead of -1, returns the highest label value
-        uint_fast32_t highLabel = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
-
-        uint_fast32_t blobCount = highLabel + 1;
-        //std::cout << "high label " << highLabel << std::endl;
-
-        //std::vector<Blob> blobVec = std::vector<Blob>(highLabel + 1, Blob{std::string(), width - 1, 0, height - 1, 0, 0, false});
+        uint_fast32_t blobCount = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
 
         blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, width - 1, 0, height - 1, 0, 0, false});
 
-        for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-            for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-        //for (uint_fast32_t y = blobsResult.minY, p = 0; y <= blobsResult.maxY; ++y) {
-            //for (uint_fast32_t x = blobsResult.minX; x <= blobsResult.maxX; ++x, p = width * y + x) {
-                if (labelsVec[p] < 1) continue;// ignored(-1) or unlabelled(0)
+        /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+            for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
+        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.minX; x <= blobsResult.maxX; ++x) {
+                uint_fast32_t p = width * y + x;
+                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
                 Blob &blob = blobsResult.blobs[labelsVec[p]];
                 SetMin(x, blob.minX);
                 SetMax(x, blob.maxX);
@@ -326,57 +322,44 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
             }
         }
 
-        for (uint_fast32_t b = 1; b < blobCount; ++b) {
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
             Blob &blob = blobsResult.blobs[b];
-            //std::cout << "count before percenting it " << blob.percent << std::endl;
             blob.percent = 100 * blob.percent / pixCount;
-            //std::cout << "count after percenting it " << blob.percent << std::endl;
             if (blob.percent >= diffsPerc) {
                 blob.label = b;
                 blobsResult.flagged = blob.flagged = true;
             }
         }
-
-        //std::cout << "total percent that triggered the blob search " << blobsResult.percent << std::endl;
-
-        //for (uint_fast32_t i = 1; i < highLabel + 1; ++i) {
-
-        //  std::cout << "label " << i << " has percent " << blobsResult.blobs[i].percent << " minX " << blobsResult.blobs[i].minX << " maxX " << blobsResult.blobs[i].maxX << " minY " << blobsResult.blobs[i].minY << " maxY " << blobsResult.blobs[i].maxY << " flagged " << blobsResult.blobs[i].flagged << std::endl;
-        //}
-
     }
-
 }
 
-// assign label value to each pixel
+// assign label value to each pixel, return number of labels (highest label number +1)
 uint_fast32_t
 LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, std::vector<int_fast32_t> &labelsVec) {
 
     std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (width * height + 1)]);
 
     // label number
-    int_fast32_t labelNumber = 0;
+    int_fast32_t labelNumber = -1;
 
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+    /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
 
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+        for (uint_fast32_t x = minX; x <= maxX; ++x) {
+            uint_fast32_t p = width * y + x;
 
-    //for (uint_fast32_t y = minY, p = 0; y <= maxY; ++y) {
+            // ignored == -2, unlabeled == -1, labeled >= 0
+            if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
 
-        //for (uint_fast32_t x = minX; x <= maxX; ++x, p = width * y + x) {
-
-            // ignored == -1, unlabeled == 0, labeled > 0
-            if (labelsVec[p] != 0) continue;   /* This pixel has already been labelled  */
-
-            /* New component found, increment label number */
+            // increment label for next blob
             ++labelNumber;
 
             // send to C function for recursive labelling
-            // todo may send min and max x y for bounds
-            LabelComponent(stack.get(), width, /*height,*/ minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
+            LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
 
         }
     }
 
-    return static_cast<uint_fast32_t>(labelNumber);
+    return static_cast<uint_fast32_t>(labelNumber + 1);
 }

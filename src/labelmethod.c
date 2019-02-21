@@ -23,9 +23,7 @@
 
 #define Y (stack[stackPointer-2])
 
-void LabelComponent(uint_fast32_t *stack, uint_fast32_t width, /*uint_fast32_t height,*/ const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, int_fast32_t labelNumber, uint_fast32_t x, uint_fast32_t y, int_fast32_t *labels) {
-    // todo mins and maxs will eventually be set with params
-    //const uint_fast32_t minX = 0, maxX = width -1, minY = 0, maxY = height - 1;
+void LabelComponent(uint_fast32_t *stack, uint_fast32_t width, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, int_fast32_t labelNumber, uint_fast32_t x, uint_fast32_t y, int_fast32_t *labels) {
     stack[0] = x;
     stack[1] = y;
     stack[2] = 0;
@@ -34,7 +32,7 @@ void LabelComponent(uint_fast32_t *stack, uint_fast32_t width, /*uint_fast32_t h
 
     START:// recursive routine starts here
     index = width * Y + X;
-    if (labels[index] != 0) RETURN;// pixel is ignored(-1) or already labelled(> 0)
+    if (labels[index] != -1) RETURN;// pixel is ignored(-1) or previously labelled(> 0)
     labels[index] = labelNumber;
     if (X > minX) CALL_LabelComponent(X - 1, Y, 1);// left  pixel
 
