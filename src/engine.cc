@@ -272,11 +272,9 @@ RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const 
 
 // gray all blobs
 void
-GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, /*const uint_fast32_t blobSize,*/ const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
-
+GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
     // fill with -2
     std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(pixCount, -2);
-
     // all elements changed to -1 will be labelled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {
@@ -290,21 +288,15 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
             ++blobsResult.percent;
         }
     }
-
+    // calculate percent size of blobbed pixels
     blobsResult.percent = 100 * blobsResult.percent / pixCount;
-
-    //todo dont flag yet until checking blobs sizes meeting threshold
-    //blobsResult.flagged = blobsResult.percent >= diffsPerc;
-
-    // percent level has been met, now check the sizes of blobs
+    // percent level has been met, check the sizes of blobs
     if (blobsResult.percent > diffsPerc) {
-        //todo carry on to label and blob
-
-        // assign label to each indexed pixel that has a 0 instead of -1, returns the highest label value
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
         uint_fast32_t blobCount = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
-
+        // create vector using blobCount size
         blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, width - 1, 0, height - 1, 0, 0, false});
-
+        // count and group labels
         /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
             for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
         for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
@@ -319,7 +311,7 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
                 ++blob.percent;
             }
         }
-
+        // convert blob size to percent and check against threshold and flag
         for (uint_fast32_t b = 0; b < blobCount; ++b) {
             Blob &blob = blobsResult.blobs[b];
             blob.percent = 100 * blob.percent / pixCount;
@@ -330,4 +322,3 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
         }
     }
 }
-

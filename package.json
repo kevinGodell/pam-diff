@@ -15,6 +15,7 @@
     "gray": "npm run gray:1 && npm run gray:2 && npm run gray:3 && npm run gray:4 && npm run gray:5 && npm run gray:6 && npm run gray:7 && npm run gray:8 && npm run gray:9 && npm run gray:10 && npm run gray:11 && npm run gray:12 && npm run gray:13 && npm run gray:14 && npm run gray:15 && npm run gray:16",
     "gray:1": "node tests/test_gray --async false --response percent",
     "gray:blobs": "node tests/test_gray_blobs --async false --response blobs",
+    "gray:blobs:async": "node tests/test_gray_blobs --async true --response blobs",
     "gray:2": "node tests/test_gray --async false --response bounds",
     "gray:3": "node tests/test_gray --async true --response percent",
     "gray:4": "node tests/test_gray --async true --response bounds",

@@ -558,7 +558,28 @@ private:
     uint_fast32_t pixCount_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
-    //uint_fast32_t blobPerc_;
+    bool draw_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class GrayAllBlobsAsync : public Napi::ObjectWrap<GrayAllBlobsAsync> {
+public:
+    explicit GrayAllBlobsAsync(const Napi::CallbackInfo &info);
+
+    static void Init(const Napi::Env &env);
+
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
+
+private:
+    Napi::Value Compare(const Napi::CallbackInfo &info);
+
+    static Napi::FunctionReference constructor;
+    uint_fast32_t width_;
+    uint_fast32_t height_;
+    uint_fast32_t pixCount_;
+    int_fast32_t pixDiff_;
+    uint_fast32_t diffsPerc_;
     bool draw_;
 };
 

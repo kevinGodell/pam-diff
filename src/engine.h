@@ -35,9 +35,9 @@ enum Engines {
     GRAY_ALL_BLOBS_SYNC = 200,
     /* not yet implemented
     GRAY_MASK_BLOBS_SYNC = 210,
-    GRAY_REGIONS_BLOBS_SYNC = 220,
+    GRAY_REGIONS_BLOBS_SYNC = 220,*/
     GRAY_ALL_BLOBS_ASYNC = 1200,
-    GRAY_MASK_BLOBS_ASYNC = 1210,
+    /*GRAY_MASK_BLOBS_ASYNC = 1210,
     GRAY_REGIONS_BLOBS_ASYNC = 1220,
     RGB_ALL_BLOBS_SYNC = 201,
     RGB_MASK_BLOBS_SYNC = 211,
@@ -181,6 +181,6 @@ RgbRegionsBounds(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t heig
 
 // gray all blobs
 void
-GrayAllBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, /*uint_fast32_t blobSize,*/ const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
+GrayAllBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
 
 #endif

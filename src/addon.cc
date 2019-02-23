@@ -102,6 +102,8 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             return RgbRegionsBoundsAsync::NewInstance(env, config);
         case GRAY_ALL_BLOBS_SYNC :
             return GrayAllBlobsSync::NewInstance(env, config);
+        case GRAY_ALL_BLOBS_ASYNC :
+            return GrayAllBlobsAsync::NewInstance(env, config);
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(engineType));
     }
@@ -146,6 +148,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     RgbRegionsBoundsAsync::Init(env);
 
     GrayAllBlobsSync::Init(env);
+    GrayAllBlobsAsync::Init(env);
 
     return exports;
 }

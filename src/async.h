@@ -344,4 +344,33 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class GrayAllBlobsWorker : public Napi::AsyncWorker {
+public:
+    GrayAllBlobsWorker(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+
+    void Execute() override;
+
+    void OnOK() override;
+
+protected:
+    // in
+    const uint_fast32_t width_;
+    const uint_fast32_t height_;
+    const uint_fast32_t pixCount_;
+    const int_fast32_t pixDiff_;
+    const uint_fast32_t diffsPerc_;
+    const bool draw_;
+    const uint_fast8_t *buf0_;
+    const uint_fast8_t *buf1_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+    const size_t buf1Size_;
+
+    // out
+    BlobsResult blobsResult_;
+    uint_fast8_t *pixels_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #endif
