@@ -322,3 +322,56 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
         }
     }
 }
+
+// gray all blobs
+void
+GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
+    // fill with -2
+    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(width * height, -2);
+    // all elements changed to -1 will be labelled while -2 will be ignored
+    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+            if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
+            //change from -2 to -1 to mark as pixel of interest
+            labelsVec[p] = -1;
+            SetMin(x, blobsResult.minX);
+            SetMax(x, blobsResult.maxX);
+            SetMin(y, blobsResult.minY);
+            SetMax(y, blobsResult.maxY);
+            ++blobsResult.percent;
+        }
+    }
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / bitsetCount;
+    // percent level has been met, check the sizes of blobs
+    if (blobsResult.percent > diffsPerc) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, width - 1, 0, height - 1, 0, 0, false});
+        // count and group labels
+        /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
+            for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
+        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.minX; x <= blobsResult.maxX; ++x) {
+                uint_fast32_t p = width * y + x;
+                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
+                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                SetMin(x, blob.minX);
+                SetMax(x, blob.maxX);
+                SetMin(y, blob.minY);
+                SetMax(y, blob.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / bitsetCount;
+            if (blob.percent >= diffsPerc) {
+                blob.label = b;
+                blobsResult.flagged = blob.flagged = true;
+            }
+        }
+    }
+}

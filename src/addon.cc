@@ -104,6 +104,10 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             return GrayAllBlobsSync::NewInstance(env, config);
         case GRAY_ALL_BLOBS_ASYNC :
             return GrayAllBlobsAsync::NewInstance(env, config);
+        case GRAY_MASK_BLOBS_SYNC :
+            return GrayMaskBlobsSync::NewInstance(env, config);
+        case GRAY_MASK_BLOBS_ASYNC :
+            return GrayMaskBlobsAsync::NewInstance(env, config);
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(engineType));
     }
@@ -149,6 +153,9 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
     GrayAllBlobsSync::Init(env);
     GrayAllBlobsAsync::Init(env);
+
+    GrayMaskBlobsSync::Init(env);
+    GrayMaskBlobsAsync::Init(env);
 
     return exports;
 }

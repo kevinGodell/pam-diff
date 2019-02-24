@@ -336,3 +336,33 @@ void GrayAllBlobsWorker::OnOK() {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayMaskBlobsWorker::GrayMaskBlobsWorker(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), width_(width), height_(height), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), blobsResult_(BlobsResult{"mask", width - 1, 0, height - 1, 0, 0, false, std::vector<Blob>()}), pixels_(nullptr) {
+}
+
+void GrayMaskBlobsWorker::Execute() {
+    GrayMaskBlobs(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->blobsResult_);
+    if (this->blobsResult_.flagged && this->draw_) {
+        this->pixels_ = new uint_fast8_t[this->buf1Size_]();
+        std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
+        DrawGrayBounds(this->blobsResult_, this->width_, this->pixels_);
+    }
+}
+
+void GrayMaskBlobsWorker::OnOK() {
+    const Napi::Env env = Env();
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->blobsResult_.flagged) {
+        ToJs(env, this->blobsResult_, resultsJs);
+        if (this->draw_) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->buf1Size_, DeleteExternalData);
+            Callback().Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    Callback().Call({env.Null(), resultsJs});
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

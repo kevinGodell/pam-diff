@@ -1270,3 +1270,108 @@ GrayAllBlobsAsync::Compare(const Napi::CallbackInfo &info) {
     grayAllBlobsWorker->Queue();
     return env.Undefined();
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayMaskBlobsSync::GrayMaskBlobsSync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<GrayMaskBlobsSync>(info) {
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
+    const Napi::Object config = info[0].As<Napi::Object>();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixCount_ = this->width_ * this->height_;
+    this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
+    const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
+    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
+}
+
+Napi::FunctionReference GrayMaskBlobsSync::constructor;
+
+void GrayMaskBlobsSync::Init(const Napi::Env &env) {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskBlobsSync", {
+            InstanceMethod("compare", &GrayMaskBlobsSync::Compare)
+    });
+    GrayMaskBlobsSync::constructor = Napi::Persistent(func);
+    GrayMaskBlobsSync::constructor.SuppressDestruct();
+}
+
+Napi::Object GrayMaskBlobsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+    Napi::EscapableHandleScope scope(env);
+    const Napi::Object object = GrayMaskBlobsSync::constructor.New({config});
+    return scope.Escape(napi_value(object)).ToObject();
+}
+
+Napi::Value GrayMaskBlobsSync::Compare(const Napi::CallbackInfo &info) {
+    const Napi::Env env = info.Env();
+    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const Napi::Function cb = info[2].As<Napi::Function>();
+    BlobsResult blobsResult = BlobsResult{"mask", this->width_ - 1, 0, this->height_ - 1, 0, 0, false, std::vector<Blob>()};
+    GrayMaskBlobs(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, blobsResult);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (blobsResult.flagged) {
+        ToJs(env, blobsResult, resultsJs);
+        if (this->draw_) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
+            DrawGrayBounds(blobsResult, this->width_, pixels.Data());
+            cb.Call({env.Null(), resultsJs, pixels});
+            return env.Undefined();
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayMaskBlobsAsync::GrayMaskBlobsAsync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<GrayMaskBlobsAsync>(info) {
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
+    const Napi::Object config = info[0].As<Napi::Object>();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixCount_ = this->width_ * this->height_;
+    this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
+    const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
+    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
+}
+
+Napi::FunctionReference GrayMaskBlobsAsync::constructor;
+
+void GrayMaskBlobsAsync::Init(const Napi::Env &env) {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayMaskBlobsAsync", {
+            InstanceMethod("compare", &GrayMaskBlobsAsync::Compare)
+    });
+    GrayMaskBlobsAsync::constructor = Napi::Persistent(func);
+    GrayMaskBlobsAsync::constructor.SuppressDestruct();
+}
+
+Napi::Object GrayMaskBlobsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+    Napi::EscapableHandleScope scope(env);
+    const Napi::Object object = GrayMaskBlobsAsync::constructor.New({config});
+    return scope.Escape(napi_value(object)).ToObject();
+}
+
+Napi::Value GrayMaskBlobsAsync::Compare(const Napi::CallbackInfo &info) {
+    const Napi::Env env = info.Env();
+    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Function cb = info[2].As<Napi::Function>();
+    auto *grayMaskBlobsWorker = new GrayMaskBlobsWorker(this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
+    grayMaskBlobsWorker->Queue();
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

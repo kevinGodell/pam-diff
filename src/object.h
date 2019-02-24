@@ -585,4 +585,54 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+class GrayMaskBlobsSync : public Napi::ObjectWrap<GrayMaskBlobsSync> {
+public:
+    explicit GrayMaskBlobsSync(const Napi::CallbackInfo &info);
+
+    static void Init(const Napi::Env &env);
+
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
+
+private:
+    Napi::Value Compare(const Napi::CallbackInfo &info);
+
+    static Napi::FunctionReference constructor;
+
+    uint_fast32_t width_;
+    uint_fast32_t height_;
+    uint_fast32_t pixCount_;
+    int_fast32_t pixDiff_;
+    uint_fast32_t diffsPerc_;
+    uint_fast32_t bitsetCount_;
+    std::vector<bool> bitsetVec_;
+    bool draw_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class GrayMaskBlobsAsync : public Napi::ObjectWrap<GrayMaskBlobsAsync> {
+public:
+    explicit GrayMaskBlobsAsync(const Napi::CallbackInfo &info);
+
+    static void Init(const Napi::Env &env);
+
+    static Napi::Object NewInstance(const Napi::Env &env, const Napi::Object &config);
+
+private:
+    Napi::Value Compare(const Napi::CallbackInfo &info);
+
+    static Napi::FunctionReference constructor;
+
+    uint_fast32_t width_;
+    uint_fast32_t height_;
+    uint_fast32_t pixCount_;
+    int_fast32_t pixDiff_;
+    uint_fast32_t diffsPerc_;
+    uint_fast32_t bitsetCount_;
+    std::vector<bool> bitsetVec_;
+    bool draw_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #endif
