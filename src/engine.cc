@@ -86,10 +86,9 @@ GrayRegionsPercent(const uint_fast32_t pixCount, const int_fast32_t minDiff, con
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         percentResultVec[r].name = regionsVec[r].name;
         percentResultVec[r].percent = percentResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (percentResultVec[r].percent >= regionsVec[r].percent) {
-            percentResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        if (regionsVec[r].percent > percentResultVec[r].percent) continue;
+        percentResultVec[r].flagged = true;
+        ++flaggedCount;
     }
     return flaggedCount;
 }
@@ -149,10 +148,9 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const i
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         boundsResultVec[r].name = regionsVec[r].name;
         boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
-            boundsResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        if (regionsVec[r].percent > boundsResultVec[r].percent) continue;
+        boundsResultVec[r].flagged = true;
+        ++flaggedCount;
     }
     return flaggedCount;
 }
@@ -199,10 +197,9 @@ RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, co
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         percentResultVec[r].name = regionsVec[r].name;
         percentResultVec[r].percent = percentResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (percentResultVec[r].percent >= regionsVec[r].percent) {
-            percentResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        if (regionsVec[r].percent > percentResultVec[r].percent) continue;
+        percentResultVec[r].flagged = true;
+        ++flaggedCount;
     }
     return flaggedCount;
 }
@@ -262,10 +259,9 @@ RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const 
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
         boundsResultVec[r].name = regionsVec[r].name;
         boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
-            boundsResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        if (regionsVec[r].percent > boundsResultVec[r].percent) continue;
+        boundsResultVec[r].flagged = true;
+        ++flaggedCount;
     }
     return flaggedCount;
 }
@@ -315,10 +311,9 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
         for (uint_fast32_t b = 0; b < blobCount; ++b) {
             Blob &blob = blobsResult.blobs[b];
             blob.percent = 100 * blob.percent / pixCount;
-            if (blob.percent >= diffsPerc) {
-                blob.label = b;
-                blobsResult.flagged = blob.flagged = true;
-            }
+            if (diffsPerc > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
         }
     }
 }
@@ -368,10 +363,9 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_f
         for (uint_fast32_t b = 0; b < blobCount; ++b) {
             Blob &blob = blobsResult.blobs[b];
             blob.percent = 100 * blob.percent / bitsetCount;
-            if (blob.percent >= diffsPerc) {
-                blob.label = b;
-                blobsResult.flagged = blob.flagged = true;
-            }
+            if (diffsPerc > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
         }
     }
 }
