@@ -60,7 +60,7 @@ void GrayRegionsPercentWorker::OnOK() {
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->flaggedCount_ > 0) {
-        ToJs(env, this->regionsLen_, this->percentResultVec_, resultsJs);
+        ToJs(env, this->percentResultVec_, resultsJs);
     }
     Callback().Call({env.Null(), resultsJs});
 }
@@ -76,7 +76,7 @@ void GrayAllBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawGrayBounds(this->boundsResult_, this->width_, this->pixels_);
+        DrawGray(this->boundsResult_, this->width_, this->pixels_);
     }
 }
 
@@ -106,7 +106,7 @@ void GrayMaskBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawGrayBounds(this->boundsResult_, this->width_, this->pixels_);
+        DrawGray(this->boundsResult_, this->width_, this->pixels_);
     }
 }
 
@@ -136,7 +136,7 @@ void GrayRegionsBoundsWorker::Execute() {
     if (this->flaggedCount_ > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawGrayBounds(this->regionsLen_, this->boundsResultVec_, this->width_, this->pixels_);
+        DrawGray(this->boundsResultVec_, this->width_, this->pixels_);
     }
 }
 
@@ -145,7 +145,7 @@ void GrayRegionsBoundsWorker::OnOK() {
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->flaggedCount_ > 0) {
-        ToJs(env, this->regionsLen_, this->boundsResultVec_, resultsJs);
+        ToJs(env, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->buf1Size_, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
@@ -210,7 +210,7 @@ void RgbRegionsPercentWorker::OnOK() {
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->flaggedCount_ > 0) {
-        ToJs(env, this->regionsLen_, this->percentResultVec_, resultsJs);
+        ToJs(env, this->percentResultVec_, resultsJs);
     }
     Callback().Call({env.Null(), resultsJs});
 }
@@ -226,7 +226,7 @@ void RgbAllBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawRgbBounds(this->boundsResult_, this->width_, this->pixDepth_, this->pixels_);
+        DrawRgb(this->boundsResult_, this->width_, this->pixDepth_, this->pixels_);
     }
 }
 
@@ -256,7 +256,7 @@ void RgbMaskBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawRgbBounds(this->boundsResult_, this->width_, this->pixDepth_, this->pixels_);
+        DrawRgb(this->boundsResult_, this->width_, this->pixDepth_, this->pixels_);
     }
 }
 
@@ -286,7 +286,7 @@ void RgbRegionsBoundsWorker::Execute() {
     if (this->flaggedCount_ > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawRgbBounds(this->regionsLen_, this->boundsResultVec_, this->width_, this->pixDepth_, this->pixels_);
+        DrawRgb(this->boundsResultVec_, this->width_, this->pixDepth_, this->pixels_);
     }
 }
 
@@ -295,7 +295,7 @@ void RgbRegionsBoundsWorker::OnOK() {
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->flaggedCount_ > 0) {
-        ToJs(env, this->regionsLen_, this->boundsResultVec_, resultsJs);
+        ToJs(env, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->buf1Size_, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
@@ -316,7 +316,7 @@ void GrayAllBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawGrayBounds(this->blobsResult_, this->width_, this->pixels_);
+        DrawGray(this->blobsResult_, this->width_, this->pixels_);
     }
 }
 
@@ -346,7 +346,7 @@ void GrayMaskBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
-        DrawGrayBounds(this->blobsResult_, this->width_, this->pixels_);
+        DrawGray(this->blobsResult_, this->width_, this->pixels_);
     }
 }
 

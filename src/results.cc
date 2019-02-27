@@ -16,12 +16,13 @@ ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resu
 
 // regions percent to js
 void
-ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<PercentResult> &percentResultVec, Napi::Array &resultsJs) {
-    for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
-        if (!percentResultVec[r].flagged) continue;
+ToJs(const Napi::Env &env, const std::vector<PercentResult> &percentResultVec, Napi::Array &resultsJs) {
+    uint_fast32_t j = 0;
+    for (const auto &percentResult : percentResultVec) {
+        if (!percentResult.flagged) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", percentResultVec[r].name);
-        obj.Set("percent", percentResultVec[r].percent);
+        obj.Set("name", percentResult.name);
+        obj.Set("percent", percentResult.percent);
         resultsJs.Set(j++, obj);
     }
 }
@@ -41,23 +42,24 @@ ToJs(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &result
 
 // regions bounds to js
 void
-ToJs(const Napi::Env &env, const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs) {
-    for (uint_fast32_t r = 0, j = 0; r < regionsLen; ++r) {
-        if (!boundsResultVec[r].flagged) continue;
+ToJs(const Napi::Env &env, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs) {
+    uint_fast32_t j = 0;
+    for (const auto &percentResult : boundsResultVec) {
+        if (!percentResult.flagged) continue;
         Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", boundsResultVec[r].name);
-        obj.Set("percent", boundsResultVec[r].percent);
-        obj.Set("minX", boundsResultVec[r].minX);
-        obj.Set("maxX", boundsResultVec[r].maxX);
-        obj.Set("minY", boundsResultVec[r].minY);
-        obj.Set("maxY", boundsResultVec[r].maxY);
+        obj.Set("name", percentResult.name);
+        obj.Set("percent", percentResult.percent);
+        obj.Set("minX", percentResult.minX);
+        obj.Set("maxX", percentResult.maxX);
+        obj.Set("minY", percentResult.minY);
+        obj.Set("maxY", percentResult.maxY);
         resultsJs.Set(j++, obj);
     }
 }
 
 // draw bounding box in gray pixels for all/mask
 void
-DrawGrayBounds(const BoundsResult &boundsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
+DrawGray(const BoundsResult &boundsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
     uint_fast32_t indexMinY = boundsResult.minY * width;
     uint_fast32_t indexMaxY = boundsResult.maxY * width;
     for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
@@ -73,26 +75,26 @@ DrawGrayBounds(const BoundsResult &boundsResult, const uint_fast32_t width, uint
 
 // draw bounding box in gray pixels for regions
 void
-DrawGrayBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
-    for (uint_fast32_t i = 0; i < regionsLen; ++i) {
-        if (!boundsResultVec[i].flagged) continue;
-        uint_fast32_t indexMinY = boundsResultVec[i].minY * width;
-        uint_fast32_t indexMaxY = boundsResultVec[i].maxY * width;
-        for (uint_fast32_t x = boundsResultVec[i].minX; x < boundsResultVec[i].maxX; ++x) {
+DrawGray(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
+    for (const auto &boundsResult : boundsResultVec) {
+        if (!boundsResult.flagged) continue;
+        uint_fast32_t indexMinY = boundsResult.minY * width;
+        uint_fast32_t indexMaxY = boundsResult.maxY * width;
+        for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
             pixels[indexMinY + x] = 0x00;
             pixels[indexMaxY + x] = 0x00;
         }
-        for (uint_fast32_t y = boundsResultVec[i].minY; y < boundsResultVec[i].maxY; ++y) {
+        for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
             uint_fast32_t indexY = y * width;
-            pixels[indexY + boundsResultVec[i].minX] = 0x00;
-            pixels[indexY + boundsResultVec[i].maxX] = 0x00;
+            pixels[indexY + boundsResult.minX] = 0x00;
+            pixels[indexY + boundsResult.maxX] = 0x00;
         }
     }
 }
 
 // draw bounding box in rgb pixels for all/mask
 void
-DrawRgbBounds(const BoundsResult &boundsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+DrawRgb(const BoundsResult &boundsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
     uint_fast32_t indexMinY = boundsResult.minY * width;
     uint_fast32_t indexMaxY = boundsResult.maxY * width;
     for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
@@ -108,19 +110,19 @@ DrawRgbBounds(const BoundsResult &boundsResult, const uint_fast32_t width, const
 
 // draw bounding box in rgb pixels for regions
 void
-DrawRgbBounds(const uint_fast32_t regionsLen, const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
-    for (uint_fast32_t i = 0; i < regionsLen; ++i) {
-        if (!boundsResultVec[i].flagged) continue;
-        uint_fast32_t indexMinY = boundsResultVec[i].minY * width;
-        uint_fast32_t indexMaxY = boundsResultVec[i].maxY * width;
-        for (uint_fast32_t x = boundsResultVec[i].minX; x < boundsResultVec[i].maxX; ++x) {
+DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+    for (const auto &boundsResult : boundsResultVec) {
+        if (!boundsResult.flagged) continue;
+        uint_fast32_t indexMinY = boundsResult.minY * width;
+        uint_fast32_t indexMaxY = boundsResult.maxY * width;
+        for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
             pixels[(indexMinY + x) * pixDepth] = 0x00;
             pixels[(indexMaxY + x) * pixDepth] = 0x00;
         }
-        for (uint_fast32_t y = boundsResultVec[i].minY; y < boundsResultVec[i].maxY; ++y) {
+        for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
             uint_fast32_t indexY = y * width;
-            pixels[(indexY + boundsResultVec[i].minX) * pixDepth] = 0x00;
-            pixels[(indexY + boundsResultVec[i].maxX) * pixDepth] = 0x00;
+            pixels[(indexY + boundsResult.minX) * pixDepth] = 0x00;
+            pixels[(indexY + boundsResult.maxX) * pixDepth] = 0x00;
         }
     }
 }
@@ -134,49 +136,45 @@ DeleteExternalData(Napi::Env /*&env*/, const uint_fast8_t *finalizeData) {
 // all/mask bounds to js
 void
 ToJs(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJs) {
-
     Napi::Object obj = Napi::Object::New(env);
-
     obj.Set("name", blobsResult.name);
     obj.Set("percent", blobsResult.percent);
     obj.Set("minX", blobsResult.minX);
     obj.Set("maxX", blobsResult.maxX);
     obj.Set("minY", blobsResult.minY);
     obj.Set("maxY", blobsResult.maxY);
-
-    Napi::Array blobs = Napi::Array::New(env);
-
-    for (uint_fast32_t b = 0, j = 0; b < blobsResult.blobs.size(); ++b) {
-        if (!blobsResult.blobs[b].flagged) continue;
-        Napi::Object blob = Napi::Object::New(env);
-        blob.Set("label", blobsResult.blobs[b].label);
-        blob.Set("percent", blobsResult.blobs[b].percent);
-        blob.Set("minX", blobsResult.blobs[b].minX);
-        blob.Set("maxX", blobsResult.blobs[b].maxX);
-        blob.Set("minY", blobsResult.blobs[b].minY);
-        blob.Set("maxY", blobsResult.blobs[b].maxY);
-        blobs.Set(j++, blob);
+    Napi::Array blobsJs = Napi::Array::New(env);
+    uint_fast32_t j = 0;
+    for (const auto &blob : blobsResult.blobs) {
+        if (!blob.flagged) continue;
+        Napi::Object blobJs = Napi::Object::New(env);
+        blobJs.Set("label", blob.label);
+        blobJs.Set("percent", blob.percent);
+        blobJs.Set("minX", blob.minX);
+        blobJs.Set("maxX", blob.maxX);
+        blobJs.Set("minY", blob.minY);
+        blobJs.Set("maxY", blob.maxY);
+        blobsJs.Set(j++, blobJs);
     }
-
-    obj.Set("blobs", blobs);
+    obj.Set("blobs", blobsJs);
     resultsJs.Set(0u, obj);
 }
 
-// draw bounding box in gray pixels for all/mask
+// draw blobs bounding box in gray pixels for all/mask
 void
-DrawGrayBounds(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
-    for (uint_fast32_t i = 0; i < blobsResult.blobs.size(); ++i) {
-        if (!blobsResult.blobs[i].flagged) continue;
-        uint_fast32_t indexMinY = blobsResult.blobs[i].minY * width;
-        uint_fast32_t indexMaxY = blobsResult.blobs[i].maxY * width;
-        for (uint_fast32_t x = blobsResult.blobs[i].minX; x < blobsResult.blobs[i].maxX; ++x) {
+DrawGray(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
+    for (const auto &blob : blobsResult.blobs) {
+        if (!blob.flagged) continue;
+        uint_fast32_t indexMinY = blob.minY * width;
+        uint_fast32_t indexMaxY = blob.maxY * width;
+        for (uint_fast32_t x = blob.minX; x < blob.maxX; ++x) {
             pixels[indexMinY + x] = 0x00;
             pixels[indexMaxY + x] = 0x00;
         }
-        for (uint_fast32_t y = blobsResult.blobs[i].minY; y < blobsResult.blobs[i].maxY; ++y) {
+        for (uint_fast32_t y = blob.minY; y < blob.maxY; ++y) {
             uint_fast32_t indexY = y * width;
-            pixels[indexY + blobsResult.blobs[i].minX] = 0x00;
-            pixels[indexY + blobsResult.blobs[i].maxX] = 0x00;
+            pixels[indexY + blob.minX] = 0x00;
+            pixels[indexY + blob.maxX] = 0x00;
         }
     }
 }
