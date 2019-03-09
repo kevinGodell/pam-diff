@@ -60,7 +60,7 @@ private:
 
 class GrayRegionsPercentWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsPercentWorker(uint_fast32_t pixCount, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionsPercentWorker(uint_fast32_t pixCount, int_fast32_t minDiff, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -70,7 +70,6 @@ private:
     // in
     const uint_fast32_t pixCount_;
     const int_fast32_t minDiff_;
-    const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
@@ -145,7 +144,7 @@ private:
 
 class GrayRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionsBoundsWorker(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -156,7 +155,6 @@ private:
     const uint_fast32_t width_;
     const uint_fast32_t height_;
     const int_fast32_t minDiff_;
-    const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -227,7 +225,7 @@ private:
 
 class RgbRegionsPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsPercentWorker(uint_fast32_t pixDepth, uint_fast32_t pixCount, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsPercentWorker(uint_fast32_t pixDepth, uint_fast32_t pixCount, int_fast32_t minDiff, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -238,7 +236,6 @@ private:
     const uint_fast32_t pixDepth_;
     const uint_fast32_t pixCount_;
     const int_fast32_t minDiff_;
-    const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
@@ -315,7 +312,7 @@ private:
 
 class RgbRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t regionsLen, const std::vector<Region> &regionVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsBoundsWorker(uint_fast32_t pixDepth, uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, const std::vector<Region> &regionVec, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -327,7 +324,6 @@ private:
     const uint_fast32_t width_;
     const uint_fast32_t height_;
     const int_fast32_t minDiff_;
-    const uint_fast32_t regionsLen_;
     const std::vector<Region> &regionVec_;
     const bool draw_;
     const uint_fast8_t *buf0_;

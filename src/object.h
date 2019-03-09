@@ -103,7 +103,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
 };
 
@@ -123,7 +122,6 @@ private:
     static Napi::FunctionReference constructor;
     uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
 };
 
@@ -238,7 +236,6 @@ private:
     uint_fast32_t height_;
     uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
     bool draw_;
 };
@@ -261,7 +258,6 @@ private:
     uint_fast32_t height_;
     uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
     bool draw_;
 };
@@ -367,7 +363,6 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
 };
 
@@ -388,7 +383,6 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
 };
 
@@ -509,7 +503,6 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
     uint_fast32_t buf1Size_;
     bool draw_;
@@ -534,7 +527,6 @@ private:
     uint_fast32_t pixCount_;
     uint_fast32_t pixDepth_;
     int_fast32_t minDiff_;
-    uint_fast32_t regionsLen_;
     std::vector<Region> regionVec_;
     bool draw_;
 };

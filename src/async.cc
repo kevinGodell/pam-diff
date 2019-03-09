@@ -47,12 +47,12 @@ void GrayMaskPercentWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GrayRegionsPercentWorker::GrayRegionsPercentWorker(const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), percentResultVec_(std::vector<PercentResult>(regionsLen)) {
+GrayRegionsPercentWorker::GrayRegionsPercentWorker(const uint_fast32_t pixCount, const int_fast32_t minDiff, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), pixCount_(pixCount), minDiff_(minDiff), regionVec_(regionVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), percentResultVec_(std::vector<PercentResult>(regionVec.size())) {
 }
 
 void GrayRegionsPercentWorker::Execute() {
-    this->flaggedCount_ = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
+    this->flaggedCount_ = GrayRegionsPercent(this->pixCount_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
 }
 
 void GrayRegionsPercentWorker::OnOK() {
@@ -127,12 +127,12 @@ void GrayMaskBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-GrayRegionsBoundsWorker::GrayRegionsBoundsWorker(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionsLen, BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})), pixels_(nullptr) {
+GrayRegionsBoundsWorker::GrayRegionsBoundsWorker(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), width_(width), height_(height), minDiff_(minDiff), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionVec.size(), BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})), pixels_(nullptr) {
 }
 
 void GrayRegionsBoundsWorker::Execute() {
-    this->flaggedCount_ = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
+    this->flaggedCount_ = GrayRegionsBounds(this->width_, this->height_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
     if (this->flaggedCount_ > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
@@ -197,12 +197,12 @@ void RgbMaskPercentWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsPercentWorker::RgbRegionsPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), pixCount_(pixCount), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), percentResultVec_(std::vector<PercentResult>(regionsLen)) {
+RgbRegionsPercentWorker::RgbRegionsPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t minDiff, const std::vector<Region> &regionVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), pixCount_(pixCount), minDiff_(minDiff), regionVec_(regionVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), percentResultVec_(std::vector<PercentResult>(regionVec.size())) {
 }
 
 void RgbRegionsPercentWorker::Execute() {
-    this->flaggedCount_ = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
+    this->flaggedCount_ = RgbRegionsPercent(this->pixDepth_, this->pixCount_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->percentResultVec_);
 }
 
 void RgbRegionsPercentWorker::OnOK() {
@@ -277,12 +277,12 @@ void RgbMaskBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
-        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), width_(width), height_(height), minDiff_(minDiff), regionsLen_(regionsLen), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionsLen, BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})), pixels_(nullptr) {
+RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const std::vector<Region> &regionVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb), pixDepth_(pixDepth), width_(width), height_(height), minDiff_(minDiff), regionVec_(regionVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResultVec_(std::vector<BoundsResult>(regionVec.size(), BoundsResult{std::string(), width - 1, 0, height - 1, 0, 0, false})), pixels_(nullptr) {
 }
 
 void RgbRegionsBoundsWorker::Execute() {
-    this->flaggedCount_ = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionsLen_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
+    this->flaggedCount_ = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
     if (this->flaggedCount_ > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
