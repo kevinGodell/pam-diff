@@ -8,10 +8,7 @@
 // all/mask percent to js
 void
 ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs) {
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set("name", percentResult.name);
-    obj.Set("percent", percentResult.percent);
-    resultsJs.Set(0u, obj);
+    SetPercentResult(env, percentResult, resultsJs);
 }
 
 // regions percent to js
@@ -20,40 +17,23 @@ ToJs(const Napi::Env &env, const std::vector<PercentResult> &percentResultVec, N
     uint_fast32_t j = 0;
     for (const auto &percentResult : percentResultVec) {
         if (!percentResult.flagged) continue;
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", percentResult.name);
-        obj.Set("percent", percentResult.percent);
-        resultsJs.Set(j++, obj);
+        SetPercentResult(env, percentResult, resultsJs, j++);
     }
 }
 
 // all/mask bounds to js
 void
 ToJs(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs) {
-    Napi::Object obj = Napi::Object::New(env);
-    obj.Set("name", boundsResult.name);
-    obj.Set("percent", boundsResult.percent);
-    obj.Set("minX", boundsResult.minX);
-    obj.Set("maxX", boundsResult.maxX);
-    obj.Set("minY", boundsResult.minY);
-    obj.Set("maxY", boundsResult.maxY);
-    resultsJs.Set(0u, obj);
+    SetBoundsResult(env, boundsResult, resultsJs);
 }
 
 // regions bounds to js
 void
 ToJs(const Napi::Env &env, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs) {
     uint_fast32_t j = 0;
-    for (const auto &percentResult : boundsResultVec) {
-        if (!percentResult.flagged) continue;
-        Napi::Object obj = Napi::Object::New(env);
-        obj.Set("name", percentResult.name);
-        obj.Set("percent", percentResult.percent);
-        obj.Set("minX", percentResult.minX);
-        obj.Set("maxX", percentResult.maxX);
-        obj.Set("minY", percentResult.minY);
-        obj.Set("maxY", percentResult.maxY);
-        resultsJs.Set(j++, obj);
+    for (const auto &boundsResult : boundsResultVec) {
+        if (!boundsResult.flagged) continue;
+        SetBoundsResult(env, boundsResult, resultsJs, j++);
     }
 }
 
@@ -80,14 +60,22 @@ DrawGray(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t w
         if (!boundsResult.flagged) continue;
         uint_fast32_t indexMinY = boundsResult.minY * width;
         uint_fast32_t indexMaxY = boundsResult.maxY * width;
-        for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
-            pixels[indexMinY + x] = 0x00;
-            pixels[indexMaxY + x] = 0x00;
+        uint_fast8_t *topPtr = &pixels[indexMinY + boundsResult.minX];
+        uint_fast8_t *bottomPtr = &pixels[indexMaxY + boundsResult.minX];
+        uint_fast8_t *leftPtr = &pixels[indexMinY + boundsResult.minX + width];
+        uint_fast8_t *rightPtr = &pixels[indexMinY + boundsResult.maxX + width];
+        for (uint_fast32_t x = boundsResult.minX; x <= boundsResult.maxX; ++x, ++topPtr, ++bottomPtr) {
+            //pixels[indexMinY + x] = 0x00;
+            //pixels[indexMaxY + x] = 0x00;
+            *topPtr = 0x80;
+            *bottomPtr = 0x80;
         }
-        for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
-            uint_fast32_t indexY = y * width;
-            pixels[indexY + boundsResult.minX] = 0x00;
-            pixels[indexY + boundsResult.maxX] = 0x00;
+        for (uint_fast32_t y = boundsResult.minY, yLimit = boundsResult.maxY - 1; y < yLimit; ++y, leftPtr += width, rightPtr += width) {
+            //uint_fast32_t indexY = y * width;
+            //pixels[indexY + boundsResult.minX] = 0x00;
+            //pixels[indexY + boundsResult.maxX] = 0x00;
+            *leftPtr = 0x80;
+            *rightPtr = 0x80;
         }
     }
 }
@@ -116,11 +104,34 @@ DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t wi
         uint_fast32_t indexMinY = boundsResult.minY * width;
         uint_fast32_t indexMaxY = boundsResult.maxY * width;
         for (uint_fast32_t x = boundsResult.minX; x < boundsResult.maxX; ++x) {
+
+            /*uint_fast8_t *ptr = &pixels[(indexMinY + x) * pixDepth];
+            *ptr = 0xFF;
+            *(++ptr) = 0x00;
+            *(++ptr) = 0x00;
+
+            ptr = &pixels[(indexMaxY + x) * pixDepth];
+            *ptr = 0xFF;
+            *(++ptr) = 0x00;
+            *(++ptr) = 0x00;*/
+
             pixels[(indexMinY + x) * pixDepth] = 0x00;
             pixels[(indexMaxY + x) * pixDepth] = 0x00;
         }
         for (uint_fast32_t y = boundsResult.minY; y < boundsResult.maxY; ++y) {
             uint_fast32_t indexY = y * width;
+
+            /*uint_fast8_t *ptr = &pixels[(indexY + boundsResult.minX) * pixDepth];
+            *ptr = 0xFF;
+            *(++ptr) = 0x00;
+            *(++ptr) = 0x00;
+
+            ptr = &pixels[(indexY + boundsResult.maxX) * pixDepth];
+            *ptr = 0xFF;
+            *(++ptr) = 0x00;
+            *(++ptr) = 0x00;*/
+
+
             pixels[(indexY + boundsResult.minX) * pixDepth] = 0x00;
             pixels[(indexY + boundsResult.maxX) * pixDepth] = 0x00;
         }

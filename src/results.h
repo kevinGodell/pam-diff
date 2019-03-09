@@ -7,6 +7,28 @@
 #include <string>
 #include <vector>
 
+// create js object and push to js array
+inline void
+SetPercentResult(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs, const uint_fast32_t index = 0) {
+    Napi::Object obj = Napi::Object::New(env);
+    obj.Set("name", percentResult.name);
+    obj.Set("percent", percentResult.percent);
+    resultsJs.Set(index, obj);
+}
+
+// create js object and push to js array
+inline void
+SetBoundsResult(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs, const uint_fast32_t index = 0) {
+    Napi::Object obj = Napi::Object::New(env);
+    obj.Set("name", boundsResult.name);
+    obj.Set("percent", boundsResult.percent);
+    obj.Set("minX", boundsResult.minX);
+    obj.Set("maxX", boundsResult.maxX);
+    obj.Set("minY", boundsResult.minY);
+    obj.Set("maxY", boundsResult.maxY);
+    resultsJs.Set(index, obj);
+}
+
 // all/mask percent to js
 void
 ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs);
