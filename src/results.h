@@ -136,6 +136,10 @@ DrawGray(const std::vector<BoundsResult> &boundsResultVec, uint_fast32_t width, 
 void
 DrawGray(const BlobsResult &blobsResult, uint_fast32_t width, uint_fast8_t *pixels);
 
+// draw blobs bounding box in gray pixels for regions
+void
+DrawGray(const std::vector<BlobsResult> &blobsResultVec, uint_fast32_t width, uint_fast8_t *pixels);
+
 // draw bounding box in rgb pixels for all/mask
 void
 DrawRgb(const BoundsResult &boundsResult, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);

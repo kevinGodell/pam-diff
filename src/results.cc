@@ -68,6 +68,27 @@ DrawGray(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t w
     }
 }
 
+// draw blobs bounding box in gray pixels for all/mask
+void
+DrawGray(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
+    for (const auto &blob : blobsResult.blobs) {
+        if (!blob.flagged) continue;
+        SetGrayPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixels);
+    }
+}
+
+// draw blobs bounding box in gray pixels for regions
+void
+DrawGray(const std::vector<BlobsResult> &blobsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
+    for (const auto &blobsResult : blobsResultVec) {
+        if (!blobsResult.flagged) continue;
+        for (const auto &blob : blobsResult.blobs) {
+            if (!blob.flagged) continue;
+            SetGrayPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixels);
+        }
+    }
+}
+
 // draw bounding box in rgb pixels for all/mask
 void
 DrawRgb(const BoundsResult &boundsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
@@ -80,15 +101,6 @@ DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t wi
     for (const auto &boundsResult : boundsResultVec) {
         if (!boundsResult.flagged) continue;
         SetRgbPixels(boundsResult.minX, boundsResult.maxX, boundsResult.minY, boundsResult.maxY, width, pixDepth, pixels);
-    }
-}
-
-// draw blobs bounding box in gray pixels for all/mask
-void
-DrawGray(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
-    for (const auto &blob : blobsResult.blobs) {
-        if (!blob.flagged) continue;
-        SetGrayPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixels);
     }
 }
 
