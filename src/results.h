@@ -60,14 +60,14 @@ SetGrayPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fas
     uint_fast8_t *firstPtr = &pixels[minY * width + minX];
     uint_fast8_t *secondPtr = &pixels[maxY * width + minX];
     for (uint_fast32_t x = minX; x <= maxX; ++x, ++firstPtr, ++secondPtr) {
-        *firstPtr = 0x80;
-        *secondPtr = 0x80;
+        *firstPtr = 0x80;// top
+        *secondPtr = 0x80;// bottom
     }
-    firstPtr = &pixels[minY * width + minX + width];
-    secondPtr = &pixels[minY * width + maxX + width];
+    firstPtr = &pixels[(minY + 1) * width + minX];
+    secondPtr = &pixels[(minY + 1) * width + maxX];
     for (uint_fast32_t y = minY, yLimit = maxY - 1; y < yLimit; ++y, firstPtr += width, secondPtr += width) {
-        *firstPtr = 0x80;
-        *secondPtr = 0x80;
+        *firstPtr = 0x80;// left
+        *secondPtr = 0x80;// right
     }
 }
 
@@ -80,21 +80,21 @@ SetRgbPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast
     uint_fast8_t *firstPtr = &pixels[minY * width * pixDepth + minX * pixDepth];
     uint_fast8_t *secondPtr = &pixels[maxY * width * pixDepth + minX * pixDepth];
     for (uint_fast32_t x = minX; x <= maxX; ++x, firstPtr += inc, secondPtr += inc) {
-        *firstPtr = 0xAF;
+        *firstPtr = 0xAF;// top
         *(++firstPtr) = 0x33;
         *(++firstPtr) = 0xFF;
-        *secondPtr = 0xAF;
+        *secondPtr = 0xAF;// bottom
         *(++secondPtr) = 0x33;
         *(++secondPtr) = 0xFF;
     }
     inc = width * pixDepth;
-    firstPtr = &pixels[minY * width * pixDepth + minX * pixDepth + width * pixDepth];
-    secondPtr = &pixels[minY * width * pixDepth + maxX * pixDepth + width * pixDepth];
+    firstPtr = &pixels[(minY + 1) * width * pixDepth + minX * pixDepth];
+    secondPtr = &pixels[(minY + 1) * width * pixDepth + maxX * pixDepth];
     for (uint_fast32_t y = minY, yLimit = maxY - 1; y < yLimit; ++y, firstPtr += inc, secondPtr += inc) {
-        *firstPtr = 0xAF;
+        *firstPtr = 0xAF;// left
         *(firstPtr + 1) = 0x33;
         *(firstPtr + 2) = 0xFF;
-        *secondPtr = 0xAF;
+        *secondPtr = 0xAF;// right
         *(secondPtr + 1) = 0x33;
         *(secondPtr + 2) = 0xFF;
     }
