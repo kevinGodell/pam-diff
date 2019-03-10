@@ -1367,3 +1367,61 @@ Napi::Value GrayMaskBlobsAsync::Compare(const Napi::CallbackInfo &info) {
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayRegionsBlobsSync::GrayRegionsBlobsSync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<GrayRegionsBlobsSync>(info) {
+    const Napi::Env env = info.Env();
+    const Napi::HandleScope scope(env);
+    const Napi::Object config = info[0].As<Napi::Object>();
+    this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixCount_ = this->width_ * this->height_;
+    const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
+    this->regionVec_ = RegionsJsToCpp(this->pixCount_, regionsJs);
+    if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
+    else this->draw_ = false;
+}
+
+Napi::FunctionReference GrayRegionsBlobsSync::constructor;
+
+void GrayRegionsBlobsSync::Init(const Napi::Env &env) {
+    const Napi::HandleScope scope(env);
+    const Napi::Function func = DefineClass(env, "GrayRegionsBlobsSync", {
+            InstanceMethod("compare", &GrayRegionsBlobsSync::Compare)
+    });
+    GrayRegionsBlobsSync::constructor = Napi::Persistent(func);
+    GrayRegionsBlobsSync::constructor.SuppressDestruct();
+}
+
+Napi::Object GrayRegionsBlobsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+    Napi::EscapableHandleScope scope(env);
+    const Napi::Object object = GrayRegionsBlobsSync::constructor.New({config});
+    return scope.Escape(napi_value(object)).ToObject();
+}
+
+Napi::Value GrayRegionsBlobsSync::Compare(const Napi::CallbackInfo &info) {
+    const Napi::Env env = info.Env();
+    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const Napi::Function cb = info[2].As<Napi::Function>();
+
+    std::vector<BlobsResult> blobsResultVec = std::vector<BlobsResult>(this->regionVec_.size(), BlobsResult{std::string(), this->width_ - 1, 0, this->height_ - 1, 0, 0, false, std::vector<Blob>()});
+
+    uint_fast32_t flaggedCount = GrayRegionsBlobs(this->width_, this->height_, this->minDiff_, this->regionVec_, buf0, buf1, blobsResultVec);
+
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (flaggedCount > 0) {
+        ToJs(env, blobsResultVec, resultsJs);
+        if (this->draw_) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->pixCount_);
+            DrawGray(blobsResultVec, this->width_, pixels.Data());
+            cb.Call({env.Null(), resultsJs, pixels});
+            return env.Undefined();
+        }
+    }
+    cb.Call({env.Null(), resultsJs, env.Null()});
+    return env.Undefined();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

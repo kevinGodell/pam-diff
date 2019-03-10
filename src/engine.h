@@ -34,7 +34,7 @@ enum Engines {
 
     GRAY_ALL_BLOBS_SYNC = 200,
     GRAY_MASK_BLOBS_SYNC = 210,
-    //GRAY_REGIONS_BLOBS_SYNC = 220,
+    GRAY_REGIONS_BLOBS_SYNC = 220,
     GRAY_ALL_BLOBS_ASYNC = 1200,
     GRAY_MASK_BLOBS_ASYNC = 1210,
     //GRAY_REGIONS_BLOBS_ASYNC = 1220,
@@ -160,6 +160,10 @@ GrayAllBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount, 
 // gray mask blobs
 void
 GrayMaskBlobs(uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
+
+// gray regions blobs
+uint_fast32_t
+GrayRegionsBlobs(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
 
 // rgb all percent
 void

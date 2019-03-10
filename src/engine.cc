@@ -372,3 +372,32 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_f
         }
     }
 }
+
+// gray regions blobs
+uint_fast32_t
+GrayRegionsBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
+    uint_fast32_t flaggedCount = 0;
+    auto regionsLen = regionsVec.size();
+    for (uint_fast32_t y = 0, p = 0, r = 0; y < height; ++y) {
+        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+            const int_fast32_t diff = GrayDiff(buf0, buf1, p);
+            if (minDiff > diff) continue;
+            for (r = 0; r < regionsLen; ++r) {
+                if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
+                SetMin(x, blobsResultVec[r].minX);
+                SetMax(x, blobsResultVec[r].maxX);
+                SetMin(y, blobsResultVec[r].minY);
+                SetMax(y, blobsResultVec[r].maxY);
+                ++blobsResultVec[r].percent;
+            }
+        }
+    }
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        blobsResultVec[r].name = regionsVec[r].name;
+        blobsResultVec[r].percent = blobsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
+        if (regionsVec[r].percent > blobsResultVec[r].percent) continue;
+        blobsResultVec[r].flagged = true;
+        ++flaggedCount;
+    }
+    return flaggedCount;
+}
