@@ -401,26 +401,45 @@ class PamDiff extends Transform {
         } else {
             const regions = [];
             let minDiff = 255;
+            let minX = this._width;
+            let maxX = 0;
+            let minY = this._height;
+            let maxY = 0;
+            const wxh = this._width * this._height;
+            const mask = Buffer.alloc(wxh, 0);
             for (const region of this._regions) {
                 if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
                     throw new Error('Region must include a name and a polygon property');
                 }
                 const pp = new PP(region.polygon);
                 const bitset = pp.getBitset(this._width, this._height);
+                for(let i = 0; i < wxh; ++i) {
+                    if (bitset[i]) {
+                        mask[i] = 1;
+                    }
+                }
                 const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
                 const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
                 minDiff = Math.min(minDiff, difference);
+                minX = Math.min(minX, pp.minX);
+                maxX = Math.max(maxX, pp.maxX);
+                minY = Math.min(minY, pp.minY);
+                maxY = Math.max(maxY, pp.maxY);
                 regions.push(
                     {
                         name: region.name,
                         diff: difference,
                         percent: percent,
                         count: bitset.count,
-                        bitset: bitset.buffer
+                        bitset: bitset.buffer,
+                        minX: pp.minX,
+                        maxX: pp.maxX,
+                        minY: pp.minY,
+                        maxY: pp.maxY
                     }
                 );
             }
-            this._regionObj = {minDiff: minDiff, length: regions.length, regions: regions};
+            this._regionObj = {mask: mask, minDiff: minDiff, minX: minX, maxX: maxX, minY: minY, maxY: maxY, length: regions.length, regions: regions};
         }
     }
 
@@ -438,7 +457,12 @@ class PamDiff extends Transform {
         if (this._regionObj) {
             engine += '_regions';
             config.target = 'regions';
+            config.mask = this._regionObj.mask;
             config.minDiff = this._regionObj.minDiff;
+            config.minX = this._regionObj.minX;
+            config.maxX = this._regionObj.maxX;
+            config.minY = this._regionObj.minY;
+            config.maxY = this._regionObj.maxY;
             config.regions = this._regionObj.regions;
         } else if (this._maskObj) {
             engine += '_mask';
