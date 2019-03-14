@@ -1377,6 +1377,10 @@ GrayRegionsBlobsSync::GrayRegionsBlobsSync(const Napi::CallbackInfo &info)
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = this->width_ * this->height_;
+    //const bool *mask = config.Get("mask").As<Napi::Buffer<bool>>().Data();
+    //std::vector<uint_fast8_t> all_mask;
+    //all_mask.reserve(this->pixCount_);
+    //all_mask.assign(mask, mask + this->pixCount_);
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionVec_ = RegionsJsToCpp(this->pixCount_, regionsJs);
     if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
