@@ -80,11 +80,11 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const region1 = {polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+const region1 = {name: 'region1', polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
 
 const regions = [region1];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, regions: regions, mask: true, response: response, draw: draw});
+const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, regions: regions, mask: false, response: response, draw: draw});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);
