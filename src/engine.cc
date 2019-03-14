@@ -6,6 +6,9 @@
 #include <vector>
 #include <memory>
 
+//#include <chrono>
+//#include <iostream>
+
 // determine engine type
 uint_fast32_t
 EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async) {
@@ -43,7 +46,11 @@ RegionsJsToCpp(const uint_fast32_t pixCount, const Napi::Array &regionsJs) {
         const bool *bitset = regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
         std::vector<bool> bitsetVec;
         bitsetVec.assign(bitset, bitset + pixCount);
-        regionVec.push_back(Region{name, bitsetVec, diff, count, percent});
+        const uint_fast32_t minX = regionsJs.Get(r).As<Napi::Object>().Get("minX").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t maxX = regionsJs.Get(r).As<Napi::Object>().Get("maxX").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t minY = regionsJs.Get(r).As<Napi::Object>().Get("minY").As<Napi::Number>().Uint32Value();
+        const uint_fast32_t maxY = regionsJs.Get(r).As<Napi::Object>().Get("maxY").As<Napi::Number>().Uint32Value();
+        regionVec.push_back(Region{name, bitsetVec, diff, count, percent, minX, maxX, minY, maxY});
     }
     return regionVec;
 }
@@ -324,6 +331,7 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
 // gray all blobs
 void
 GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
+    //auto start = std::chrono::high_resolution_clock::now();
     // fill with -2
     std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(width * height, -2);
     // all elements changed to -1 will be labelled while -2 will be ignored
@@ -371,6 +379,9 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_f
             blobsResult.flagged = blob.flagged = true;
         }
     }
+    //auto stop = std::chrono::high_resolution_clock::now();
+    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    //std::cout << duration.count() << std::endl;
 }
 
 // gray regions blobs
