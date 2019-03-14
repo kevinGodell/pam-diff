@@ -46,7 +46,11 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             const uint_fast32_t diff = regionsJs.Get(r).As<Napi::Object>().Get("diff").As<Napi::Number>().Int32Value();
             const uint_fast32_t percent = regionsJs.Get(r).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
             const uint_fast32_t count = regionsJs.Get(r).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-            std::cout << name << " - " << diff << " - " << percent << " - " << count << " - " << regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
+            const uint_fast32_t minX = regionsJs.Get(r).As<Napi::Object>().Get("minX").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t maxX = regionsJs.Get(r).As<Napi::Object>().Get("maxX").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t minY = regionsJs.Get(r).As<Napi::Object>().Get("minY").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t maxY = regionsJs.Get(r).As<Napi::Object>().Get("maxY").As<Napi::Number>().Uint32Value();
+            std::cout << name << " - " << diff << " - " << minX << " - " << maxX << " - " << minY << " - " << maxY << " - " << percent << " - " << count << " - " << regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
         }
     }
 #endif
