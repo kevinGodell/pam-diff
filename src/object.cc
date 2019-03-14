@@ -1373,16 +1373,26 @@ GrayRegionsBlobsSync::GrayRegionsBlobsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
-    this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
+
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
     this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
     this->pixCount_ = this->width_ * this->height_;
-    //const bool *mask = config.Get("mask").As<Napi::Buffer<bool>>().Data();
-    //std::vector<uint_fast8_t> all_mask;
-    //all_mask.reserve(this->pixCount_);
-    //all_mask.assign(mask, mask + this->pixCount_);
+
+    // minDiff, minX, maxX, minY, maxY, mask used in first pass to minimize looping calculations
+    this->minDiff_ = config.Get("minDiff").As<Napi::Number>().Int32Value();
+    this->minX_ = config.Get("minX").As<Napi::Number>().Uint32Value();
+    this->maxX_ = config.Get("maxX").As<Napi::Number>().Uint32Value();
+    this->minY_ = config.Get("minY").As<Napi::Number>().Uint32Value();
+    this->maxY_ = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    const bool *mask = config.Get("mask").As<Napi::Buffer<bool>>().Data();
+    this->maskVec_.reserve(this->pixCount_);
+    this->maskVec_.assign(mask, mask + this->pixCount_);
+
+    // get region specific values
     const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
     this->regionVec_ = RegionsJsToCpp(this->pixCount_, regionsJs);
+
+    // should results be drawn to pixels
     if (config.HasOwnProperty("draw")) this->draw_ = config.Get("draw").As<Napi::Boolean>().Value();
     else this->draw_ = false;
 }
@@ -1412,7 +1422,7 @@ Napi::Value GrayRegionsBlobsSync::Compare(const Napi::CallbackInfo &info) {
 
     std::vector<BlobsResult> blobsResultVec = std::vector<BlobsResult>(this->regionVec_.size(), BlobsResult{std::string(), this->width_ - 1, 0, this->height_ - 1, 0, 0, false, std::vector<Blob>()});
 
-    uint_fast32_t flaggedCount = GrayRegionsBlobs(this->width_, this->height_, this->minDiff_, this->regionVec_, buf0, buf1, blobsResultVec);
+    uint_fast32_t flaggedCount = GrayRegionsBlobs(this->width_, this->height_, this->minDiff_, this->minX_, this->maxX_, this->minY_, this->maxY_, this->regionVec_, buf0, buf1, blobsResultVec);
 
     Napi::Array resultsJs = Napi::Array::New(env);
     if (flaggedCount > 0) {

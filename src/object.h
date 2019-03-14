@@ -643,6 +643,11 @@ private:
     uint_fast32_t height_;
     uint_fast32_t pixCount_;
     int_fast32_t minDiff_;
+    uint_fast32_t minX_;
+    uint_fast32_t maxX_;
+    uint_fast32_t minY_;
+    uint_fast32_t maxY_;
+    std::vector<bool> maskVec_;
     std::vector<Region> regionVec_;
     bool draw_;
 };
