@@ -52,6 +52,10 @@ struct Region {
     const int_fast32_t pixDiff;// 4
     const uint_fast32_t bitsetCount;// 4
     const uint_fast32_t percent;// 4
+    const uint_fast32_t minX;
+    const uint_fast32_t maxX;
+    const uint_fast32_t minY;
+    const uint_fast32_t maxY;
 };
 
 struct PercentResult {
