@@ -66,12 +66,34 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fas
     /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
         for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
 
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+    //int_fast32_t *ptr; = labelsVec.data();
+
+    /*for (uint_fast32_t y = minY; y <= maxY; ++y) {
+
         for (uint_fast32_t x = minX; x <= maxX; ++x) {
+
             uint_fast32_t p = width * y + x;
 
             // ignored == -2, unlabeled == -1, labeled >= 0
             if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
+
+            // increment label for next blob
+            ++labelNumber;
+
+            // send to C function for recursive labelling
+            LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
+
+        }
+    }*/
+
+    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+
+        int_fast32_t *ptr = &labelsVec[y * width + minX];
+
+        for (uint_fast32_t x = minX; x <= maxX; ++x, ++ptr) {
+
+            // ignored == -2, unlabeled == -1, labeled >= 0
+            if (*ptr != -1) continue;
 
             // increment label for next blob
             ++labelNumber;
