@@ -306,8 +306,7 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
         /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
             for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
         for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
-            for (uint_fast32_t x = blobsResult.minX; x <= blobsResult.maxX; ++x) {
-                uint_fast32_t p = width * y + x;
+            for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
                 if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
                 Blob &blob = blobsResult.blobs[labelsVec[p]];
                 SetMin(x, blob.minX);
@@ -359,8 +358,7 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_f
         /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
             for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
         for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
-            for (uint_fast32_t x = blobsResult.minX; x <= blobsResult.maxX; ++x) {
-                uint_fast32_t p = width * y + x;
+            for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
                 if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
                 Blob &blob = blobsResult.blobs[labelsVec[p]];
                 SetMin(x, blob.minX);
@@ -386,14 +384,14 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_f
 
 // gray regions blobs
 uint_fast32_t
-GrayRegionsBlobs(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
+GrayRegionsBlobs(const uint_fast32_t width, const uint_fast32_t /*height*/, const int_fast32_t minDiff, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
     uint_fast32_t flaggedCount = 0;
     auto regionsLen = regionsVec.size();
-    for (uint_fast32_t y = 0, p = 0, r = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
             const int_fast32_t diff = GrayDiff(buf0, buf1, p);
             if (minDiff > diff) continue;
-            for (r = 0; r < regionsLen; ++r) {
+            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
                 if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
                 SetMin(x, blobsResultVec[r].minX);
                 SetMax(x, blobsResultVec[r].maxX);

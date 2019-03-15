@@ -167,7 +167,7 @@ GrayMaskBlobs(uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, u
 
 // gray regions blobs
 uint_fast32_t
-GrayRegionsBlobs(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
+GrayRegionsBlobs(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, uint_fast32_t minX, uint_fast32_t maxX, uint_fast32_t minY, uint_fast32_t maxY, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
 
 // rgb all percent
 void
