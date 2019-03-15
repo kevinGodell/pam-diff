@@ -63,16 +63,9 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fas
     // label number
     int_fast32_t labelNumber = -1;
 
-    /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
+    for (uint_fast32_t y = minY; y <= maxY; ++y) {
 
-    //int_fast32_t *ptr; = labelsVec.data();
-
-    /*for (uint_fast32_t y = minY; y <= maxY; ++y) {
-
-        for (uint_fast32_t x = minX; x <= maxX; ++x) {
-
-            uint_fast32_t p = width * y + x;
+        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
 
             // ignored == -2, unlabeled == -1, labeled >= 0
             if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
@@ -84,9 +77,9 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fas
             LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
 
         }
-    }*/
+    }
 
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+    /*for (uint_fast32_t y = minY; y <= maxY; ++y) {
 
         int_fast32_t *ptr = &labelsVec[y * width + minX];
 
@@ -102,7 +95,7 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fas
             LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
 
         }
-    }
+    }*/
 
     return static_cast<uint_fast32_t>(labelNumber + 1);
 }
