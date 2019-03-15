@@ -373,6 +373,10 @@ class PamDiff extends Transform {
             return;
         }
         if (this._mask) {
+            let minX = this._width;
+            let maxX = 0;
+            let minY = this._height;
+            let maxY = 0;
             const wxh = this._width * this._height;
             const buffer = Buffer.alloc(wxh, 1);
             for (const region of this._regions) {
@@ -391,13 +395,19 @@ class PamDiff extends Transform {
             let count = 0;
             for (let i = 0; i < wxh; i++) {
                 if (buffer[i]) {
+                    const y = Math.floor(i / this._width);
+                    const x = i % this._width;
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
                     count++;
                 }
             }
             if (count === 0) {
                 throw new Error('Bitset count must be greater than 0');
             }
-            this._maskObj = {count: count, bitset: buffer};
+            this._maskObj = {count: count, bitset: buffer, minX: minX, maxX: maxX, minY: minY, maxY: maxY};
         } else {
             const regions = [];
             let minDiff = 255;
@@ -415,16 +425,16 @@ class PamDiff extends Transform {
                 const bitset = pp.getBitset(this._width, this._height);
                 for(let i = 0; i < wxh; ++i) {
                     if (bitset[i]) {
-                        mask[i] = 1;
+                        mask[i] = 1;// todo should be called combined bitset
                     }
                 }
                 const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
                 const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
                 minDiff = Math.min(minDiff, difference);
-                minX = Math.min(minX, pp.minX);
-                maxX = Math.max(maxX, pp.maxX);
-                minY = Math.min(minY, pp.minY);
-                maxY = Math.max(maxY, pp.maxY);
+                minX = Math.min(minX, bitset.minX);
+                maxX = Math.max(maxX, bitset.maxX);
+                minY = Math.min(minY, bitset.minY);
+                maxY = Math.max(maxY, bitset.maxY);
                 regions.push(
                     {
                         name: region.name,
@@ -432,10 +442,10 @@ class PamDiff extends Transform {
                         percent: percent,
                         count: bitset.count,
                         bitset: bitset.buffer,
-                        minX: pp.minX,
-                        maxX: pp.maxX,
-                        minY: pp.minY,
-                        maxY: pp.maxY
+                        minX: bitset.minX,
+                        maxX: bitset.maxX,
+                        minY: bitset.minY,
+                        maxY: bitset.maxY
                     }
                 );
             }
@@ -471,6 +481,10 @@ class PamDiff extends Transform {
             config.percent = this._percent;
             config.bitsetCount = this._maskObj.count;
             config.bitset = this._maskObj.bitset;
+            config.minX = this._maskObj.minX;
+            config.maxX = this._maskObj.maxX;
+            config.minY = this._maskObj.minY;
+            config.maxY = this._maskObj.maxY;
         } else {
             engine += '_all';
             config.target = 'all';

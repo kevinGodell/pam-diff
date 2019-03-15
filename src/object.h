@@ -64,6 +64,12 @@ private:
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
     std::vector<bool> bitsetVec_;
+    uint_fast32_t width_;
+    uint_fast32_t height_;
+    uint_fast32_t minX_;
+    uint_fast32_t maxX_;
+    uint_fast32_t minY_;
+    uint_fast32_t maxY_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
