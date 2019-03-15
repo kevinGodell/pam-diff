@@ -111,7 +111,7 @@
   "dependencies": {
     "bindings": "^1.3.1",
     "node-addon-api": "^1.6.2",
-    "polygon-points": "kevinGodell/polygon-points"
+    "polygon-points": "github:kevinGodell/polygon-points"
   },
   "devDependencies": {
     "dotenv": "^6.2.0",
