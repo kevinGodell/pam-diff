@@ -196,8 +196,8 @@ GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const u
 // rgb all percent
 void
 RgbAllPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0, byteCount = pixCount * pixDepth; p < byteCount; p += pixDepth) {
-        if (pixDiff > RgbDiff(buf0, buf1, p)) continue;
+    for (uint_fast32_t p = 0; p < pixCount; ++p) {
+        if (pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
         ++percentResult.percent;
     }
     percentResult.percent = 100 * percentResult.percent / pixCount;
