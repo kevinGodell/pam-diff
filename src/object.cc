@@ -103,18 +103,19 @@ GrayMaskPercentSync::GrayMaskPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
-    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
-    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
-    this->height_ = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = this->width_ * this->height_;
-    this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
-    const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
-    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
     this->minX_ = config.Get("minX").As<Napi::Number>().Uint32Value();
     this->maxX_ = config.Get("maxX").As<Napi::Number>().Uint32Value();
     this->minY_ = config.Get("minY").As<Napi::Number>().Uint32Value();
     this->maxY_ = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
+    this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
+    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
+    const bool *bitsetData = bitset.Data();
+    const size_t bitsetLength = bitset.Length();
+    this->bitsetVec_.assign(bitsetData, bitsetData + bitsetLength);
+
 }
 
 Napi::FunctionReference GrayMaskPercentSync::constructor;
@@ -140,7 +141,7 @@ Napi::Value GrayMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     PercentResult percentResult = PercentResult{"mask", 0, false};
-    GrayMaskPercent(this->pixCount_, this->width_, this->height_, this->minX_, this->maxX_, this->minY_, this->maxY_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, percentResult);
+    GrayMaskPercent(this->width_, this->minX_, this->maxX_, this->minY_, this->maxY_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, percentResult);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (percentResult.flagged) {
         ToJs(env, percentResult, resultsJs);
@@ -156,14 +157,18 @@ GrayMaskPercentAsync::GrayMaskPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
+    this->width_ = config.Get("width").As<Napi::Number>().Uint32Value();
+    this->minX_ = config.Get("minX").As<Napi::Number>().Uint32Value();
+    this->maxX_ = config.Get("maxX").As<Napi::Number>().Uint32Value();
+    this->minY_ = config.Get("minY").As<Napi::Number>().Uint32Value();
+    this->maxY_ = config.Get("maxY").As<Napi::Number>().Uint32Value();
     this->pixDiff_ = config.Get("difference").As<Napi::Number>().Int32Value();
     this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    this->pixCount_ = width * height;
     this->bitsetCount_ = config.Get("bitsetCount").As<Napi::Number>().Uint32Value();
-    const bool *bitset = config.Get("bitset").As<Napi::Buffer<bool>>().Data();
-    this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
+    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
+    const bool *bitsetData = bitset.Data();
+    const size_t bitsetLength = bitset.Length();
+    this->bitsetVec_.assign(bitsetData, bitsetData + bitsetLength);
 }
 
 Napi::FunctionReference GrayMaskPercentAsync::constructor;
@@ -188,7 +193,7 @@ Napi::Value GrayMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayMaskPercentWorker = new GrayMaskPercentWorker(this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
+    auto *grayMaskPercentWorker = new GrayMaskPercentWorker(this->width_, this->minX_, this->maxX_, this->minY_, this->maxY_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
     grayMaskPercentWorker->Queue();
     return env.Undefined();
 }

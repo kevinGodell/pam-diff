@@ -34,7 +34,7 @@ private:
 
 class GrayMaskPercentWorker : public Napi::AsyncWorker {
 public:
-    GrayMaskPercentWorker(uint_fast32_t pixCount, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayMaskPercentWorker(uint_fast32_t width, uint_fast32_t minX, uint_fast32_t maxX, uint_fast32_t minY, uint_fast32_t maxY, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -42,7 +42,11 @@ public:
 
 private:
     // in
-    const uint_fast32_t pixCount_;
+    const uint_fast32_t width_;
+    const uint_fast32_t minX_;
+    const uint_fast32_t maxX_;
+    const uint_fast32_t minY_;
+    const uint_fast32_t maxY_;
     const int_fast32_t pixDiff_;
     const uint_fast32_t diffsPerc_;
     const uint_fast32_t bitsetCount_;

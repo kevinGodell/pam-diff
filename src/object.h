@@ -59,17 +59,15 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixCount_;
-    int_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t bitsetCount_;
-    std::vector<bool> bitsetVec_;
     uint_fast32_t width_;
-    uint_fast32_t height_;
     uint_fast32_t minX_;
     uint_fast32_t maxX_;
     uint_fast32_t minY_;
     uint_fast32_t maxY_;
+    int_fast32_t pixDiff_;
+    uint_fast32_t diffsPerc_;
+    uint_fast32_t bitsetCount_;
+    std::vector<bool> bitsetVec_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -86,7 +84,11 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixCount_;
+    uint_fast32_t width_;
+    uint_fast32_t minX_;
+    uint_fast32_t maxX_;
+    uint_fast32_t minY_;
+    uint_fast32_t maxY_;
     int_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
     uint_fast32_t bitsetCount_;
