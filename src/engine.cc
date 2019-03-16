@@ -147,6 +147,23 @@ GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const int_
     boundsResult.flagged = boundsResult.percent >= diffsPerc;
 }
 
+// gray mask bounds
+void
+GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
+            if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
+            SetMin(x, boundsResult.minX);
+            SetMax(x, boundsResult.maxX);
+            SetMin(y, boundsResult.minY);
+            SetMax(y, boundsResult.maxY);
+            ++boundsResult.percent;
+        }
+    }
+    boundsResult.percent = 100 * boundsResult.percent / bitsetCount;
+    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+}
+
 // gray regions bounds
 uint_fast32_t
 GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {

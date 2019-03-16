@@ -157,6 +157,10 @@ GrayAllBounds(uint_fast32_t width, uint_fast32_t height, uint_fast32_t pixCount,
 void
 GrayMaskBounds(uint_fast32_t width, uint_fast32_t height, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult);
 
+// gray mask bounds
+void
+GrayMaskBounds(uint_fast32_t width, uint_fast32_t minX, uint_fast32_t maxX, uint_fast32_t minY, uint_fast32_t maxY, int_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult);
+
 // gray regions bounds
 uint_fast32_t
 GrayRegionsBounds(uint_fast32_t width, uint_fast32_t height, int_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec);
