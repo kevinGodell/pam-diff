@@ -7,7 +7,7 @@
 #include <memory>
 
 //#include <chrono>
-//#include <iostream>
+#include <iostream>
 
 // determine engine type
 uint_fast32_t
@@ -68,20 +68,9 @@ GrayAllPercent(const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const 
 
 // gray mask percent
 void
-GrayMaskPercent(const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
-        ++percentResult.percent;
-    }
-    percentResult.percent = 100 * percentResult.percent / bitsetCount;
-    percentResult.flagged = percentResult.percent >= diffsPerc;
-}
-
-// gray mask percent
-void
-GrayMaskPercent(const uint_fast32_t width, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
-        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
+GrayMaskPercent(const uint_fast32_t width, const Bounds &bounds, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+        for (uint_fast32_t x = bounds.minX, p = y * width + x; x <= bounds.maxX; ++x, ++p) {
             if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
             ++percentResult.percent;
         }
@@ -113,6 +102,31 @@ GrayRegionsPercent(const uint_fast32_t pixCount, const uint_fast32_t minDiff, co
     return flaggedCount;
 }
 
+// gray regions percent
+uint_fast32_t
+GrayRegionsPercent(const uint_fast32_t width, const Bounds &bounds, const uint_fast32_t minDiff, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<PercentResult> &percentResultVec) {
+    uint_fast32_t flaggedCount = 0;
+    auto regionsLen = regionsVec.size();
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+        for (uint_fast32_t x = bounds.minX, p = y * width + x; x <= bounds.maxX; ++x, ++p) {
+            const uint_fast32_t diff = GrayDiff(buf0, buf1, p);
+            if (minDiff > diff) continue;
+            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+                if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
+                ++percentResultVec[r].percent;
+            }
+        }
+    }
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        percentResultVec[r].name = regionsVec[r].name;
+        percentResultVec[r].percent = percentResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
+        if (regionsVec[r].percent > percentResultVec[r].percent) continue;
+        percentResultVec[r].flagged = true;
+        ++flaggedCount;
+    }
+    return flaggedCount;
+}
+
 // gray all bounds
 void
 GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
@@ -132,26 +146,9 @@ GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_
 
 // gray mask bounds
 void
-GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, boundsResult.minX);
-            SetMax(x, boundsResult.maxX);
-            SetMin(y, boundsResult.minY);
-            SetMax(y, boundsResult.maxY);
-            ++boundsResult.percent;
-        }
-    }
-    boundsResult.percent = 100 * boundsResult.percent / bitsetCount;
-    boundsResult.flagged = boundsResult.percent >= diffsPerc;
-}
-
-// gray mask bounds
-void
-GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
-        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
+GrayMaskBounds(const uint_fast32_t width, const Bounds &bounds, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+        for (uint_fast32_t x = bounds.minX, p = y * width + x; x <= bounds.maxX; ++x, ++p) {
             if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
             SetMin(x, boundsResult.minX);
             SetMax(x, boundsResult.maxX);
@@ -352,15 +349,16 @@ GrayAllBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_f
     }
 }
 
-// gray all blobs
+// gray mask blobs
 void
-GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
+GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const Bounds &bounds, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
     //auto start = std::chrono::high_resolution_clock::now();
+
     // fill with -2
     std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(width * height, -2);
     // all elements changed to -1 will be labelled while -2 will be ignored
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+        for (uint_fast32_t x = bounds.minX, p = y * width + x; x <= bounds.maxX; ++x, ++p) {
             if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
             //change from -2 to -1 to mark as pixel of interest
             labelsVec[p] = -1;
@@ -378,10 +376,8 @@ GrayMaskBlobs(const uint_fast32_t width, const uint_fast32_t height, const uint_
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
         uint_fast32_t blobCount = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
         // create vector using blobCount size
-        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, width - 1, 0, height - 1, 0, 0, false});
+        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, bounds.maxX, bounds.minX, bounds.maxY, bounds.minY, 0, false});
         // count and group labels
-        /*for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-            for (uint_fast32_t x = 0; x < width; ++x, ++p) {*/
         for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
             for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
                 if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
