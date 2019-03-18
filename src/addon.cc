@@ -3,6 +3,8 @@
 #include "engine.h"
 #include "napi.h"
 
+#include <iostream>
+
 #ifdef NAPI_DEBUG
 #include <iostream>
 #endif
@@ -57,6 +59,15 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
 #endif
     const uint_fast32_t pixDepth = config.Get("depth").As<Napi::Number>().Uint32Value();
     const std::string target = config.Get("target").As<Napi::String>().Utf8Value();
+    // todo target will be set by length of "regions" array
+    // no regions array == all
+    // 1 region in array == region
+    // > 1 regions in array == regions
+    // no need for mask, it is simply a region that was flipped on js side
+    const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
+
+    std::cout << "regions length " << regionsLength << std::endl;
+
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
     const bool async = config.Get("async").As<Napi::Boolean>().Value();
     const uint_fast32_t engineType = EngineType(pixDepth, target, response, async);

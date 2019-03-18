@@ -16,10 +16,10 @@ GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
-    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Uint32Value();
-    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Uint32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
 }
 
@@ -62,10 +62,10 @@ GrayAllPercentAsync::GrayAllPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
-    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Uint32Value();
-    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
     const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
+    this->pixDiff_ = config.Get("difference").As<Napi::Number>().Uint32Value();
+    this->diffsPerc_ = config.Get("percent").As<Napi::Number>().Uint32Value();
     this->pixCount_ = width * height;
 }
 

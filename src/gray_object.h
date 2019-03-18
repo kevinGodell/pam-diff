@@ -21,9 +21,9 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixCount_;
     uint_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    uint_fast32_t pixCount_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -40,9 +40,9 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixCount_;
     uint_fast32_t pixDiff_;
     uint_fast32_t diffsPerc_;
+    uint_fast32_t pixCount_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
