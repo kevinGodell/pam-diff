@@ -1,4 +1,5 @@
-#include "object.h"
+#include "gray_object.h"
+#include "rgb_object.h"
 #include "engine.h"
 #include "napi.h"
 

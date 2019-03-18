@@ -1,5 +1,5 @@
-#ifndef SRC_CCL_H
-#define SRC_CCL_H
+#ifndef SRC_CCL_H_
+#define SRC_CCL_H_
 
 #include <cstdint>
 #include <vector>
