@@ -128,7 +128,7 @@ SetMax(const uint_fast32_t &val, uint_fast32_t &max) {
 
 // determine engine type
 uint_fast32_t
-EngineType(uint_fast32_t pixDepth, const std::string &target, const std::string &returns, bool async);
+EngineType(uint_fast32_t pixDepth, const std::string &target, const std::string &returns, bool async, uint_fast32_t regionsLength);
 
 // convert js regions to cpp
 std::vector<Region>

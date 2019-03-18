@@ -11,7 +11,7 @@
 
 // determine engine type
 uint_fast32_t
-EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async) {
+EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async, const uint_fast32_t regionsLength) {
     uint_fast32_t value = 0;
     if (pixDepth == 3 || pixDepth == 4) {//dont add for pixDepth == 1
         value += 1;
@@ -28,6 +28,13 @@ EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::s
     }
     if (async) {
         value += 1000;
+    }
+    if (regionsLength > 1) {
+        // regions
+    } else if (regionsLength == 1) {
+        // region
+    } else {
+        // all
     }
     return value;
 }
