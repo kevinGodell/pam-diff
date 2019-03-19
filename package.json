@@ -15,7 +15,7 @@
     "doc": "jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
     "gray:blobs": "node tests/test_gray_blobs --async false --response blobs --draw true",
     "gray:blobs:async": "node tests/test_gray_blobs --async true --response blobs --draw true",
-    "gray": "npm run gray:all && npm run gray:mask && npm run gray:region && npm run gray:regions",
+    "gray": "npm run gray:all && npm run gray:mask && npm run gray:regions",
     "gray:all": "npm run gray:all:1 && npm run gray:all:2 && npm run gray:all:3 && npm run gray:all:4 && npm run gray:all:5 && npm run gray:all:6",
     "gray:all:1": "node tests/test_gray --async false --response percent",
     "gray:all:2": "node tests/test_gray --async true --response percent",
