@@ -8,23 +8,39 @@
 
 enum Engines {
     GRAY_ALL_PERCENT_SYNC = 0,
-    GRAY_REGION_PERCENT_SYNC = 10,
-    GRAY_REGIONS_PERCENT_SYNC = 20,
     GRAY_ALL_PERCENT_ASYNC = 1000,
+
+    GRAY_REGION_PERCENT_SYNC = 10,
     GRAY_REGION_PERCENT_ASYNC = 1010,
+
+    GRAY_REGIONS_PERCENT_SYNC = 20,
     GRAY_REGIONS_PERCENT_ASYNC = 1020,
+
+    GRAY_ALL_BOUNDS_SYNC = 100,
+    GRAY_ALL_BOUNDS_ASYNC = 1100,
+
+    GRAY_REGION_BOUNDS_SYNC = 110,
+    GRAY_REGION_BOUNDS_ASYNC = 1110,
+
+    GRAY_REGIONS_BOUNDS_SYNC = 120,
+    GRAY_REGIONS_BOUNDS_ASYNC = 1120,
+
+    GRAY_ALL_BLOBS_SYNC = 200,
+    GRAY_ALL_BLOBS_ASYNC = 1200,
+
+    GRAY_REGION_BLOBS_SYNC = 210,
+    GRAY_REGION_BLOBS_ASYNC = 1210,
+
+    GRAY_REGIONS_BLOBS_SYNC = 220,
+    GRAY_REGIONS_BLOBS_ASYNC = 1220,
+
     /*RGB_ALL_PERCENT_SYNC = 1,
     RGB_REGION_PERCENT_SYNC = 11,
     RGB_REGIONS_PERCENT_SYNC = 21,
     RGB_ALL_PERCENT_ASYNC = 1001,
     RGB_REGION_PERCENT_ASYNC = 1011,
     RGB_REGIONS_PERCENT_ASYNC = 1021,*/
-    GRAY_ALL_BOUNDS_SYNC = 100,
-    GRAY_ALL_BOUNDS_ASYNC = 1100,
-    GRAY_REGION_BOUNDS_SYNC = 110,
-    GRAY_REGION_BOUNDS_ASYNC = 1110,
-    GRAY_REGIONS_BOUNDS_SYNC = 120,
-    GRAY_REGIONS_BOUNDS_ASYNC = 1120,
+
     /*RGB_ALL_BOUNDS_SYNC = 101,
     RGB_REGION_BOUNDS_SYNC = 111,
     RGB_REGIONS_BOUNDS_SYNC = 121,
@@ -32,14 +48,8 @@ enum Engines {
     RGB_REGION_BOUNDS_ASYNC = 1111,
     RGB_REGIONS_BOUNDS_ASYNC = 1121,*/
 
-    GRAY_ALL_BLOBS_SYNC = 200,
-    GRAY_ALL_BLOBS_ASYNC = 1200,
 
-    GRAY_REGION_BLOBS_SYNC = 210,
-    GRAY_REGION_BLOBS_ASYNC = 1210,
-    GRAY_REGIONS_BLOBS_SYNC = 220,
 
-    //GRAY_REGIONS_BLOBS_ASYNC = 1220,
     //RGB_ALL_BLOBS_SYNC = 201,
     //RGB_REGION_BLOBS_SYNC = 211,
     //RGB_REGIONS_BLOBS_SYNC = 221,
@@ -162,41 +172,40 @@ std::vector<Region>
 RegionsJsToCpp(const Napi::Array &regionsJs);
 
 // gray all percent
-void
-GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult);
+PercentResult
+GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region percent
-void
-GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult);
+PercentResult
+GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions percent
-uint_fast32_t
-GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<PercentResult> &percentResultVec);
+std::vector<PercentResult>
+GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray all bounds
-void
-GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult);
+BoundsResult
+GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region bounds
-void
-GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult);
+BoundsResult
+GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions bounds
-uint_fast32_t
-GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec);
+std::vector<BoundsResult>
+GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray all blobs
-void
-GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
-
+BlobsResult
+GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region blobs
-void
-GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
+BlobsResult
+GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions blobs
-uint_fast32_t
-GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
+std::vector<BlobsResult>
+GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 /*
 // rgb all percent

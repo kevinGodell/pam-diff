@@ -6,12 +6,6 @@
 #include <vector>
 #include <memory>
 
-//#include <chrono>
-#include <iostream>
-
-using std::cout;
-using std::endl;
-
 // determine engine type
 uint_fast32_t
 EngineType(const uint_fast32_t pixDepth, const std::string &response, const bool async, const uint_fast32_t regionsLength) {
@@ -32,9 +26,6 @@ EngineType(const uint_fast32_t pixDepth, const std::string &response, const bool
     if (async) {
         value += 1000;
     }
-
-    cout << "engine number " << value << endl;
-
     return value;
 }
 
@@ -74,19 +65,22 @@ RegionsJsToCpp(const Napi::Array &regionsJs) {
 }
 
 // gray all percent
-void
-GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
+PercentResult
+GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {"all", 0, false};// initialize results
     for (uint_fast32_t p = 0; p < dimensions.pixelCount; ++p) {
         if (all.difference > GrayDiff(buf0, buf1, p)) continue;
         ++percentResult.percent;
     }
     percentResult.percent = 100 * percentResult.percent / dimensions.pixelCount;
     percentResult.flagged = percentResult.percent >= all.percent;
+    return percentResult;
 }
 
 // gray region percent
-void
-GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
+PercentResult
+GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {region.name, 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -95,48 +89,28 @@ GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint
     }
     percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
     percentResult.flagged = percentResult.percent >= region.percent;
+    return percentResult;
 }
 
 // gray regions percent
-uint_fast32_t
-GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<PercentResult> &percentResultVec) {
-    uint_fast32_t flaggedCount = 0;
+std::vector<PercentResult>
+GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     auto regionsLen = regions.regions.size();
-
+    std::vector<PercentResult> percentResultVec;
+    percentResultVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        for (uint_fast32_t y = regions.regions[r].bounds.minY; y <= regions.regions[r].bounds.maxY; ++y) {
-            for (uint_fast32_t x = regions.regions[r].bounds.minX, p = y * dimensions.width + x; x <= regions.regions[r].bounds.maxX; ++x, ++p) {
-                if (regions.regions[r].bitset[p] == 0 || regions.regions[r].difference > GrayDiff(buf0, buf1, p)) continue;
-                ++percentResultVec[r].percent;
-            }
-        }
+        PercentResult percentResult = GrayRegionPercent(dimensions, regions.regions[r], buf0, buf1);
+        if (!percentResult.flagged) continue;
+        percentResultVec.push_back(percentResult);
     }
-
-    /*for (uint_fast32_t y = regions.bounds.minY; y <= regions.bounds.maxY; ++y) {
-        for (uint_fast32_t x = regions.bounds.minX, p = y * dimensions.width + x; x <= regions.bounds.maxX; ++x, ++p) {
-            if (!regions.bitset[p]) continue;
-            const uint_fast32_t difference = GrayDiff(buf0, buf1, p);
-            if (regions.difference > difference) continue;
-            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-                if (regions.regions[r].bitset[p] == 0 || regions.regions[r].difference > difference) continue;
-                ++percentResultVec[r].percent;
-            }
-        }
-    }*/
-
-    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        percentResultVec[r].name = regions.regions[r].name;
-        percentResultVec[r].percent = percentResultVec[r].percent * 100 / regions.regions[r].bitsetCount;
-        if (regions.regions[r].percent > percentResultVec[r].percent) continue;
-        percentResultVec[r].flagged = true;
-        ++flaggedCount;
-    }
-    return flaggedCount;
+    percentResultVec.shrink_to_fit();
+    return percentResultVec;
 }
 
 // gray all bounds
-void
-GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+BoundsResult
+GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {"all", dimensions.width - 1, 0, dimensions.height - 1, 0, 0, false};// initialize results
     for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
         for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
             if (all.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -149,11 +123,13 @@ GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *
     }
     boundsResult.percent = 100 * boundsResult.percent / dimensions.pixelCount;
     boundsResult.flagged = boundsResult.percent >= all.percent;
+    return boundsResult;
 }
 
 // gray region bounds
-void
-GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
+BoundsResult
+GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {region.name, region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY, 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -166,52 +142,28 @@ GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_
     }
     boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
     boundsResult.flagged = boundsResult.percent >= region.percent;
+    return boundsResult;
 }
 
 // gray regions bounds
-uint_fast32_t
-GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
-    uint_fast32_t flaggedCount = 0;
+std::vector<BoundsResult>
+GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     auto regionsLen = regions.regions.size();
+    std::vector<BoundsResult> boundsResultVec;
+    boundsResultVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        for (uint_fast32_t y = regions.regions[r].bounds.minY; y <= regions.regions[r].bounds.maxY; ++y) {
-            for (uint_fast32_t x = regions.regions[r].bounds.minX, p = y * dimensions.width + x; x <= regions.regions[r].bounds.maxX; ++x, ++p) {
-                if (regions.regions[r].bitset[p] == 0 || regions.regions[r].difference > GrayDiff(buf0, buf1, p)) continue;
-                SetMin(x, boundsResultVec[r].minX);
-                SetMax(x, boundsResultVec[r].maxX);
-                SetMin(y, boundsResultVec[r].minY);
-                SetMax(y, boundsResultVec[r].maxY);
-                ++boundsResultVec[r].percent;
-            }
-        }
+        BoundsResult boundsResult = GrayRegionBounds(dimensions, regions.regions[r], buf0, buf1);
+        if (!boundsResult.flagged) continue;
+        boundsResultVec.push_back(boundsResult);
     }
-    /*for (uint_fast32_t y = 0, p = 0, r = 0; y < dimensions.height; ++y) {
-        for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
-            const uint_fast32_t difference = GrayDiff(buf0, buf1, p);
-            if (regions.difference > difference) continue;
-            for (r = 0; r < regionsLen; ++r) {
-                if (regions.regions[r].bitset[p] == 0 || regions.regions[r].difference > difference) continue;
-                SetMin(x, boundsResultVec[r].minX);
-                SetMax(x, boundsResultVec[r].maxX);
-                SetMin(y, boundsResultVec[r].minY);
-                SetMax(y, boundsResultVec[r].maxY);
-                ++boundsResultVec[r].percent;
-            }
-        }
-    }*/
-    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        boundsResultVec[r].name = regions.regions[r].name;
-        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regions.regions[r].bitsetCount;
-        if (regions.regions[r].percent > boundsResultVec[r].percent) continue;
-        boundsResultVec[r].flagged = true;
-        ++flaggedCount;
-    }
-    return flaggedCount;
+    boundsResultVec.shrink_to_fit();
+    return boundsResultVec;
 }
 
 // gray all blobs
-void
-GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
+BlobsResult
+GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {"all", dimensions.width - 1, 0, dimensions.height - 1, 0, 0, false, std::vector<Blob>()};// initialize results
     // fill with -2
     std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
     // all elements changed to -1 will be labelled while -2 will be ignored
@@ -256,13 +208,13 @@ GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *b
             blobsResult.flagged = blob.flagged = true;
         }
     }
+    return blobsResult;
 }
 
 // gray region blobs
-void
-GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
-    //auto start = std::chrono::high_resolution_clock::now();
-
+BlobsResult
+GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {region.name, region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY, 0, false, std::vector<Blob>()};// initialize results
     // fill with -2
     std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
     // all elements changed to -1 will be labelled while -2 will be ignored
@@ -306,49 +258,23 @@ GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_f
             blob.label = b;
             blobsResult.flagged = blob.flagged = true;
         }
-        /*// assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(dimensions.width, dimensions.height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
-        // create vector using blobCount size
-        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, blobsResult.maxX, bounds.minX, bounds.maxY, bounds.minY, 0, false});
-        // count and group labels
-        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
-            for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
-                SetMin(x, blob.minX);
-                SetMax(x, blob.maxX);
-                SetMin(y, blob.minY);
-                SetMax(y, blob.maxY);
-                ++blob.percent;
-            }
-        }
-        // convert blob size to percent and check against threshold and flag
-        for (uint_fast32_t b = 0; b < blobCount; ++b) {
-            Blob &blob = blobsResult.blobs[b];
-            blob.percent = 100 * blob.percent / bitsetCount;
-            if (diffsPerc > blob.percent) continue;
-            blob.label = b;
-            blobsResult.flagged = blob.flagged = true;
-        }*/
     }
-    //auto stop = std::chrono::high_resolution_clock::now();
-    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    //std::cout << duration.count() << std::endl;
+    return blobsResult;
 }
 
 // gray regions blobs
-uint_fast32_t
-GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
-    uint_fast32_t flaggedCount = 0;
-
+std::vector<BlobsResult>
+GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     auto regionsLen = regions.regions.size();
-
+    std::vector<BlobsResult> blobsResultVec;
+    blobsResultVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        GrayRegionBlobs(dimensions, regions.regions[r], buf0, buf1, blobsResultVec[r]);
-        if (blobsResultVec[r].flagged) ++flaggedCount;
+        BlobsResult blobsResult = GrayRegionBlobs(dimensions, regions.regions[r], buf0, buf1);
+        if (!blobsResult.flagged) continue;
+        blobsResultVec.push_back(blobsResult);
     }
-
-    return flaggedCount;
+    blobsResultVec.shrink_to_fit();
+    return blobsResultVec;
 }
 
 /*

@@ -94,7 +94,7 @@ pamDiff.on('diff', data => {
     //assert(data.trigger[0].name === 'all', 'trigger name is not correct');
     //assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 
-    //console.log(data);
+    console.log(data);
 
     ++diffCounter;
 

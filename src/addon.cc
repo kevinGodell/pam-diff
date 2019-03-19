@@ -55,20 +55,15 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
         }
     }
 #endif
-    const uint_fast32_t pixDepth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    //const std::string target = config.Get("target").As<Napi::String>().Utf8Value();
-    // todo target will be set by length of "regions" array
-    // no regions array == all
-    // 1 region in array == region
-    // > 1 regions in array == regions
-    // no need for mask, it is simply a region that was flipped on js side
+    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
+
     const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
 
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
 
     const bool async = config.Get("async").As<Napi::Boolean>().Value();
 
-    const uint_fast32_t engineType = EngineType(pixDepth, response, async, regionsLength);
+    const uint_fast32_t engineType = EngineType(depth, response, async, regionsLength);
 
     switch (engineType) {
         case GRAY_ALL_PERCENT_SYNC :
@@ -95,30 +90,6 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             return GrayRegionsBoundsSync::NewInstance(env, config);
         case GRAY_REGIONS_BOUNDS_ASYNC :
             return GrayRegionsBoundsAsync::NewInstance(env, config);
-        /*case RGB_ALL_PERCENT_SYNC :
-            return RgbAllPercentSync::NewInstance(env, config);
-        case RGB_ALL_PERCENT_ASYNC :
-            return RgbAllPercentAsync::NewInstance(env, config);
-        case RGB_REGION_PERCENT_SYNC :
-            return RgbRegionPercentSync::NewInstance(env, config);
-        case RGB_REGION_PERCENT_ASYNC :
-            return RgbRegionPercentAsync::NewInstance(env, config);
-        case RGB_REGIONS_PERCENT_SYNC :
-            return RgbRegionsPercentSync::NewInstance(env, config);
-        case RGB_REGIONS_PERCENT_ASYNC :
-            return RgbRegionsPercentAsync::NewInstance(env, config);
-        case RGB_ALL_BOUNDS_SYNC :
-            return RgbAllBoundsSync::NewInstance(env, config);
-        case RGB_ALL_BOUNDS_ASYNC :
-            return RgbAllBoundsAsync::NewInstance(env, config);
-        case RGB_REGION_BOUNDS_SYNC :
-            return RgbRegionBoundsSync::NewInstance(env, config);
-        case RGB_REGION_BOUNDS_ASYNC :
-            return RgbRegionBoundsAsync::NewInstance(env, config);
-        case RGB_REGIONS_BOUNDS_SYNC :
-            return RgbRegionsBoundsSync::NewInstance(env, config);
-        case RGB_REGIONS_BOUNDS_ASYNC :
-            return RgbRegionsBoundsAsync::NewInstance(env, config);*/
         case GRAY_ALL_BLOBS_SYNC :
             return GrayAllBlobsSync::NewInstance(env, config);
         case GRAY_ALL_BLOBS_ASYNC :
@@ -129,6 +100,32 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             return GrayRegionBlobsAsync::NewInstance(env, config);
         case GRAY_REGIONS_BLOBS_SYNC :
             return GrayRegionsBlobsSync::NewInstance(env, config);
+        case GRAY_REGIONS_BLOBS_ASYNC :
+            return GrayRegionsBlobsAsync::NewInstance(env, config);
+            /*case RGB_ALL_PERCENT_SYNC :
+                return RgbAllPercentSync::NewInstance(env, config);
+            case RGB_ALL_PERCENT_ASYNC :
+                return RgbAllPercentAsync::NewInstance(env, config);
+            case RGB_REGION_PERCENT_SYNC :
+                return RgbRegionPercentSync::NewInstance(env, config);
+            case RGB_REGION_PERCENT_ASYNC :
+                return RgbRegionPercentAsync::NewInstance(env, config);
+            case RGB_REGIONS_PERCENT_SYNC :
+                return RgbRegionsPercentSync::NewInstance(env, config);
+            case RGB_REGIONS_PERCENT_ASYNC :
+                return RgbRegionsPercentAsync::NewInstance(env, config);
+            case RGB_ALL_BOUNDS_SYNC :
+                return RgbAllBoundsSync::NewInstance(env, config);
+            case RGB_ALL_BOUNDS_ASYNC :
+                return RgbAllBoundsAsync::NewInstance(env, config);
+            case RGB_REGION_BOUNDS_SYNC :
+                return RgbRegionBoundsSync::NewInstance(env, config);
+            case RGB_REGION_BOUNDS_ASYNC :
+                return RgbRegionBoundsAsync::NewInstance(env, config);
+            case RGB_REGIONS_BOUNDS_SYNC :
+                return RgbRegionsBoundsSync::NewInstance(env, config);
+            case RGB_REGIONS_BOUNDS_ASYNC :
+                return RgbRegionsBoundsAsync::NewInstance(env, config);*/
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(engineType));
     }
@@ -136,6 +133,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports = Napi::Function::New(env, CreateObject, "CreateObject");
+
     GrayAllPercentSync::Init(env);
     GrayAllPercentAsync::Init(env);
 
@@ -154,6 +152,15 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     GrayRegionsBoundsSync::Init(env);
     GrayRegionsBoundsAsync::Init(env);
 
+    GrayAllBlobsSync::Init(env);
+    GrayAllBlobsAsync::Init(env);
+
+    GrayRegionBlobsSync::Init(env);
+    GrayRegionBlobsAsync::Init(env);
+
+    GrayRegionsBlobsSync::Init(env);
+    GrayRegionsBlobsAsync::Init(env);
+
     /*RgbAllPercentSync::Init(env);
     RgbAllPercentAsync::Init(env);
 
@@ -171,14 +178,6 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
 
     RgbRegionsBoundsSync::Init(env);
     RgbRegionsBoundsAsync::Init(env);*/
-
-    GrayAllBlobsSync::Init(env);
-    GrayAllBlobsAsync::Init(env);
-
-    GrayRegionBlobsSync::Init(env);
-    GrayRegionBlobsAsync::Init(env);
-
-    GrayRegionsBlobsSync::Init(env);
 
     return exports;
 }

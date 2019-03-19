@@ -72,7 +72,6 @@ private:
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
 
     // out
-    uint_fast32_t flaggedCount_;
     std::vector<PercentResult> percentResultVec_;
 };
 
@@ -147,7 +146,6 @@ private:
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
 
     // out
-    uint_fast32_t flaggedCount_;
     std::vector<BoundsResult> boundsResultVec_;
     uint_fast8_t *pixels_;
 };
@@ -199,6 +197,32 @@ protected:
 
     // out
     BlobsResult blobsResult_;
+    uint_fast8_t *pixels_;
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+class GrayRegionsBlobsWorker : public Napi::AsyncWorker {
+public:
+    GrayRegionsBlobsWorker(const Dimensions &dimensions, const Regions &regions, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+
+    void Execute() override;
+
+    void OnOK() override;
+
+protected:
+    // in
+    const Dimensions &dimensions_;
+    const Regions &regions_;
+    const bool draw_;
+    const uint_fast8_t *buf0_;
+    const uint_fast8_t *buf1_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1Ref_;
+
+    // out
+    std::vector<BlobsResult> blobsResultVec_;
     uint_fast8_t *pixels_;
 };
 

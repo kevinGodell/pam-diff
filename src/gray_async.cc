@@ -14,12 +14,11 @@ GrayAllPercentWorker::GrayAllPercentWorker(const Dimensions &dimensions, const A
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-          buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-          percentResult_(PercentResult{"all", 0, false}) {
+          buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)) {
 }
 
 void GrayAllPercentWorker::Execute() {
-    GrayAllPercent(this->dimensions_, this->all_, this->buf0_, this->buf1_, this->percentResult_);
+    this->percentResult_ = GrayAllPercent(this->dimensions_, this->all_, this->buf0_, this->buf1_);
 }
 
 void GrayAllPercentWorker::OnOK() {
@@ -36,17 +35,16 @@ void GrayAllPercentWorker::OnOK() {
 
 GrayRegionPercentWorker::GrayRegionPercentWorker(const Dimensions &dimensions, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        region_(region),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        percentResult_(PercentResult{region.name, 0, false}) {
+          dimensions_(dimensions),
+          region_(region),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)) {
 }
 
 void GrayRegionPercentWorker::Execute() {
-    GrayRegionPercent(this->dimensions_, this->region_, this->buf0_, this->buf1_, this->percentResult_);
+    this->percentResult_ = GrayRegionPercent(this->dimensions_, this->region_, this->buf0_, this->buf1_);
 }
 
 void GrayRegionPercentWorker::OnOK() {
@@ -63,24 +61,23 @@ void GrayRegionPercentWorker::OnOK() {
 
 GrayRegionsPercentWorker::GrayRegionsPercentWorker(const Dimensions &dimensions, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        regions_(regions),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        percentResultVec_(std::vector<PercentResult>(regions.regions.size())) {
+          dimensions_(dimensions),
+          regions_(regions),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)) {
 }
 
 void GrayRegionsPercentWorker::Execute() {
-    this->flaggedCount_ = GrayRegionsPercent(this->dimensions_, this->regions_, this->buf0_, this->buf1_, this->percentResultVec_);
+    this->percentResultVec_ = GrayRegionsPercent(this->dimensions_, this->regions_, this->buf0_, this->buf1_);
 }
 
 void GrayRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->flaggedCount_ > 0) {
+    if (this->percentResultVec_.size() > 0) {
         ToJs(env, this->percentResultVec_, resultsJs);
     }
     Callback().Call({env.Null(), resultsJs});
@@ -90,19 +87,18 @@ void GrayRegionsPercentWorker::OnOK() {
 
 GrayAllBoundsWorker::GrayAllBoundsWorker(const Dimensions &dimensions, const All &all, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        all_(all),
-        draw_(draw),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        boundsResult_(BoundsResult{"all", dimensions.width - 1, 0, dimensions.height - 1, 0, 0, false}),
-        pixels_(nullptr) {
+          dimensions_(dimensions),
+          all_(all),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
 }
 
 void GrayAllBoundsWorker::Execute() {
-    GrayAllBounds(this->dimensions_, this->all_, this->buf0_, this->buf1_, this->boundsResult_);
+    this->boundsResult_ = GrayAllBounds(this->dimensions_, this->all_, this->buf0_, this->buf1_);
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
@@ -129,19 +125,18 @@ void GrayAllBoundsWorker::OnOK() {
 
 GrayRegionBoundsWorker::GrayRegionBoundsWorker(const Dimensions &dimensions, const Region &region, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        region_(region),
-        draw_(draw),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        boundsResult_(BoundsResult{region.name, region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY, 0, false}),
-        pixels_(nullptr) {
+          dimensions_(dimensions),
+          region_(region),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
 }
 
 void GrayRegionBoundsWorker::Execute() {
-    GrayRegionBounds(this->dimensions_, this->region_, this->buf0_, this->buf1_, this->boundsResult_);
+    this->boundsResult_ = GrayRegionBounds(this->dimensions_, this->region_, this->buf0_, this->buf1_);
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
@@ -168,20 +163,19 @@ void GrayRegionBoundsWorker::OnOK() {
 
 GrayRegionsBoundsWorker::GrayRegionsBoundsWorker(const Dimensions &dimensions, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        regions_(regions),
-        draw_(draw),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        boundsResultVec_(std::vector<BoundsResult>(regions.regions.size(), BoundsResult{std::string(), regions.bounds.maxX, regions.bounds.minX, regions.bounds.maxY, regions.bounds.minY, 0, false})),
-        pixels_(nullptr) {
+          dimensions_(dimensions),
+          regions_(regions),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
 }
 
 void GrayRegionsBoundsWorker::Execute() {
-    this->flaggedCount_ = GrayRegionsBounds(this->dimensions_, this->regions_, this->buf0_, this->buf1_, this->boundsResultVec_);
-    if (this->flaggedCount_ > 0 && this->draw_) {
+    this->boundsResultVec_ = GrayRegionsBounds(this->dimensions_, this->regions_, this->buf0_, this->buf1_);
+    if (this->boundsResultVec_.size() > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
         DrawGray(this->boundsResultVec_, this->dimensions_.width, this->pixels_);
@@ -192,7 +186,7 @@ void GrayRegionsBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->flaggedCount_ > 0) {
+    if (this->boundsResultVec_.size() > 0) {
         ToJs(env, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->dimensions_.byteLength, DeleteExternalData);
@@ -207,19 +201,18 @@ void GrayRegionsBoundsWorker::OnOK() {
 
 GrayAllBlobsWorker::GrayAllBlobsWorker(const Dimensions &dimensions, const All &all, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        all_(all),
-        draw_(draw),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        blobsResult_(BlobsResult{"all", dimensions.width - 1, 0, dimensions.height - 1, 0, 0, false, std::vector<Blob>()}),
-        pixels_(nullptr) {
+          dimensions_(dimensions),
+          all_(all),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
 }
 
 void GrayAllBlobsWorker::Execute() {
-    GrayAllBlobs(this->dimensions_, this->all_, this->buf0_, this->buf1_, this->blobsResult_);
+    this->blobsResult_ = GrayAllBlobs(this->dimensions_, this->all_, this->buf0_, this->buf1_);
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
@@ -246,19 +239,18 @@ void GrayAllBlobsWorker::OnOK() {
 
 GrayRegionBlobsWorker::GrayRegionBlobsWorker(const Dimensions &dimensions, const Region &region, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
-        dimensions_(dimensions),
-        region_(region),
-        draw_(draw),
-        buf0_(napiBuf0.Data()),
-        buf1_(napiBuf1.Data()),
-        buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
-        buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
-        blobsResult_(BlobsResult{region.name, region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY, 0, false, std::vector<Blob>()}),
-        pixels_(nullptr) {
+          dimensions_(dimensions),
+          region_(region),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
 }
 
 void GrayRegionBlobsWorker::Execute() {
-    GrayRegionBlobs(this->dimensions_, this->region_, this->buf0_, this->buf1_, this->blobsResult_);
+    this->blobsResult_ = GrayRegionBlobs(this->dimensions_, this->region_, this->buf0_, this->buf1_);
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
@@ -272,6 +264,44 @@ void GrayRegionBlobsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->blobsResult_.flagged) {
         ToJs(env, this->blobsResult_, resultsJs);
+        if (this->draw_) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->dimensions_.byteLength, DeleteExternalData);
+            Callback().Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    Callback().Call({env.Null(), resultsJs});
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+GrayRegionsBlobsWorker::GrayRegionsBlobsWorker(const Dimensions &dimensions, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb),
+          dimensions_(dimensions),
+          regions_(regions),
+          draw_(draw),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)),
+          pixels_(nullptr) {
+}
+
+void GrayRegionsBlobsWorker::Execute() {
+    this->blobsResultVec_ = GrayRegionsBlobs(this->dimensions_, this->regions_, this->buf0_, this->buf1_);
+    if (this->blobsResultVec_.size() > 0 && this->draw_) {
+        this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
+        std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
+        DrawGray(this->blobsResultVec_, this->dimensions_.width, this->pixels_);
+    }
+}
+
+void GrayRegionsBlobsWorker::OnOK() {
+    const Napi::Env env = Env();
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (this->blobsResultVec_.size() > 0) {
+        ToJs(env, this->blobsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->dimensions_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
