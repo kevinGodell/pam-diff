@@ -33,10 +33,12 @@ enum Engines {
     RGB_REGIONS_BOUNDS_ASYNC = 1121,*/
 
     GRAY_ALL_BLOBS_SYNC = 200,
-    /*GRAY_REGION_BLOBS_SYNC = 210,
-    GRAY_REGIONS_BLOBS_SYNC = 220,
     GRAY_ALL_BLOBS_ASYNC = 1200,
-    GRAY_REGION_BLOBS_ASYNC = 1210,*/
+
+    GRAY_REGION_BLOBS_SYNC = 210,
+    GRAY_REGION_BLOBS_ASYNC = 1210,
+    GRAY_REGIONS_BLOBS_SYNC = 220,
+
     //GRAY_REGIONS_BLOBS_ASYNC = 1220,
     //RGB_ALL_BLOBS_SYNC = 201,
     //RGB_REGION_BLOBS_SYNC = 211,
@@ -187,15 +189,16 @@ GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const ui
 void
 GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
 
-/*
+
 // gray region blobs
 void
-GrayRegionBlobs(uint_fast32_t width, uint_fast32_t height, const Bounds &bounds, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
+GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult);
 
 // gray regions blobs
 uint_fast32_t
-GrayRegionsBlobs(uint_fast32_t width, uint_fast32_t height, uint_fast32_t minDiff, uint_fast32_t minX, uint_fast32_t maxX, uint_fast32_t minY, uint_fast32_t maxY, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
+GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec);
 
+/*
 // rgb all percent
 void
 RgbAllPercent(uint_fast32_t pixDepth, uint_fast32_t pixCount, uint_fast32_t pixDiff, uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult);

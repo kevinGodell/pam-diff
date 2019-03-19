@@ -229,7 +229,7 @@ GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *b
     }
     // calculate percent size of blobbed pixels
     blobsResult.percent = 100 * blobsResult.percent / dimensions.pixelCount;
-    // percent level has been met, check the sizes of blobs
+    // initial percent level has been met, check the sizes of blobs
     if (blobsResult.percent >= all.percent) {
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
         uint_fast32_t blobCount = LabelImage(dimensions.width, dimensions.height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
@@ -256,6 +256,99 @@ GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *b
             blobsResult.flagged = blob.flagged = true;
         }
     }
+}
+
+// gray region blobs
+void
+GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
+    //auto start = std::chrono::high_resolution_clock::now();
+
+    // fill with -2
+    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
+    // all elements changed to -1 will be labelled while -2 will be ignored
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
+            //change from -2 to -1 to mark as pixel of interest
+            labelsVec[p] = -1;
+            SetMin(x, blobsResult.minX);
+            SetMax(x, blobsResult.maxX);
+            SetMin(y, blobsResult.minY);
+            SetMax(y, blobsResult.maxY);
+            ++blobsResult.percent;
+        }
+    }
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+    // percent level has been met, check the sizes of blobs
+    if (blobsResult.percent >= region.percent) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions.width, dimensions.height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, {0, blobsResult.maxX, blobsResult.minX, blobsResult.maxY, blobsResult.minY, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.minX, p = y * dimensions.width + x; x <= blobsResult.maxX; ++x, ++p) {
+                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
+                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                SetMin(x, blob.minX);
+                SetMax(x, blob.maxX);
+                SetMin(y, blob.minY);
+                SetMax(y, blob.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / region.bitsetCount;
+            if (region.percent > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
+        }
+        /*// assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions.width, dimensions.height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, blobsResult.maxX, bounds.minX, bounds.maxY, bounds.minY, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
+                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
+                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                SetMin(x, blob.minX);
+                SetMax(x, blob.maxX);
+                SetMin(y, blob.minY);
+                SetMax(y, blob.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / bitsetCount;
+            if (diffsPerc > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
+        }*/
+    }
+    //auto stop = std::chrono::high_resolution_clock::now();
+    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    //std::cout << duration.count() << std::endl;
+}
+
+// gray regions blobs
+uint_fast32_t
+GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
+    uint_fast32_t flaggedCount = 0;
+
+    auto regionsLen = regions.regions.size();
+
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        GrayRegionBlobs(dimensions, regions.regions[r], buf0, buf1, blobsResultVec[r]);
+        if (blobsResultVec[r].flagged) ++flaggedCount;
+    }
+
+    return flaggedCount;
 }
 
 /*
@@ -368,85 +461,6 @@ RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const 
 }
 
 
-// gray region blobs
-void
-GrayRegionBlobs(const uint_fast32_t width, const uint_fast32_t height, const Bounds &bounds, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BlobsResult &blobsResult) {
-    //auto start = std::chrono::high_resolution_clock::now();
 
-    // fill with -2
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(width * height, -2);
-    // all elements changed to -1 will be labelled while -2 will be ignored
-    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
-        for (uint_fast32_t x = bounds.minX, p = y * width + x; x <= bounds.maxX; ++x, ++p) {
-            if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
-            //change from -2 to -1 to mark as pixel of interest
-            labelsVec[p] = -1;
-            SetMin(x, blobsResult.minX);
-            SetMax(x, blobsResult.maxX);
-            SetMin(y, blobsResult.minY);
-            SetMax(y, blobsResult.maxY);
-            ++blobsResult.percent;
-        }
-    }
-    // calculate percent size of blobbed pixels
-    blobsResult.percent = 100 * blobsResult.percent / bitsetCount;
-    // percent level has been met, check the sizes of blobs
-    if (blobsResult.percent > diffsPerc) {
-        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(width, height, blobsResult.minX, blobsResult.maxX, blobsResult.minY, blobsResult.maxY, labelsVec);
-        // create vector using blobCount size
-        blobsResult.blobs = std::vector<Blob>(blobCount, Blob{0, bounds.maxX, bounds.minX, bounds.maxY, bounds.minY, 0, false});
-        // count and group labels
-        for (uint_fast32_t y = blobsResult.minY; y <= blobsResult.maxY; ++y) {
-            for (uint_fast32_t x = blobsResult.minX, p = y * width + x; x <= blobsResult.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
-                SetMin(x, blob.minX);
-                SetMax(x, blob.maxX);
-                SetMin(y, blob.minY);
-                SetMax(y, blob.maxY);
-                ++blob.percent;
-            }
-        }
-        // convert blob size to percent and check against threshold and flag
-        for (uint_fast32_t b = 0; b < blobCount; ++b) {
-            Blob &blob = blobsResult.blobs[b];
-            blob.percent = 100 * blob.percent / bitsetCount;
-            if (diffsPerc > blob.percent) continue;
-            blob.label = b;
-            blobsResult.flagged = blob.flagged = true;
-        }
-    }
-    //auto stop = std::chrono::high_resolution_clock::now();
-    //auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    //std::cout << duration.count() << std::endl;
-}
 
-// gray regions blobs
-uint_fast32_t
-GrayRegionsBlobs(const uint_fast32_t width, const uint_fast32_t /height/, const uint_fast32_t minDiff, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BlobsResult> &blobsResultVec) {
-    uint_fast32_t flaggedCount = 0;
-    auto regionsLen = regionsVec.size();
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
-        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
-            const uint_fast32_t diff = GrayDiff(buf0, buf1, p);
-            if (minDiff > diff) continue;
-            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-                if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
-                SetMin(x, blobsResultVec[r].minX);
-                SetMax(x, blobsResultVec[r].maxX);
-                SetMin(y, blobsResultVec[r].minY);
-                SetMax(y, blobsResultVec[r].maxY);
-                ++blobsResultVec[r].percent;
-            }
-        }
-    }
-    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        blobsResultVec[r].name = regionsVec[r].name;
-        blobsResultVec[r].percent = blobsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (regionsVec[r].percent > blobsResultVec[r].percent) continue;
-        blobsResultVec[r].flagged = true;
-        ++flaggedCount;
-    }
-    return flaggedCount;
-}*/
+*/
