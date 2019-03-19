@@ -95,13 +95,13 @@ p2p.on('pam', (data) => {
 let regions, mask;
 
 if (target === 'regions') {
-    const region1 = {name: 'region1', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 0, y: 360}, {x: 160, y: 360}, {x: 160, y: 0}]};
-    const region2 = {name: 'region2', difference: 10, percent: 7, polygon: [{x: 160, y: 0}, {x: 160, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
-    const region3 = {name: 'region3', difference: 10, percent: 7, polygon: [{x: 320, y: 0}, {x: 320, y: 360}, {x: 480, y: 360}, {x: 480, y: 0}]};
-    const region4 = {name: 'region4', difference: 10, percent: 7, polygon: [{x: 480, y: 0}, {x: 480, y: 360}, {x: 640, y: 360}, {x: 640, y: 0}]};
+    const region1 = {name: 'region1', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 0, y: 359}, {x: 159, y: 359}, {x: 159, y: 0}]};
+    const region2 = {name: 'region2', difference: 10, percent: 7, polygon: [{x: 160, y: 0}, {x: 160, y: 359}, {x: 319, y: 359}, {x: 319, y: 0}]};
+    const region3 = {name: 'region3', difference: 10, percent: 7, polygon: [{x: 320, y: 0}, {x: 320, y: 359}, {x: 479, y: 359}, {x: 479, y: 0}]};
+    const region4 = {name: 'region4', difference: 10, percent: 7, polygon: [{x: 480, y: 0}, {x: 480, y: 359}, {x: 639, y: 359}, {x: 639, y: 0}]};
     regions = [region1, region2, region3, region4];
 } else if (target === 'mask') {
-    const region1 = {name: 'myMask', polygon: [{x: 0, y: 0}, {x: 0, y: 360}, {x: 320, y: 360}, {x: 320, y: 0}]};
+    const region1 = {name: 'myMask', polygon: [{x: 0, y: 0}, {x: 0, y: 359}, {x: 319, y: 359}, {x: 319, y: 0}]};
     regions = [region1];
     mask = true;
 } else {
