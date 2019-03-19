@@ -49,9 +49,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbMaskPercentSync : public Napi::ObjectWrap<RgbMaskPercentSync> {
+class RgbRegionPercentSync : public Napi::ObjectWrap<RgbRegionPercentSync> {
 public:
-    explicit RgbMaskPercentSync(const Napi::CallbackInfo &info);
+    explicit RgbRegionPercentSync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -71,9 +71,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbMaskPercentAsync : public Napi::ObjectWrap<RgbMaskPercentAsync> {
+class RgbRegionPercentAsync : public Napi::ObjectWrap<RgbRegionPercentAsync> {
 public:
-    explicit RgbMaskPercentAsync(const Napi::CallbackInfo &info);
+    explicit RgbRegionPercentAsync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -180,9 +180,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbMaskBoundsSync : public Napi::ObjectWrap<RgbMaskBoundsSync> {
+class RgbRegionBoundsSync : public Napi::ObjectWrap<RgbRegionBoundsSync> {
 public:
-    explicit RgbMaskBoundsSync(const Napi::CallbackInfo &info);
+    explicit RgbRegionBoundsSync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -206,9 +206,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class RgbMaskBoundsAsync : public Napi::ObjectWrap<RgbMaskBoundsAsync> {
+class RgbRegionBoundsAsync : public Napi::ObjectWrap<RgbRegionBoundsAsync> {
 public:
-    explicit RgbMaskBoundsAsync(const Napi::CallbackInfo &info);
+    explicit RgbRegionBoundsAsync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 

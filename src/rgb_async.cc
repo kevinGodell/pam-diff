@@ -12,7 +12,7 @@ RgbAllPercentWorker::RgbAllPercentWorker(const uint_fast32_t pixDepth, const uin
 }
 
 void RgbAllPercentWorker::Execute() {
-    RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->percentResult_);
+    //RgbAllPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
 void RgbAllPercentWorker::OnOK() {
@@ -27,15 +27,15 @@ void RgbAllPercentWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskPercentWorker::RgbMaskPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionPercentWorker::RgbRegionPercentWorker(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb), pixDepth_(pixDepth), pixCount_(pixCount), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), percentResult_(PercentResult{"mask", 0, false}) {
 }
 
-void RgbMaskPercentWorker::Execute() {
-    RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->percentResult_);
+void RgbRegionPercentWorker::Execute() {
+    //RgbRegionPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->percentResult_);
 }
 
-void RgbMaskPercentWorker::OnOK() {
+void RgbRegionPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
@@ -72,7 +72,7 @@ RgbAllBoundsWorker::RgbAllBoundsWorker(const uint_fast32_t pixDepth, const uint_
 }
 
 void RgbAllBoundsWorker::Execute() {
-    RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->boundsResult_);
+    //RgbAllBounds(this->pixDepth_, this->width_, this->height_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->buf0_, this->buf1_, this->boundsResult_);
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
@@ -97,12 +97,12 @@ void RgbAllBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskBoundsWorker::RgbMaskBoundsWorker(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionBoundsWorker::RgbRegionBoundsWorker(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb), pixDepth_(pixDepth), width_(width), height_(height), pixDiff_(pixDiff), diffsPerc_(diffsPerc), bitsetCount_(bitsetCount), bitsetVec_(bitsetVec), draw_(draw), buf0_(napiBuf0.Data()), buf1_(napiBuf1.Data()), buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)), buf1Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)), buf1Size_(napiBuf1.Length()), boundsResult_(BoundsResult{"mask", width - 1, 0, height - 1, 0, 0, false}), pixels_(nullptr) {
 }
 
-void RgbMaskBoundsWorker::Execute() {
-    RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->boundsResult_);
+void RgbRegionBoundsWorker::Execute() {
+    //RgbRegionBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->buf0_, this->buf1_, this->boundsResult_);
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);
@@ -110,7 +110,7 @@ void RgbMaskBoundsWorker::Execute() {
     }
 }
 
-void RgbMaskBoundsWorker::OnOK() {
+void RgbRegionBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
@@ -132,7 +132,7 @@ RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const uint_fast32_t pixDepth, con
 }
 
 void RgbRegionsBoundsWorker::Execute() {
-    this->flaggedCount_ = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
+    //this->flaggedCount_ = RgbRegionsBounds(this->pixDepth_, this->width_, this->height_, this->minDiff_, this->regionVec_, this->buf0_, this->buf1_, this->boundsResultVec_);
     if (this->flaggedCount_ > 0 && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->buf1Size_]();
         std::copy(this->buf1_, this->buf1_ + this->buf1Size_, this->pixels_);

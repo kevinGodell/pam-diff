@@ -21,12 +21,12 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t pixCount_;
+    Dimensions dimensions_;
+    All all_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 class GrayAllPercentAsync : public Napi::ObjectWrap<GrayAllPercentAsync> {
 public:
@@ -40,16 +40,15 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t pixCount_;
+    Dimensions dimensions_;
+    All all_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskPercentSync : public Napi::ObjectWrap<GrayMaskPercentSync> {
+class GrayRegionPercentSync : public Napi::ObjectWrap<GrayRegionPercentSync> {
 public:
-    explicit GrayMaskPercentSync(const Napi::CallbackInfo &info);
+    explicit GrayRegionPercentSync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -59,19 +58,15 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    Bounds bounds_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t bitsetCount_;
-    std::vector<bool> bitsetVec_;
+    Dimensions dimensions_;
+    Region region_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskPercentAsync : public Napi::ObjectWrap<GrayMaskPercentAsync> {
+class GrayRegionPercentAsync : public Napi::ObjectWrap<GrayRegionPercentAsync> {
 public:
-    explicit GrayMaskPercentAsync(const Napi::CallbackInfo &info);
+    explicit GrayRegionPercentAsync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -81,12 +76,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    Bounds bounds_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t bitsetCount_;
-    std::vector<bool> bitsetVec_;
+    Dimensions dimensions_;
+    Region region_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,11 +94,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    //uint_fast32_t pixCount_;
-    uint_fast32_t width_;
-    Bounds bounds_;
-    uint_fast32_t minDiff_;
-    std::vector<Region> regionVec_;
+    Dimensions dimensions_;
+    Regions regions_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,11 +112,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    //uint_fast32_t pixCount_;
-    uint_fast32_t width_;
-    Bounds bounds_;
-    uint_fast32_t minDiff_;
-    std::vector<Region> regionVec_;
+    Dimensions dimensions_;
+    Regions regions_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,11 +130,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t height_;
-    uint_fast32_t pixCount_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
+    Dimensions dimensions_;
+    All all_;
     bool draw_;
 };
 
@@ -167,19 +149,16 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t height_;
-    uint_fast32_t pixCount_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
+    Dimensions dimensions_;
+    All all_;
     bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskBoundsSync : public Napi::ObjectWrap<GrayMaskBoundsSync> {
+class GrayRegionBoundsSync : public Napi::ObjectWrap<GrayRegionBoundsSync> {
 public:
-    explicit GrayMaskBoundsSync(const Napi::CallbackInfo &info);
+    explicit GrayRegionBoundsSync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -189,21 +168,16 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t pixCount_;
-    Bounds bounds_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t bitsetCount_;
-    std::vector<bool> bitsetVec_;
+    Dimensions dimensions_;
+    Region region_;
     bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskBoundsAsync : public Napi::ObjectWrap<GrayMaskBoundsAsync> {
+class GrayRegionBoundsAsync : public Napi::ObjectWrap<GrayRegionBoundsAsync> {
 public:
-    explicit GrayMaskBoundsAsync(const Napi::CallbackInfo &info);
+    explicit GrayRegionBoundsAsync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -214,12 +188,8 @@ private:
 
     static Napi::FunctionReference constructor;
 
-    uint_fast32_t width_;
-    Bounds bounds_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
-    uint_fast32_t bitsetCount_;
-    std::vector<bool> bitsetVec_;
+    Dimensions dimensions_;
+    Region region_;
     bool draw_;
 };
 
@@ -237,11 +207,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t height_;
-    uint_fast32_t pixCount_;
-    uint_fast32_t minDiff_;
-    std::vector<Region> regionVec_;
+    Dimensions dimensions_;
+    Regions regions_;
     bool draw_;
 };
 
@@ -259,15 +226,13 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t height_;
-    uint_fast32_t pixCount_;
-    uint_fast32_t minDiff_;
-    std::vector<Region> regionVec_;
+    Dimensions dimensions_;
+    Regions regions_;
     bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 class GrayAllBlobsSync : public Napi::ObjectWrap<GrayAllBlobsSync> {
 public:
@@ -281,16 +246,13 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    uint_fast32_t width_;
-    uint_fast32_t height_;
-    uint_fast32_t pixCount_;
-    uint_fast32_t pixDiff_;
-    uint_fast32_t diffsPerc_;
+    Dimensions dimensions_;
+    All all_;
     bool draw_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
+/*
 class GrayAllBlobsAsync : public Napi::ObjectWrap<GrayAllBlobsAsync> {
 public:
     explicit GrayAllBlobsAsync(const Napi::CallbackInfo &info);
@@ -313,9 +275,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskBlobsSync : public Napi::ObjectWrap<GrayMaskBlobsSync> {
+class GrayRegionBlobsSync : public Napi::ObjectWrap<GrayRegionBlobsSync> {
 public:
-    explicit GrayMaskBlobsSync(const Napi::CallbackInfo &info);
+    explicit GrayRegionBlobsSync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -339,9 +301,9 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class GrayMaskBlobsAsync : public Napi::ObjectWrap<GrayMaskBlobsAsync> {
+class GrayRegionBlobsAsync : public Napi::ObjectWrap<GrayRegionBlobsAsync> {
 public:
-    explicit GrayMaskBlobsAsync(const Napi::CallbackInfo &info);
+    explicit GrayRegionBlobsAsync(const Napi::CallbackInfo &info);
 
     static void Init(const Napi::Env &env);
 
@@ -392,4 +354,6 @@ private:
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+*/
 #endif

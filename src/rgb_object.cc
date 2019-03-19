@@ -100,8 +100,8 @@ Napi::Value RgbAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
-        : Napi::ObjectWrap<RgbMaskPercentSync>(info) {
+RgbRegionPercentSync::RgbRegionPercentSync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<RgbRegionPercentSync>(info) {
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
@@ -116,30 +116,30 @@ RgbMaskPercentSync::RgbMaskPercentSync(const Napi::CallbackInfo &info)
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
 }
 
-Napi::FunctionReference RgbMaskPercentSync::constructor;
+Napi::FunctionReference RgbRegionPercentSync::constructor;
 
-void RgbMaskPercentSync::Init(const Napi::Env &env) {
+void RgbRegionPercentSync::Init(const Napi::Env &env) {
     const Napi::HandleScope scope(env);
-    const Napi::Function func = DefineClass(env, "RgbMaskPercentSync", {
-            InstanceMethod("compare", &RgbMaskPercentSync::Compare)
+    const Napi::Function func = DefineClass(env, "RgbRegionPercentSync", {
+            InstanceMethod("compare", &RgbRegionPercentSync::Compare)
     });
-    RgbMaskPercentSync::constructor = Napi::Persistent(func);
-    RgbMaskPercentSync::constructor.SuppressDestruct();
+    RgbRegionPercentSync::constructor = Napi::Persistent(func);
+    RgbRegionPercentSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionPercentSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    const Napi::Object object = RgbMaskPercentSync::constructor.New({config});
+    const Napi::Object object = RgbRegionPercentSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
-Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
+Napi::Value RgbRegionPercentSync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     PercentResult percentResult = PercentResult{"mask", 0, false};
-    RgbMaskPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, percentResult);
+    RgbRegionPercent(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, percentResult);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (percentResult.flagged) {
         ToJs(env, percentResult, resultsJs);
@@ -150,8 +150,8 @@ Napi::Value RgbMaskPercentSync::Compare(const Napi::CallbackInfo &info) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
-        : Napi::ObjectWrap<RgbMaskPercentAsync>(info) {
+RgbRegionPercentAsync::RgbRegionPercentAsync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<RgbRegionPercentAsync>(info) {
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
@@ -166,30 +166,30 @@ RgbMaskPercentAsync::RgbMaskPercentAsync(const Napi::CallbackInfo &info)
     this->bitsetVec_.assign(bitset, bitset + this->pixCount_);
 }
 
-Napi::FunctionReference RgbMaskPercentAsync::constructor;
+Napi::FunctionReference RgbRegionPercentAsync::constructor;
 
-void RgbMaskPercentAsync::Init(const Napi::Env &env) {
+void RgbRegionPercentAsync::Init(const Napi::Env &env) {
     const Napi::HandleScope scope(env);
-    const Napi::Function func = DefineClass(env, "RgbMaskPercentAsync", {
-            InstanceMethod("compare", &RgbMaskPercentAsync::Compare)
+    const Napi::Function func = DefineClass(env, "RgbRegionPercentAsync", {
+            InstanceMethod("compare", &RgbRegionPercentAsync::Compare)
     });
-    RgbMaskPercentAsync::constructor = Napi::Persistent(func);
-    RgbMaskPercentAsync::constructor.SuppressDestruct();
+    RgbRegionPercentAsync::constructor = Napi::Persistent(func);
+    RgbRegionPercentAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionPercentAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    const Napi::Object object = RgbMaskPercentAsync::constructor.New({config});
+    const Napi::Object object = RgbRegionPercentAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
-Napi::Value RgbMaskPercentAsync::Compare(const Napi::CallbackInfo &info) {
+Napi::Value RgbRegionPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rbgMaskPercentWorker = new RgbMaskPercentWorker(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
-    rbgMaskPercentWorker->Queue();
+    auto *rbgRegionPercentWorker = new RgbRegionPercentWorker(this->pixDepth_, this->pixCount_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, napiBuf0, napiBuf1, cb);
+    rbgRegionPercentWorker->Queue();
     return env.Undefined();
 }
 
@@ -386,8 +386,8 @@ Napi::Value RgbAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
-        : Napi::ObjectWrap<RgbMaskBoundsSync>(info) {
+RgbRegionBoundsSync::RgbRegionBoundsSync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<RgbRegionBoundsSync>(info) {
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
@@ -405,30 +405,30 @@ RgbMaskBoundsSync::RgbMaskBoundsSync(const Napi::CallbackInfo &info)
     else this->draw_ = false;
 }
 
-Napi::FunctionReference RgbMaskBoundsSync::constructor;
+Napi::FunctionReference RgbRegionBoundsSync::constructor;
 
-void RgbMaskBoundsSync::Init(const Napi::Env &env) {
+void RgbRegionBoundsSync::Init(const Napi::Env &env) {
     const Napi::HandleScope scope(env);
-    const Napi::Function func = DefineClass(env, "RgbMaskBoundsSync", {
-            InstanceMethod("compare", &RgbMaskBoundsSync::Compare)
+    const Napi::Function func = DefineClass(env, "RgbRegionBoundsSync", {
+            InstanceMethod("compare", &RgbRegionBoundsSync::Compare)
     });
-    RgbMaskBoundsSync::constructor = Napi::Persistent(func);
-    RgbMaskBoundsSync::constructor.SuppressDestruct();
+    RgbRegionBoundsSync::constructor = Napi::Persistent(func);
+    RgbRegionBoundsSync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionBoundsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    const Napi::Object object = RgbMaskBoundsSync::constructor.New({config});
+    const Napi::Object object = RgbRegionBoundsSync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
-Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
+Napi::Value RgbRegionBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
     BoundsResult boundsResult = BoundsResult{"mask", this->width_ - 1, 0, this->height_ - 1, 0, 0, false};
-    RgbMaskBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, boundsResult);
+    RgbRegionBounds(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, buf0, buf1, boundsResult);
     Napi::Array resultsJs = Napi::Array::New(env);
     if (boundsResult.flagged) {
         ToJs(env, boundsResult, resultsJs);
@@ -445,8 +445,8 @@ Napi::Value RgbMaskBoundsSync::Compare(const Napi::CallbackInfo &info) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
-        : Napi::ObjectWrap<RgbMaskBoundsAsync>(info) {
+RgbRegionBoundsAsync::RgbRegionBoundsAsync(const Napi::CallbackInfo &info)
+        : Napi::ObjectWrap<RgbRegionBoundsAsync>(info) {
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
     const Napi::Object config = info[0].As<Napi::Object>();
@@ -463,30 +463,30 @@ RgbMaskBoundsAsync::RgbMaskBoundsAsync(const Napi::CallbackInfo &info)
     else this->draw_ = false;
 }
 
-Napi::FunctionReference RgbMaskBoundsAsync::constructor;
+Napi::FunctionReference RgbRegionBoundsAsync::constructor;
 
-void RgbMaskBoundsAsync::Init(const Napi::Env &env) {
+void RgbRegionBoundsAsync::Init(const Napi::Env &env) {
     const Napi::HandleScope scope(env);
-    const Napi::Function func = DefineClass(env, "RgbMaskBoundsAsync", {
-            InstanceMethod("compare", &RgbMaskBoundsAsync::Compare)
+    const Napi::Function func = DefineClass(env, "RgbRegionBoundsAsync", {
+            InstanceMethod("compare", &RgbRegionBoundsAsync::Compare)
     });
-    RgbMaskBoundsAsync::constructor = Napi::Persistent(func);
-    RgbMaskBoundsAsync::constructor.SuppressDestruct();
+    RgbRegionBoundsAsync::constructor = Napi::Persistent(func);
+    RgbRegionBoundsAsync::constructor.SuppressDestruct();
 }
 
-Napi::Object RgbMaskBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
+Napi::Object RgbRegionBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
     Napi::EscapableHandleScope scope(env);
-    const Napi::Object object = RgbMaskBoundsAsync::constructor.New({config});
+    const Napi::Object object = RgbRegionBoundsAsync::constructor.New({config});
     return scope.Escape(napi_value(object)).ToObject();
 }
 
-Napi::Value RgbMaskBoundsAsync::Compare(const Napi::CallbackInfo &info) {
+Napi::Value RgbRegionBoundsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbMaskBoundsWorker = new RgbMaskBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
-    rgbMaskBoundsWorker->Queue();
+    auto *rgbRegionBoundsWorker = new RgbRegionBoundsWorker(this->pixDepth_, this->width_, this->height_, this->pixDiff_, this->diffsPerc_, this->bitsetCount_, this->bitsetVec_, this->draw_, napiBuf0, napiBuf1, cb);
+    rgbRegionBoundsWorker->Queue();
     return env.Undefined();
 }
 
