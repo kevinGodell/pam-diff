@@ -6,6 +6,8 @@
        "src/addon.cc",
        "src/gray_object.cc",
        "src/gray_async.cc",
+       "src/rgb_object.cc",
+       "src/rgb_async.cc",
        "src/engine.cc",
        "src/results.cc",
        "src/ccl.cc"
