@@ -359,7 +359,6 @@ class PamDiff extends Transform {
         delete this._depth;
         delete this._tupltype;
         delete this._regionObj;
-        delete this._maskObj;
         this._parseChunk = this._parseFirstChunk;
         return this;
     }
@@ -445,9 +444,7 @@ class PamDiff extends Transform {
                 );
             }
         }
-
         this._regionObj = {length: regions.length, regions: regions};
-
         if (regions.length > 1) {
             let minDiff = 255;
             let minX = this._width;
