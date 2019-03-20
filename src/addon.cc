@@ -3,6 +3,9 @@
 #include "engine.h"
 #include "napi.h"
 
+#include <cstdint>
+
+
 //#ifdef NAPI_DEBUG
 #include <iostream>
 using std::cout;
@@ -42,6 +45,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.HasOwnProperty("maxY")) std::cout << "maxY : " << config.Get("maxY").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("regions")) {
         const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
+        //uint_fast32_t regionsLength = regionsJs.Length();
         cout << "regions length : " << regionsJs.Length() << endl;
         for (uint_fast32_t r = 0; r < regionsJs.Length(); ++r) {
             Napi::Object obj = regionsJs.Get(r).As<Napi::Object>();
