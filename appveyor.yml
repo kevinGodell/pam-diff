@@ -12,7 +12,8 @@ cache:
   - node_modules
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
-#  - npm cache clean --force
+  - npm install polygon-points
+  - npm cache clean --force
   - npm install
 #  - npm install --cache /tmp/empty-cache
   - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
