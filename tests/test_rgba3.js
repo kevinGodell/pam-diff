@@ -70,7 +70,7 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 224}, {x: 99, y: 224}, {x: 99, y: 0}]};
 
 const regions = [region1];
 
