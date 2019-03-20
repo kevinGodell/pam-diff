@@ -22,7 +22,8 @@ before_test:
 test_script:
   - node --version
   - npm --version
-  - npm test
+#  - npm test
+  - npm run gray:region
 on_success:
 #  - npm run examples
 #  - npm run jpeg
