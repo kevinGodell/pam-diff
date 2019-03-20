@@ -239,7 +239,7 @@ Napi::Value GrayRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Function cb = info[2].As<Napi::Function>();
     const std::vector<PercentResult> percentResultVec = GrayRegionsPercent(this->dimensions_, this->regions_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResultVec.size() > 0) {
+    if (!percentResultVec.empty()) {
         ToJs(env, percentResultVec, resultsJs);
     }
     cb.Call({env.Null(), resultsJs});
@@ -551,7 +551,7 @@ Napi::Value GrayRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Function cb = info[2].As<Napi::Function>();
     const std::vector<BoundsResult> boundsResultVec = GrayRegionsBounds(this->dimensions_, this->regions_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (boundsResultVec.size() > 0) {
+    if (!boundsResultVec.empty()) {
         ToJs(env, boundsResultVec, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
@@ -877,7 +877,7 @@ Napi::Value GrayRegionsBlobsSync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Function cb = info[2].As<Napi::Function>();
     const std::vector<BlobsResult> blobsResultVec = GrayRegionsBlobs(this->dimensions_, this->regions_, buf0, buf1);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (blobsResultVec.size() > 0) {
+    if (!blobsResultVec.empty()) {
         ToJs(env, blobsResultVec, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
@@ -934,21 +934,11 @@ Napi::Object GrayRegionsBlobsAsync::NewInstance(const Napi::Env &env, const Napi
 
 Napi::Value GrayRegionsBlobsAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
+    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
+    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<BlobsResult> blobsResultVec = GrayRegionsBlobs(this->dimensions_, this->regions_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (blobsResultVec.size() > 0) {
-        ToJs(env, blobsResultVec, resultsJs);
-        if (this->draw_) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawGray(blobsResultVec, this->dimensions_.width, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs, env.Null()});
+    auto *grayRegionsBlobsWorker = new GrayRegionsBlobsWorker(this->dimensions_, this->regions_, this->draw_, napiBuf0, napiBuf1, cb);
+    grayRegionsBlobsWorker->Queue();
     return env.Undefined();
 }
 

@@ -61,7 +61,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
     const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
-    const bool async = config.Get("async").As<Napi::Boolean>().Value();
+    const bool async = config.HasOwnProperty("async") && config.Get("async").As<Napi::Boolean>().Value();
     const uint_fast32_t engineType = EngineType(depth, response, async, regionsLength);
     switch (engineType) {
         case GRAY_ALL_PERCENT_SYNC :

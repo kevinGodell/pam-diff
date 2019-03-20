@@ -77,7 +77,7 @@ void RgbRegionsPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->percentResultVec_.size() > 0) {
+    if (!this->percentResultVec_.empty()) {
         ToJs(env, this->percentResultVec_, resultsJs);
     }
     Callback().Call({env.Null(), resultsJs});
@@ -175,7 +175,7 @@ RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const Dimensions &dimensions, con
 
 void RgbRegionsBoundsWorker::Execute() {
     this->boundsResultVec_ = RgbRegionsBounds(this->dimensions_, this->regions_, this->buf0_, this->buf1_);
-    if (this->boundsResultVec_.size() > 0 && this->draw_) {
+    if (!this->boundsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
         DrawRgb(this->boundsResultVec_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
@@ -186,7 +186,7 @@ void RgbRegionsBoundsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->boundsResultVec_.size() > 0) {
+    if (!this->boundsResultVec_.empty()) {
         ToJs(env, this->boundsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->dimensions_.byteLength, DeleteExternalData);
@@ -289,7 +289,7 @@ RgbRegionsBlobsWorker::RgbRegionsBlobsWorker(const Dimensions &dimensions, const
 
 void RgbRegionsBlobsWorker::Execute() {
     this->blobsResultVec_ = RgbRegionsBlobs(this->dimensions_, this->regions_, this->buf0_, this->buf1_);
-    if (this->blobsResultVec_.size() > 0 && this->draw_) {
+    if (!this->blobsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
         DrawRgb(this->blobsResultVec_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
@@ -300,7 +300,7 @@ void RgbRegionsBlobsWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->blobsResultVec_.size() > 0) {
+    if (!this->blobsResultVec_.empty()) {
         ToJs(env, this->blobsResultVec_, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->dimensions_.byteLength, DeleteExternalData);

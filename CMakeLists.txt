@@ -12,12 +12,12 @@ include_directories(node_modules/node-addon-api)
 include_directories(node_modules/node-addon-api/src)
 include_directories(node_modules/node-addon-api/external-napi)
 
-file(GLOB SOURCES "src/*.cc")
-
-add_executable(addon ${SOURCES})
-
-# use specific list of files
-#set(SOURCES src/addon.cc src/async.cc src/engine.cc src/object.cc src/results.cc)
+#file(GLOB SOURCES "src/*.cc")
 
 # use pattern matching to include files
 #file(GLOB SOURCES "src/*.cc" "src/*.c")
+
+# use specific list of files
+set(SOURCES src/addon.cc src/ccl.cc src/engine.cc src/gray_async.cc src/gray_object.cc src/results.cc src/rgb_async.cc src/rgb_object.cc)
+
+add_executable(addon ${SOURCES})
