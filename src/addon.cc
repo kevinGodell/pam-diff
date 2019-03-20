@@ -32,7 +32,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.HasOwnProperty("draw")) std::cout << "draw : " << config.Get("draw").As<Napi::Boolean>().Value() << std::endl;
     if (config.HasOwnProperty("async")) std::cout << "async : " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
     if (config.HasOwnProperty("target")) std::cout << "target : " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
-    if (config.HasOwnProperty("difference")) std::cout << "difference : " << config.Get("difference").As<Napi::Number>().Int32Value() << std::endl;
+    if (config.HasOwnProperty("difference")) std::cout << "difference : " << config.Get("difference").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("percent")) std::cout << "percent : " << config.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("bitsetCount")) std::cout << "bitsetCount : " << config.Get("bitsetCount").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("bitset")) std::cout << "bitset length : " << config.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
@@ -47,7 +47,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             Napi::Object obj = regionsJs.Get(r).As<Napi::Object>();
             const std::string name = obj.HasOwnProperty("name") ? obj.Get("name").As<Napi::String>() : std::string();
             const uint_fast32_t difference = obj.HasOwnProperty("difference") ? obj.Get("difference").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t percent = regionsJs.Get(r).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
+            const uint_fast32_t percent = obj.HasOwnProperty("percent") ? obj.Get("percent").As<Napi::Number>().Uint32Value() : 0;
             const uint_fast32_t bitsetCount = obj.HasOwnProperty("bitsetCount") ? obj.Get("bitsetCount").As<Napi::Number>().Uint32Value() : 0;
             const uint_fast32_t bitsetLength = obj.HasOwnProperty("bitset") ? static_cast<uint_fast32_t>(obj.Get("bitset").As<Napi::Buffer<bool>>().Length()) : 0;
             const uint_fast32_t minX = obj.HasOwnProperty("minX") ? obj.Get("minX").As<Napi::Number>().Uint32Value() : 0;

@@ -490,11 +490,11 @@ class PamDiff extends Transform {
         const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
         if (this._regionObj) {
             engine += '_region';
-            config.target = 'region';
+            //config.target = 'region';
             config.regions = this._regionObj.regions;
             if (this._regionObj.length > 1) {
                 engine += 's';
-                config.target += 's';
+                //config.target += 's';
                 config.bitset = this._regionObj.bitset;
                 config.difference = this._regionObj.difference;
                 config.minX = this._regionObj.minX;
@@ -504,7 +504,7 @@ class PamDiff extends Transform {
             }
         } else {
             engine += '_all';
-            config.target = 'all';
+            //config.target = 'all';
             config.difference = this._difference;
             config.percent = this._percent;
         }
