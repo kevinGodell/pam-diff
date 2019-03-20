@@ -148,6 +148,14 @@ DrawRgb(const BoundsResult &boundsResult, uint_fast32_t width, uint_fast32_t pix
 void
 DrawRgb(const std::vector<BoundsResult> &boundsResultVec, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
 
+// draw blobs bounding box in rgb pixels for all/mask
+void
+DrawRgb(const BlobsResult &blobsResult, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
+
+// draw blobs bounding box in rgb pixels for regions
+void
+DrawRgb(const std::vector<BlobsResult> &blobsResultVec, uint_fast32_t width, uint_fast32_t pixDepth, uint_fast8_t *pixels);
+
 // free memory from heap allocated array used as Buffer data
 void
 DeleteExternalData(Napi::Env env, const uint_fast8_t *finalizeData);

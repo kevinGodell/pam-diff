@@ -104,6 +104,27 @@ DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t wi
     }
 }
 
+// draw blobs bounding box in rgb pixels for all/mask
+void
+DrawRgb(const BlobsResult &blobsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+    for (const auto &blob : blobsResult.blobs) {
+        if (!blob.flagged) continue;
+        SetRgbPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixDepth, pixels);
+    }
+}
+
+// draw blobs bounding box in gray pixels for regions
+void
+DrawRgb(const std::vector<BlobsResult> &blobsResultVec, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+    for (const auto &blobsResult : blobsResultVec) {
+        if (!blobsResult.flagged) continue;
+        for (const auto &blob : blobsResult.blobs) {
+            if (!blob.flagged) continue;
+            SetRgbPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixDepth, pixels);
+        }
+    }
+}
+
 // free memory from heap allocated array used as Buffer data
 void
 DeleteExternalData(Napi::Env /*&env*/, const uint_fast8_t *finalizeData) {

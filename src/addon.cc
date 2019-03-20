@@ -1,22 +1,18 @@
 #include "gray_object.h"
-//#include "rgb_object.h"
+#include "rgb_object.h"
 #include "engine.h"
 #include "napi.h"
 
-#include <cstdint>
-
-
-//#ifdef NAPI_DEBUG
+#ifdef NAPI_DEBUG
 #include <iostream>
 using std::cout;
 using std::endl;
-//#endif
+#endif
 
 Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const Napi::Env env = info.Env();
     const Napi::Object config = info[0].As<Napi::Object>();
-//#ifdef NAPI_DEBUG
-
+#ifdef NAPI_DEBUG
     // show system size values for types being used
     cout << "size of bool : " << sizeof(bool) << endl;
     cout << "size of std::string : " << sizeof(std::string) << endl;
@@ -61,17 +57,12 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             cout << name << " - " << difference << " - " << minX << " - " << maxX << " - " << minY << " - " << maxY << " - " << percent << " - " << bitsetCount << " - " << bitsetLength << endl;
         }
     }
-//#endif
+#endif
     const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    cout << "depth " << depth << endl;
     const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
-    cout << "regionsLength " << regionsLength << endl;
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
-    cout << "response " << response << endl;
     const bool async = config.Get("async").As<Napi::Boolean>().Value();
-    cout << "async " << async << endl;
     const uint_fast32_t engineType = EngineType(depth, response, async, regionsLength);
-    cout << "engineType " << engineType << endl;
     switch (engineType) {
         case GRAY_ALL_PERCENT_SYNC :
             return GrayAllPercentSync::NewInstance(env, config);
@@ -109,30 +100,42 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
             return GrayRegionsBlobsSync::NewInstance(env, config);
         case GRAY_REGIONS_BLOBS_ASYNC :
             return GrayRegionsBlobsAsync::NewInstance(env, config);
-            /*case RGB_ALL_PERCENT_SYNC :
-                return RgbAllPercentSync::NewInstance(env, config);
-            case RGB_ALL_PERCENT_ASYNC :
-                return RgbAllPercentAsync::NewInstance(env, config);
-            case RGB_REGION_PERCENT_SYNC :
-                return RgbRegionPercentSync::NewInstance(env, config);
-            case RGB_REGION_PERCENT_ASYNC :
-                return RgbRegionPercentAsync::NewInstance(env, config);
-            case RGB_REGIONS_PERCENT_SYNC :
-                return RgbRegionsPercentSync::NewInstance(env, config);
-            case RGB_REGIONS_PERCENT_ASYNC :
-                return RgbRegionsPercentAsync::NewInstance(env, config);
-            case RGB_ALL_BOUNDS_SYNC :
-                return RgbAllBoundsSync::NewInstance(env, config);
-            case RGB_ALL_BOUNDS_ASYNC :
-                return RgbAllBoundsAsync::NewInstance(env, config);
-            case RGB_REGION_BOUNDS_SYNC :
-                return RgbRegionBoundsSync::NewInstance(env, config);
-            case RGB_REGION_BOUNDS_ASYNC :
-                return RgbRegionBoundsAsync::NewInstance(env, config);
-            case RGB_REGIONS_BOUNDS_SYNC :
-                return RgbRegionsBoundsSync::NewInstance(env, config);
-            case RGB_REGIONS_BOUNDS_ASYNC :
-                return RgbRegionsBoundsAsync::NewInstance(env, config);*/
+        case RGB_ALL_PERCENT_SYNC :
+            return RgbAllPercentSync::NewInstance(env, config);
+        case RGB_ALL_PERCENT_ASYNC :
+            return RgbAllPercentAsync::NewInstance(env, config);
+        case RGB_REGION_PERCENT_SYNC :
+            return RgbRegionPercentSync::NewInstance(env, config);
+        case RGB_REGION_PERCENT_ASYNC :
+            return RgbRegionPercentAsync::NewInstance(env, config);
+        case RGB_REGIONS_PERCENT_SYNC :
+            return RgbRegionsPercentSync::NewInstance(env, config);
+        case RGB_REGIONS_PERCENT_ASYNC :
+            return RgbRegionsPercentAsync::NewInstance(env, config);
+        case RGB_ALL_BOUNDS_SYNC :
+            return RgbAllBoundsSync::NewInstance(env, config);
+        case RGB_ALL_BOUNDS_ASYNC :
+            return RgbAllBoundsAsync::NewInstance(env, config);
+        case RGB_REGION_BOUNDS_SYNC :
+            return RgbRegionBoundsSync::NewInstance(env, config);
+        case RGB_REGION_BOUNDS_ASYNC :
+            return RgbRegionBoundsAsync::NewInstance(env, config);
+        case RGB_REGIONS_BOUNDS_SYNC :
+            return RgbRegionsBoundsSync::NewInstance(env, config);
+        case RGB_REGIONS_BOUNDS_ASYNC :
+            return RgbRegionsBoundsAsync::NewInstance(env, config);
+        case RGB_ALL_BLOBS_SYNC :
+            return RgbAllBlobsSync::NewInstance(env, config);
+        case RGB_ALL_BLOBS_ASYNC :
+            return RgbAllBlobsAsync::NewInstance(env, config);
+        case RGB_REGION_BLOBS_SYNC :
+            return RgbRegionBlobsSync::NewInstance(env, config);
+        case RGB_REGION_BLOBS_ASYNC :
+            return RgbRegionBlobsAsync::NewInstance(env, config);
+        case RGB_REGIONS_BLOBS_SYNC :
+            return RgbRegionsBlobsSync::NewInstance(env, config);
+        case RGB_REGIONS_BLOBS_ASYNC :
+            return RgbRegionsBlobsAsync::NewInstance(env, config);
         default:
             throw Napi::Error::New(env, "Engine not found for type " + std::to_string(engineType));
     }
@@ -168,7 +171,7 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     GrayRegionsBlobsSync::Init(env);
     GrayRegionsBlobsAsync::Init(env);
 
-    /*RgbAllPercentSync::Init(env);
+    RgbAllPercentSync::Init(env);
     RgbAllPercentAsync::Init(env);
 
     RgbRegionPercentSync::Init(env);
@@ -184,7 +187,16 @@ Napi::Object Init(Napi::Env env, Napi::Object exports) {
     RgbRegionBoundsAsync::Init(env);
 
     RgbRegionsBoundsSync::Init(env);
-    RgbRegionsBoundsAsync::Init(env);*/
+    RgbRegionsBoundsAsync::Init(env);
+
+    RgbAllBlobsSync::Init(env);
+    RgbAllBlobsAsync::Init(env);
+
+    RgbRegionBlobsSync::Init(env);
+    RgbRegionBlobsAsync::Init(env);
+
+    RgbRegionsBlobsSync::Init(env);
+    RgbRegionsBlobsAsync::Init(env);
 
     return exports;
 }
