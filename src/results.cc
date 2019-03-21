@@ -56,7 +56,7 @@ ToJs(const Napi::Env &env, const std::vector<BlobsResult> &blobsResultVec, Napi:
 // draw bounding box in gray pixels for all/mask
 void
 DrawGray(const BoundsResult &boundsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
-    SetGrayPixels(boundsResult.minX, boundsResult.maxX, boundsResult.minY, boundsResult.maxY, width, pixels);
+    SetGrayPixels(boundsResult.bounds, width, pixels);
 }
 
 // draw bounding box in gray pixels for regions
@@ -64,7 +64,7 @@ void
 DrawGray(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, uint_fast8_t *pixels) {
     for (const auto &boundsResult : boundsResultVec) {
         if (!boundsResult.flagged) continue;
-        SetGrayPixels(boundsResult.minX, boundsResult.maxX, boundsResult.minY, boundsResult.maxY, width, pixels);
+        SetGrayPixels(boundsResult.bounds, width, pixels);
     }
 }
 
@@ -73,7 +73,7 @@ void
 DrawGray(const BlobsResult &blobsResult, const uint_fast32_t width, uint_fast8_t *pixels) {
     for (const auto &blob : blobsResult.blobs) {
         if (!blob.flagged) continue;
-        SetGrayPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixels);
+        SetGrayPixels(blob.bounds, width, pixels);
     }
 }
 
@@ -84,7 +84,7 @@ DrawGray(const std::vector<BlobsResult> &blobsResultVec, const uint_fast32_t wid
         if (!blobsResult.flagged) continue;
         for (const auto &blob : blobsResult.blobs) {
             if (!blob.flagged) continue;
-            SetGrayPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixels);
+            SetGrayPixels(blob.bounds, width, pixels);
         }
     }
 }
@@ -92,7 +92,7 @@ DrawGray(const std::vector<BlobsResult> &blobsResultVec, const uint_fast32_t wid
 // draw bounding box in rgb pixels for all/mask
 void
 DrawRgb(const BoundsResult &boundsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
-    SetRgbPixels(boundsResult.minX, boundsResult.maxX, boundsResult.minY, boundsResult.maxY, width, pixDepth, pixels);
+    SetRgbPixels(boundsResult.bounds, width, pixDepth, pixels);
 }
 
 // draw bounding box in rgb pixels for regions
@@ -100,7 +100,7 @@ void
 DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
     for (const auto &boundsResult : boundsResultVec) {
         if (!boundsResult.flagged) continue;
-        SetRgbPixels(boundsResult.minX, boundsResult.maxX, boundsResult.minY, boundsResult.maxY, width, pixDepth, pixels);
+        SetRgbPixels(boundsResult.bounds, width, pixDepth, pixels);
     }
 }
 
@@ -109,7 +109,7 @@ void
 DrawRgb(const BlobsResult &blobsResult, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
     for (const auto &blob : blobsResult.blobs) {
         if (!blob.flagged) continue;
-        SetRgbPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixDepth, pixels);
+        SetRgbPixels(blob.bounds, width, pixDepth, pixels);
     }
 }
 
@@ -120,7 +120,7 @@ DrawRgb(const std::vector<BlobsResult> &blobsResultVec, const uint_fast32_t widt
         if (!blobsResult.flagged) continue;
         for (const auto &blob : blobsResult.blobs) {
             if (!blob.flagged) continue;
-            SetRgbPixels(blob.minX, blob.maxX, blob.minY, blob.maxY, width, pixDepth, pixels);
+            SetRgbPixels(blob.bounds, width, pixDepth, pixels);
         }
     }
 }

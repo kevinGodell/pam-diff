@@ -1,5 +1,6 @@
 //based on article @ https://www.codeproject.com/Articles/825200/%2FArticles%2F825200%2FAn-Implementation-Of-The-Connected-Component-Label
 #include "ccl.h"
+#include "engine.h"
 #include <cstdint>
 #include <memory>
 #include <vector>
@@ -28,7 +29,7 @@
 #define Y (stack[stackPointer-2])
 
 void
-LabelComponent(uint_fast32_t *stack, const uint_fast32_t width, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, int_fast32_t *labels) {
+LabelComponent(uint_fast32_t *stack, const Dimensions &dimensions, const Bounds &bounds, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, int_fast32_t *labels) {
     stack[0] = x;
     stack[1] = y;
     stack[2] = 0;
@@ -36,19 +37,19 @@ LabelComponent(uint_fast32_t *stack, const uint_fast32_t width, const uint_fast3
     int_fast32_t index;
 
     START:// recursive routine starts here
-    index = width * Y + X;
+    index = dimensions.width * Y + X;
     if (labels[index] != -1) RETURN;// pixel is ignored(-2) or previously labelled(>= 0)
     labels[index] = labelNumber;
-    if (X > minX) CALL_LabelComponent(X - 1, Y, 1);// left  pixel
+    if (X > bounds.minX) CALL_LabelComponent(X - 1, Y, 1);// left  pixel
 
     RETURN1:
-    if (X < maxX) CALL_LabelComponent(X + 1, Y, 2);// right pixel
+    if (X < bounds.maxX) CALL_LabelComponent(X + 1, Y, 2);// right pixel
 
     RETURN2:
-    if (Y > minY) CALL_LabelComponent(X, Y - 1, 3);// top pixel
+    if (Y > bounds.minY) CALL_LabelComponent(X, Y - 1, 3);// top pixel
 
     RETURN3:
-    if (Y < maxY) CALL_LabelComponent(X, Y + 1, 4);// bottom pixel
+    if (Y < bounds.maxY) CALL_LabelComponent(X, Y + 1, 4);// bottom pixel
 
     RETURN4:
     RETURN;
@@ -56,16 +57,16 @@ LabelComponent(uint_fast32_t *stack, const uint_fast32_t width, const uint_fast3
 
 // assign label value to each pixel, return number of labels (highest label number +1)
 uint_fast32_t
-LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, std::vector<int_fast32_t> &labelsVec) {
+LabelImage(const Dimensions &dimensions, const Bounds &bounds, std::vector<int_fast32_t> &labelsVec) {
 
-    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (width * height + 1)]);
+    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (dimensions.pixelCount + 1)]);
 
     // label number
     int_fast32_t labelNumber = -1;
 
-    for (uint_fast32_t y = minY; y <= maxY; ++y) {
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
 
-        for (uint_fast32_t x = minX, p = y * width + x; x <= maxX; ++x, ++p) {
+        for (uint_fast32_t x = bounds.minX, p = y * dimensions.width + x; x <= bounds.maxX; ++x, ++p) {
 
             // ignored == -2, unlabeled == -1, labeled >= 0
             if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
@@ -74,7 +75,7 @@ LabelImage(const uint_fast32_t width, const uint_fast32_t height, const uint_fas
             ++labelNumber;
 
             // send to C function for recursive labelling
-            LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
+            LabelComponent(stack.get(), dimensions, bounds, labelNumber, x, y, labelsVec.data());
 
         }
     }

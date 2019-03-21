@@ -106,7 +106,7 @@ struct PercentResult {
     bool flagged;// 1
 };
 
-struct BoundsResult {
+/*struct BoundsResult {
     std::string name;// 24
     uint_fast32_t minX;// 4
     uint_fast32_t maxX;// 4
@@ -114,24 +114,25 @@ struct BoundsResult {
     uint_fast32_t maxY;// 4
     uint_fast32_t percent;// 4
     bool flagged;// 1
+};*/
+
+struct BoundsResult {
+    std::string name;
+    Bounds bounds;
+    uint_fast32_t percent;
+    bool flagged;
 };
 
 struct Blob {
     uint_fast32_t label;
-    uint_fast32_t minX;
-    uint_fast32_t maxX;
-    uint_fast32_t minY;
-    uint_fast32_t maxY;
+    Bounds bounds;
     uint_fast32_t percent;
     bool flagged;
 };
 
 struct BlobsResult {
     std::string name;// 24
-    uint_fast32_t minX;// 4
-    uint_fast32_t maxX;// 4
-    uint_fast32_t minY;// 4
-    uint_fast32_t maxY;// 4
+    Bounds bounds;
     uint_fast32_t percent;// 4
     bool flagged;// 1
     std::vector<Blob> blobs;

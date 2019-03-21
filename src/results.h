@@ -22,10 +22,10 @@ SetBoundsResult(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Ar
     Napi::Object obj = Napi::Object::New(env);
     obj.Set("name", boundsResult.name);
     obj.Set("percent", boundsResult.percent);
-    obj.Set("minX", boundsResult.minX);
-    obj.Set("maxX", boundsResult.maxX);
-    obj.Set("minY", boundsResult.minY);
-    obj.Set("maxY", boundsResult.maxY);
+    obj.Set("minX", boundsResult.bounds.minX);
+    obj.Set("maxX", boundsResult.bounds.maxX);
+    obj.Set("minY", boundsResult.bounds.minY);
+    obj.Set("maxY", boundsResult.bounds.maxY);
     resultsJs.Set(index, obj);
 }
 
@@ -34,10 +34,10 @@ SetBlobsResult(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array
     Napi::Object obj = Napi::Object::New(env);
     obj.Set("name", blobsResult.name);
     obj.Set("percent", blobsResult.percent);
-    obj.Set("minX", blobsResult.minX);
-    obj.Set("maxX", blobsResult.maxX);
-    obj.Set("minY", blobsResult.minY);
-    obj.Set("maxY", blobsResult.maxY);
+    obj.Set("minX", blobsResult.bounds.minX);
+    obj.Set("maxX", blobsResult.bounds.maxX);
+    obj.Set("minY", blobsResult.bounds.minY);
+    obj.Set("maxY", blobsResult.bounds.maxY);
     Napi::Array blobsJs = Napi::Array::New(env);
     uint_fast32_t j = 0;
     for (const auto &blob : blobsResult.blobs) {
@@ -45,17 +45,17 @@ SetBlobsResult(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array
         Napi::Object blobJs = Napi::Object::New(env);
         blobJs.Set("label", blob.label);
         blobJs.Set("percent", blob.percent);
-        blobJs.Set("minX", blob.minX);
-        blobJs.Set("maxX", blob.maxX);
-        blobJs.Set("minY", blob.minY);
-        blobJs.Set("maxY", blob.maxY);
+        blobJs.Set("minX", blob.bounds.minX);
+        blobJs.Set("maxX", blob.bounds.maxX);
+        blobJs.Set("minY", blob.bounds.minY);
+        blobJs.Set("maxY", blob.bounds.maxY);
         blobsJs.Set(j++, blobJs);
     }
     obj.Set("blobs", blobsJs);
     resultsJs.Set(index, obj);
 }
 
-inline void
+/*inline void
 SetGrayPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const uint_fast32_t width, uint_fast8_t *pixels) {
     uint_fast8_t *firstPtr = &pixels[minY * width + minX];
     uint_fast8_t *secondPtr = &pixels[maxY * width + minX];
@@ -69,17 +69,33 @@ SetGrayPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fas
         *firstPtr = 0x80;// left
         *secondPtr = 0x80;// right
     }
+}*/
+
+inline void
+SetGrayPixels(const Bounds bounds, const uint_fast32_t width, uint_fast8_t *pixels) {
+    uint_fast8_t *firstPtr = &pixels[bounds.minY * width + bounds.minX];
+    uint_fast8_t *secondPtr = &pixels[bounds.maxY * width + bounds.minX];
+    for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, ++firstPtr, ++secondPtr) {
+        *firstPtr = 0x80;// top
+        *secondPtr = 0x80;// bottom
+    }
+    firstPtr = &pixels[(bounds.minY + 1) * width + bounds.minX];
+    secondPtr = &pixels[(bounds.minY + 1) * width + bounds.maxX];
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, firstPtr += width, secondPtr += width) {
+        *firstPtr = 0x80;// left
+        *secondPtr = 0x80;// right
+    }
 }
 
 inline void
-SetRgbPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast32_t minY, const uint_fast32_t maxY, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
+SetRgbPixels(const Bounds &bounds, const uint_fast32_t width, const uint_fast32_t pixDepth, uint_fast8_t *pixels) {
     uint_fast32_t inc = 1;
     if (pixDepth > 3) {
         inc += (pixDepth - 3);
     }
-    uint_fast8_t *firstPtr = &pixels[minY * width * pixDepth + minX * pixDepth];
-    uint_fast8_t *secondPtr = &pixels[maxY * width * pixDepth + minX * pixDepth];
-    for (uint_fast32_t x = minX; x <= maxX; ++x, firstPtr += inc, secondPtr += inc) {
+    uint_fast8_t *firstPtr = &pixels[bounds.minY * width * pixDepth + bounds.minX * pixDepth];
+    uint_fast8_t *secondPtr = &pixels[bounds.maxY * width * pixDepth + bounds.minX * pixDepth];
+    for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, firstPtr += inc, secondPtr += inc) {
         *firstPtr = 0xAF;// top
         *(++firstPtr) = 0x33;
         *(++firstPtr) = 0xFF;
@@ -88,9 +104,9 @@ SetRgbPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fast
         *(++secondPtr) = 0xFF;
     }
     inc = width * pixDepth;
-    firstPtr = &pixels[(minY + 1) * width * pixDepth + minX * pixDepth];
-    secondPtr = &pixels[(minY + 1) * width * pixDepth + maxX * pixDepth];
-    for (uint_fast32_t y = minY, yLimit = maxY - 1; y < yLimit; ++y, firstPtr += inc, secondPtr += inc) {
+    firstPtr = &pixels[(bounds.minY + 1) * width * pixDepth + bounds.minX * pixDepth];
+    secondPtr = &pixels[(bounds.minY + 1) * width * pixDepth + bounds.maxX * pixDepth];
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, firstPtr += inc, secondPtr += inc) {
         *firstPtr = 0xAF;// left
         *(firstPtr + 1) = 0x33;
         *(firstPtr + 2) = 0xFF;
