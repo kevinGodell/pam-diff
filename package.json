@@ -116,13 +116,13 @@
     "pam:rgba:sync": "node --expose-gc examples/createJpegs --pixfmt rgba --async false --response bounds --draw false --target regions",
     "draw": "npm run draw:async && npm run draw:sync",
     "draw:async": "npm run draw:gray:async && npm run draw:rgb:async && npm run draw:rgba:async",
-    "draw:gray:async": "node --expose-gc examples/createJpegs --pixfmt gray --async true --response bounds --draw true --target regions",
-    "draw:rgb:async": "node --expose-gc examples/createJpegs --pixfmt rgb24 --async true --response bounds --draw true --target regions",
-    "draw:rgba:async": "node --expose-gc examples/createJpegs --pixfmt rgba --async true --response bounds --draw true --target regions",
+    "draw:gray:async": "node --expose-gc examples/createJpegs --pixfmt gray --async true --response blobs --draw true --target regions",
+    "draw:rgb:async": "node --expose-gc examples/createJpegs --pixfmt rgb24 --async true --response blobs --draw true --target regions",
+    "draw:rgba:async": "node --expose-gc examples/createJpegs --pixfmt rgba --async true --response blobs --draw true --target regions",
     "draw:sync": "npm run draw:gray:sync && npm run draw:rgb:sync && npm run draw:rgba:sync",
-    "draw:gray:sync": "node --expose-gc examples/createJpegs --pixfmt gray --async false --response bounds --draw true --target regions",
-    "draw:rgb:sync": "node --expose-gc examples/createJpegs --pixfmt rgb24 --async false --response bounds --draw true --target regions",
-    "draw:rgba:sync": "node --expose-gc examples/createJpegs --pixfmt rgba --async false --response bounds --draw true --target regions"
+    "draw:gray:sync": "node --expose-gc examples/createJpegs --pixfmt gray --async false --response blobs --draw true --target regions",
+    "draw:rgb:sync": "node --expose-gc examples/createJpegs --pixfmt rgb24 --async false --response blobs --draw true --target regions",
+    "draw:rgba:sync": "node --expose-gc examples/createJpegs --pixfmt rgba --async false --response blobs --draw true --target regions"
   },
   "repository": {
     "type": "git",
