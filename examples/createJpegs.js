@@ -10,7 +10,7 @@ const target = argv.target || process.env.TARGET || 'all';// all or mask or regi
 
 const async = argv.async || process.env.ASYNC || false;// true or false
 
-const response = argv.response || process.env.RESPONSE || 'percent';// percent or bounds
+const response = argv.response || process.env.RESPONSE || 'percent';// percent or bounds or blobs
 
 const draw = argv.draw || process.env.DRAW || false;// true or false
 
@@ -18,7 +18,7 @@ const pixFmt = argv.pixfmt || process.env.PIXFMT || 'gray';// gray or rgb24 or r
 
 const {cpus} = require('os');
 
-const basePathToJpeg = `${__dirname}/out/${response === 'bounds' && toBool(draw) ? 'draw' : 'pam'}/`;
+const basePathToJpeg = `${__dirname}/out/${(response === 'bounds' || response === 'blobs') && toBool(draw) ? 'draw' : 'pam'}/`;
 
 function toBool(val) {
     return val === true || val === 'true' || val === 1 || val === '1';
