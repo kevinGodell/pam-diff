@@ -80,23 +80,35 @@ LabelImage(const Dimensions &dimensions, const Bounds &bounds, std::vector<int_f
         }
     }
 
-    /*for (uint_fast32_t y = minY; y <= maxY; ++y) {
+    return static_cast<uint_fast32_t>(labelNumber + 1);
+}
 
-        int_fast32_t *ptr = &labelsVec[y * width + minX];
+// assign label value to each pixel, return number of labels (highest label number +1)
+uint_fast32_t
+LabelImage(const Dimensions &dimensions, const Bounds &bounds, int_fast32_t *labels) {
 
-        for (uint_fast32_t x = minX; x <= maxX; ++x, ++ptr) {
+    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (dimensions.pixelCount + 1)]);
+
+    uint_fast32_t *stackPtr = stack.get();
+
+    // label number
+    int_fast32_t labelNumber = -1;
+
+    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+
+        for (uint_fast32_t x = bounds.minX, p = y * dimensions.width + x; x <= bounds.maxX; ++x, ++p) {
 
             // ignored == -2, unlabeled == -1, labeled >= 0
-            if (*ptr != -1) continue;
+            if (labels[p] != -1) continue;// pixel does not need to be labelled
 
             // increment label for next blob
             ++labelNumber;
 
             // send to C function for recursive labelling
-            LabelComponent(stack.get(), width, minX, maxX, minY, maxY, labelNumber, x, y, labelsVec.data());
+            LabelComponent(stackPtr, dimensions, bounds, labelNumber, x, y, labels);
 
         }
-    }*/
+    }
 
     return static_cast<uint_fast32_t>(labelNumber + 1);
 }
