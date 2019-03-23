@@ -6,15 +6,27 @@ dotenvConfig();
 
 const argv = require('minimist')(process.argv.slice(2));
 
-const target = argv.target || process.env.TARGET || 'all';// all or mask or regions
+function getVal(...vals) {//returns first defined val or undefined
+    for (let val of vals) {
+        if (val === undefined) {continue;}
+        return val;
+    }
+    return undefined;
+}
 
-const async = argv.async || process.env.ASYNC || false;// true or false
+//get vals in order of priority, args || env || default
 
-const response = argv.response || process.env.RESPONSE || 'percent';// percent or bounds or blobs
+const target = getVal(argv.target, process.env.TARGET,'all');// all || region(s)
 
-const draw = argv.draw || process.env.DRAW || false;// true or false
+const mask = getVal(argv.mask, process.env.MASK, false);// true || false
 
-const pixFmt = argv.pixfmt || process.env.PIXFMT || 'gray';// gray or rgb24 or rgba
+const async = getVal(argv.async, process.env.ASYNC, false);// true || false
+
+const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
+
+const draw = getVal(argv.draw, process.env.DRAW, false);// true || false
+
+const pixFmt = getVal(argv.pixfmt, process.env.PIXFMT, 'gray');// gray || rgb24 || rgba
 
 const {cpus} = require('os');
 
@@ -39,6 +51,8 @@ const params = [
     /* use hardware acceleration */
     '-hwaccel',
     'auto',//vda, videotoolbox, none, auto
+
+    '-stream_loop', '1',//-1 for infinite
 
     /* use a pre-recorded mp4 video as input */
     //'-re',//comment out to have ffmpeg read video as fast as possible
@@ -92,20 +106,15 @@ p2p.on('pam', (data) => {
     ++pamCounter;
 });
 
-let regions, mask;
+let regions;
 
-if (target === 'regions') {
-    const region1 = {name: 'region1', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 0, y: 359}, {x: 159, y: 359}, {x: 159, y: 0}]};
-    const region2 = {name: 'region2', difference: 10, percent: 7, polygon: [{x: 160, y: 0}, {x: 160, y: 359}, {x: 319, y: 359}, {x: 319, y: 0}]};
-    const region3 = {name: 'region3', difference: 10, percent: 7, polygon: [{x: 320, y: 0}, {x: 320, y: 359}, {x: 479, y: 359}, {x: 479, y: 0}]};
-    const region4 = {name: 'region4', difference: 10, percent: 7, polygon: [{x: 480, y: 0}, {x: 480, y: 359}, {x: 639, y: 359}, {x: 639, y: 0}]};
-    regions = [region1, region2, region3, region4];
-} else if (target === 'mask') {
-    const region1 = {name: 'myMask', polygon: [{x: 0, y: 0}, {x: 0, y: 359}, {x: 319, y: 359}, {x: 319, y: 0}]};
-    regions = [region1];
-    mask = true;
-} else {
-    regions = mask = null;
+if (target === 'all') {
+    regions = null;
+} else {                                                                        //640 360
+    const region1 = {name: 'TOP_LEFT', difference: 10, percent: 7, polygon: [{x: 0, y: 0}, {x: 319, y: 0}, {x: 319, y: 179}, {x: 0, y: 179}]};
+    const region2 = {name: 'BOTTOM_LEFT', difference: 10, percent: 7, polygon: [{x: 0, y: 180}, {x: 319, y: 180}, {x: 319, y: 359}, {x: 0, y: 359}]};
+    const region3 = {name: 'TOP_RIGHT', difference: 10, percent: 7, polygon: [{x: 320, y: 0}, {x: 639, y: 0}, {x: 639, y: 179}, {x: 320, y: 179}]};
+    regions = [region1, region2, region3];
 }
 
 const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, async: async, draw: draw});
