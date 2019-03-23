@@ -106,16 +106,6 @@ struct PercentResult {
     bool flagged;// 1
 };
 
-/*struct BoundsResult {
-    std::string name;// 24
-    uint_fast32_t minX;// 4
-    uint_fast32_t maxX;// 4
-    uint_fast32_t minY;// 4
-    uint_fast32_t maxY;// 4
-    uint_fast32_t percent;// 4
-    bool flagged;// 1
-};*/
-
 struct BoundsResult {
     std::string name;
     Bounds bounds;
