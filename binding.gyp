@@ -28,6 +28,7 @@
          }
        }],
        ["OS==\"mac\"", {
+         "cflags+": [ "-fvisibility=hidden" ],
          "xcode_settings": {
            "CLANG_CXX_LANGUAGE_STANDARD": "c++11",
            "CLANG_CXX_LIBRARY": "libc++",
@@ -37,7 +38,7 @@
            # "fast", "3", "2", "1", "0", "", "s"
            "GCC_OPTIMIZATION_LEVEL": "2",
            # only passed to C files
-           "OTHER_CFLAGS" : [],
+           "OTHER_CFLAGS": [ "-fvisibility=hidden" ],
            # remove defaults passed to C files
            "OTHER_CFLAGS!": [ "-fno-strict-aliasing" ],
            # only passed to C++ files
