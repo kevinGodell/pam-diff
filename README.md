@@ -9,6 +9,7 @@ npm install pam-diff@latest --save
 #### *New Feature:* Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.2, the option to get x y bounding box coordinates can be set by passing `{response: "bounds"}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.5, the option to get the pixel buffer containing the drawn x y bounding box can be set by passing `{draw: true}` to the pam-diff constructor.
+#### *New Feature:* Starting with version 0.13.6, the option to filter results by connected pixels(blobs) can be set by passing `{response: blobs}` to the pam-diff constructor.
 ### Usage Options:
 ##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
 1. all (default)
@@ -108,5 +109,5 @@ View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](ht
 - [ ] Add node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
 - [x] Include option to return coordinates for bounding box of changed pixels.
 - [x] Include option to return pixel buffer containing bounding boxes.
-- [ ] Introduce blob filtering to group changed pixels with their neighbors.
-- [ ] Include option to return pixel buffer containing bounding boxes around blobs.
+- [x] Introduce blob filtering to group changed pixels with their neighbors.
+- [x] Include option to return pixel buffer containing bounding boxes around blobs.

@@ -70,19 +70,20 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 225}, {x: 100, y: 225}, {x: 100, y: 0}]};
+const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y: 224}, {x: 99, y: 224}, {x: 99, y: 0}]};
 
-const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, y: 0}, {x: 100, y: 225}, {x: 200, y: 225}, {x: 200, y: 0}]};
+const region2 = {name: 'region2', difference: 1, percent: 1, polygon: [{x: 100, y: 0}, {x: 100, y: 224}, {x: 199, y: 224}, {x: 199, y: 0}]};
 
-const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 200, y: 0}, {x: 200, y: 225}, {x: 300, y: 225}, {x: 300, y: 0}]};
+const region3 = {name: 'region3', difference: 1, percent: 1, polygon: [{x: 200, y: 0}, {x: 200, y: 224}, {x: 299, y: 224}, {x: 299, y: 0}]};
 
-const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, y: 0}, {x: 300, y: 225}, {x: 400, y: 225}, {x: 400, y: 0}]};
+const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, y: 0}, {x: 300, y: 224}, {x: 399, y: 224}, {x: 399, y: 0}]};
 
 const regions = [region1, region2, region3, region4];
 
 const pamDiff = new PamDiff({regions : regions, async: async, response: response, draw: draw});
 
 pamDiff.on('diff', data => {
+    //console.log(data.trigger[3].percent, pamDiffResults[pamDiffCounter]);
     assert(data.trigger[3].name === 'region4', 'trigger name is not correct');
     assert(data.trigger[3].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });

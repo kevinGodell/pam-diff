@@ -359,7 +359,6 @@ class PamDiff extends Transform {
         delete this._depth;
         delete this._tupltype;
         delete this._regionObj;
-        delete this._maskObj;
         this._parseChunk = this._parseFirstChunk;
         return this;
     }
@@ -372,9 +371,14 @@ class PamDiff extends Transform {
         if (!this._regions || !this._width || !this._height) {
             return;
         }
-        if (this._mask) {
+        const regions = [];
+        if (this._mask === true) {// combine all regions to form a single region of flipped 0's and 1's
+            let minX = this._width;
+            let maxX = 0;
+            let minY = this._height;
+            let maxY = 0;
             const wxh = this._width * this._height;
-            const buffer = Buffer.alloc(wxh, 1);
+            const maskBitset = Buffer.alloc(wxh, 1);
             for (const region of this._regions) {
                 if (!region.hasOwnProperty('polygon')) {
                     throw new Error('Region must include a polygon property');
@@ -382,25 +386,41 @@ class PamDiff extends Transform {
                 const pp = new PP(region.polygon);
                 const bitset = pp.getBitset(this._width, this._height);
                 const bitsetBuffer = bitset.buffer;
-                for (let i = 0; i < wxh; i++) {
-                    if (bitsetBuffer[i]) {
-                        buffer[i] = 0;
+                for (let i = 0; i < wxh; ++i) {
+                    if (bitsetBuffer[i] === 1) {
+                        maskBitset[i] = 0;
                     }
                 }
             }
-            let count = 0;
-            for (let i = 0; i < wxh; i++) {
-                if (buffer[i]) {
-                    count++;
+            let maskBitsetCount = 0;
+            for (let i = 0; i < wxh; ++i) {
+                if (maskBitset[i] === 1) {
+                    const y = Math.floor(i / this._width);
+                    const x = i % this._width;
+                    minX = Math.min(minX, x);
+                    maxX = Math.max(maxX, x);
+                    minY = Math.min(minY, y);
+                    maxY = Math.max(maxY, y);
+                    maskBitsetCount++;
                 }
             }
-            if (count === 0) {
+            if (maskBitsetCount === 0) {
                 throw new Error('Bitset count must be greater than 0');
             }
-            this._maskObj = {count: count, bitset: buffer};
+            regions.push(
+                {
+                    name: 'mask',
+                    bitset: maskBitset,
+                    bitsetCount: maskBitsetCount,
+                    difference: this._difference,
+                    percent: this._percent,
+                    minX: minX,
+                    maxX: maxX,
+                    minY: minY,
+                    maxY: maxY
+                }
+            );
         } else {
-            const regions = [];
-            let minDiff = 255;
             for (const region of this._regions) {
                 if (!region.hasOwnProperty('name') || !region.hasOwnProperty('polygon')) {
                     throw new Error('Region must include a name and a polygon property');
@@ -409,18 +429,48 @@ class PamDiff extends Transform {
                 const bitset = pp.getBitset(this._width, this._height);
                 const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
                 const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
-                minDiff = Math.min(minDiff, difference);
                 regions.push(
                     {
                         name: region.name,
-                        diff: difference,
+                        bitset: bitset.buffer,
+                        bitsetCount: bitset.count,
+                        difference: difference,
                         percent: percent,
-                        count: bitset.count,
-                        bitset: bitset.buffer
+                        minX: bitset.minX,
+                        maxX: bitset.maxX,
+                        minY: bitset.minY,
+                        maxY: bitset.maxY
                     }
                 );
             }
-            this._regionObj = {minDiff: minDiff, length: regions.length, regions: regions};
+        }
+        this._regionObj = {length: regions.length, regions: regions};
+        if (regions.length > 1) {
+            let minDiff = 255;
+            let minX = this._width;
+            let maxX = 0;
+            let minY = this._height;
+            let maxY = 0;
+            const wxh = this._width * this._height;
+            const mergedBitset = Buffer.alloc(wxh, 0);
+            for (const region of regions) {
+                minDiff = Math.min(minDiff, region.difference);
+                minX = Math.min(minX, region.minX);
+                maxX = Math.max(maxX, region.maxX);
+                minY = Math.min(minY, region.minY);
+                maxY = Math.max(maxY, region.maxY);
+                for (let i = 0; i < wxh; ++i) {
+                    if (region.bitset[i] === 1) {
+                        mergedBitset[i] = 1;
+                    }
+                }
+            }
+            this._regionObj.bitset = mergedBitset;
+            this._regionObj.difference = minDiff;
+            this._regionObj.minX = minX;
+            this._regionObj.maxX = maxX;
+            this._regionObj.minY = minY;
+            this._regionObj.maxY = maxY;
         }
     }
 
@@ -436,25 +486,27 @@ class PamDiff extends Transform {
         engine += `_${this._width}_x_${this._height}`;
         const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
         if (this._regionObj) {
-            engine += '_regions';
-            config.target = 'regions';
-            config.minDiff = this._regionObj.minDiff;
+            engine += '_region';
+            //config.target = 'region';
             config.regions = this._regionObj.regions;
-        } else if (this._maskObj) {
-            engine += '_mask';
-            config.target = 'mask';
-            config.difference = this._difference;
-            config.percent = this._percent;
-            config.bitsetCount = this._maskObj.count;
-            config.bitset = this._maskObj.bitset;
+            if (this._regionObj.length > 1) {
+                engine += 's';
+                //config.target += 's';
+                config.bitset = this._regionObj.bitset;
+                config.difference = this._regionObj.difference;
+                config.minX = this._regionObj.minX;
+                config.maxX = this._regionObj.maxX;
+                config.minY = this._regionObj.minY;
+                config.maxY = this._regionObj.maxY;
+            }
         } else {
             engine += '_all';
-            config.target = 'all';
+            //config.target = 'all';
             config.difference = this._difference;
             config.percent = this._percent;
         }
         engine += `_${this._response}`;
-        if (this._response === 'bounds' && this._draw) {
+        if ((this._response === 'bounds' || this._response === 'blobs') && this._draw) {
             config.draw = this._draw;
             engine += '_draw';
         }

@@ -12,6 +12,7 @@ cache:
   - node_modules
 install:
   - ps: Install-Product node $env:nodejs_version $env:platform
+#  - npm install polygon-points
 #  - npm cache clean --force
   - npm install
 #  - npm install --cache /tmp/empty-cache
@@ -23,7 +24,8 @@ test_script:
   - node --version
   - npm --version
   - npm test
+#  - npm run gray:region
 on_success:
 #  - npm run examples
-  - npm run jpeg
+#  - npm run jpeg
 build: off

@@ -1,262 +1,527 @@
 #include "engine.h"
+#include "ccl.h"
 #include "napi.h"
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // determine engine type
 uint_fast32_t
-EngineType(const uint_fast32_t pixDepth, const std::string &target, const std::string &response, const bool async) {
+EngineType(const uint_fast32_t pixDepth, const std::string &response, const bool async, const uint_fast32_t regionsLength) {
     uint_fast32_t value = 0;
-    if (pixDepth == 3 || pixDepth == 4) {//dont add for pixDepth == 1
-        value += 1;
-    }
-    if (target == "mask") {//dont add for target == "all"
-        value += 10;
-    } else if (target == "regions") {
-        value += 20;
-    }
-    if (response == "bounds") {//dont add for target == "percent"
-        value += 100;
-    } else if (response == "blobs") {
-        value += 200;
-    }
-    if (async) {
-        value += 1000;
-    }
+    value += pixDepth == 4 || pixDepth == 3 ? 1 : 0;
+    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
+    value += response == "blobs" ? 200 : response == "bounds" ? 100 : 0;
+    value += async ? 1000 : 0;
     return value;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+std::vector<bool>
+BitsetJsToCpp(const Napi::Buffer<bool> &bitsetJs) {
+    const size_t length = bitsetJs.Length();
+    const bool *bitsetJsPtr = bitsetJs.Data();
+    std::vector<bool> bitset;
+    bitset.assign(bitsetJsPtr, bitsetJsPtr + length);
+    return bitset;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Region
+RegionJsToCpp(const Napi::Object &regionJs) {
+    const std::string name = regionJs.Get("name").As<Napi::String>();
+    const std::vector<bool> bitset = BitsetJsToCpp(regionJs.Get("bitset").As<Napi::Buffer<bool>>());
+    const uint_fast32_t bitsetCount = regionJs.Get("bitsetCount").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t difference = regionJs.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = regionJs.Get("percent").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minX = regionJs.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxX = regionJs.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minY = regionJs.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxY = regionJs.Get("maxY").As<Napi::Number>().Uint32Value();
+    return {name, bitset, bitsetCount, difference, percent, {minX, maxX, minY, maxY}};
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // convert js regions to cpp
 std::vector<Region>
-RegionsJsToCpp(const uint_fast32_t pixCount, const uint_fast32_t regionsLen, const Napi::Array &regionsJs) {
+RegionsJsToCpp(const Napi::Array &regionsJs) {
     std::vector<Region> regionVec;
+    auto regionsLen = regionsJs.Length();
     regionVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        const std::string name = regionsJs.Get(r).As<Napi::Object>().Get("name").As<Napi::String>();
-        const int_fast32_t diff = regionsJs.Get(r).As<Napi::Object>().Get("diff").As<Napi::Number>().Int32Value();
-        const uint_fast32_t percent = regionsJs.Get(r).As<Napi::Object>().Get("percent").As<Napi::Number>().Uint32Value();
-        const uint_fast32_t count = regionsJs.Get(r).As<Napi::Object>().Get("count").As<Napi::Number>().Uint32Value();
-        const bool *bitset = regionsJs.Get(r).As<Napi::Object>().Get("bitset").As<Napi::Buffer<bool>>().Data();
-        std::vector<bool> bitsetVec;
-        bitsetVec.assign(bitset, bitset + pixCount);
-        regionVec.push_back(Region{name, bitsetVec, diff, count, percent});
+        regionVec.push_back(RegionJsToCpp(regionsJs.Get(r).As<Napi::Object>()));
     }
     return regionVec;
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 // gray all percent
-void
-GrayAllPercent(const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
+PercentResult
+GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {"all", 0, false};// initialize results
+    for (uint_fast32_t p = 0; p < dimensions.pixelCount; ++p) {
+        if (all.difference > GrayDiff(buf0, buf1, p)) continue;
         ++percentResult.percent;
     }
-    percentResult.percent = 100 * percentResult.percent / pixCount;
-    percentResult.flagged = percentResult.percent >= diffsPerc;
+    percentResult.percent = 100 * percentResult.percent / dimensions.pixelCount;
+    percentResult.flagged = percentResult.percent >= all.percent;
+    return percentResult;
 }
 
-// gray mask percent
-void
-GrayMaskPercent(const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
-        ++percentResult.percent;
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// gray region percent
+PercentResult
+GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {region.name, 0, false};// initialize results
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
+            ++percentResult.percent;
+        }
     }
-    percentResult.percent = 100 * percentResult.percent / bitsetCount;
-    percentResult.flagged = percentResult.percent >= diffsPerc;
+    percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+    percentResult.flagged = percentResult.percent >= region.percent;
+    return percentResult;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray regions percent
-uint_fast32_t
-GrayRegionsPercent(const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<PercentResult> &percentResultVec) {
-    uint_fast32_t flaggedCount = 0;
-    for (uint_fast32_t p = 0, r = 0; p < pixCount; ++p) {
-        const int_fast32_t diff = GrayDiff(buf0, buf1, p);
-        if (minDiff > diff) continue;
-        for (r = 0; r < regionsLen; ++r) {
-            if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
-            ++percentResultVec[r].percent;
-        }
-    }
+std::vector<PercentResult>
+GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<PercentResult> percentResultVec;
+    percentResultVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        percentResultVec[r].name = regionsVec[r].name;
-        percentResultVec[r].percent = percentResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (percentResultVec[r].percent >= regionsVec[r].percent) {
-            percentResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        PercentResult percentResult = GrayRegionPercent(dimensions, regions.regions[r], buf0, buf1);
+        if (!percentResult.flagged) continue;
+        percentResultVec.push_back(percentResult);
     }
-    return flaggedCount;
+    percentResultVec.shrink_to_fit();
+    return percentResultVec;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray all bounds
-void
-GrayAllBounds(const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            if (pixDiff > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, boundsResult.minX);
-            SetMax(x, boundsResult.maxX);
-            SetMin(y, boundsResult.minY);
-            SetMax(y, boundsResult.maxY);
+BoundsResult
+GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false};// initialize results
+    for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
+        for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
+            if (all.difference > GrayDiff(buf0, buf1, p)) continue;
+            SetMin(x, boundsResult.bounds.minX);
+            SetMax(x, boundsResult.bounds.maxX);
+            SetMin(y, boundsResult.bounds.minY);
+            SetMax(y, boundsResult.bounds.maxY);
             ++boundsResult.percent;
         }
     }
-    boundsResult.percent = 100 * boundsResult.percent / pixCount;
-    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+    boundsResult.percent = 100 * boundsResult.percent / dimensions.pixelCount;
+    boundsResult.flagged = boundsResult.percent >= all.percent;
+    return boundsResult;
 }
 
-// gray mask bounds
-void
-GrayMaskBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            if (bitsetVec[p] == 0 || pixDiff > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, boundsResult.minX);
-            SetMax(x, boundsResult.maxX);
-            SetMin(y, boundsResult.minY);
-            SetMax(y, boundsResult.maxY);
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// gray region bounds
+BoundsResult
+GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
+            SetMin(x, boundsResult.bounds.minX);
+            SetMax(x, boundsResult.bounds.maxX);
+            SetMin(y, boundsResult.bounds.minY);
+            SetMax(y, boundsResult.bounds.maxY);
             ++boundsResult.percent;
         }
     }
-    boundsResult.percent = 100 * boundsResult.percent / bitsetCount;
-    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+    boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+    boundsResult.flagged = boundsResult.percent >= region.percent;
+    return boundsResult;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray regions bounds
-uint_fast32_t
-GrayRegionsBounds(const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
-    uint_fast32_t flaggedCount = 0;
-    for (uint_fast32_t y = 0, x = 0, i = 0, r = 0; y < height; ++y) {
-        for (x = 0; x < width; ++x, ++i) {
-            const int_fast32_t diff = GrayDiff(buf0, buf1, i);
-            if (minDiff > diff) continue;
-            for (r = 0; r < regionsLen; ++r) {
-                if (regionsVec[r].bitset[i] == 0 || regionsVec[r].pixDiff > diff) continue;
-                SetMin(x, boundsResultVec[r].minX);
-                SetMax(x, boundsResultVec[r].maxX);
-                SetMin(y, boundsResultVec[r].minY);
-                SetMax(y, boundsResultVec[r].maxY);
-                ++boundsResultVec[r].percent;
+std::vector<BoundsResult>
+GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<BoundsResult> boundsResultVec;
+    boundsResultVec.reserve(regionsLen);
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        BoundsResult boundsResult = GrayRegionBounds(dimensions, regions.regions[r], buf0, buf1);
+        if (!boundsResult.flagged) continue;
+        boundsResultVec.push_back(boundsResult);
+    }
+    boundsResultVec.shrink_to_fit();
+    return boundsResultVec;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// gray all blobs
+BlobsResult
+GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
+    for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
+        for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
+            if (all.difference > GrayDiff(buf0, buf1, p)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
             }
         }
     }
-    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        boundsResultVec[r].name = regionsVec[r].name;
-        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
-            boundsResultVec[r].flagged = true;
-            ++flaggedCount;
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / dimensions.pixelCount;
+    // initial percent level has been met, check the sizes of blobs
+    if (blobsResult.percent >= all.percent) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
+                SetMin(x, blob.bounds.minX);
+                SetMax(x, blob.bounds.maxX);
+                SetMin(y, blob.bounds.minY);
+                SetMax(y, blob.bounds.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / dimensions.pixelCount;
+            if (all.percent > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
         }
     }
-    return flaggedCount;
+    return blobsResult;
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// gray region blobs
+BlobsResult
+GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
+
+        }
+    }
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+    // percent level has been met, check the sizes of blobs
+    if (blobsResult.percent >= region.percent) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
+                SetMin(x, blob.bounds.minX);
+                SetMax(x, blob.bounds.maxX);
+                SetMin(y, blob.bounds.minY);
+                SetMax(y, blob.bounds.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / region.bitsetCount;
+            if (region.percent > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
+        }
+    }
+    return blobsResult;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// gray regions blobs
+std::vector<BlobsResult>
+GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<BlobsResult> blobsResultVec;
+    blobsResultVec.reserve(regionsLen);
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        BlobsResult blobsResult = GrayRegionBlobs(dimensions, regions.regions[r], buf0, buf1);
+        if (!blobsResult.flagged) continue;
+        blobsResultVec.push_back(blobsResult);
+    }
+    blobsResultVec.shrink_to_fit();
+    return blobsResultVec;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // rgb all percent
-void
-RgbAllPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        if (pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
+PercentResult
+RgbAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {"all", 0, false};// initialize results
+    for (uint_fast32_t p = 0; p < dimensions.pixelCount; ++p) {
+        if (all.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
         ++percentResult.percent;
     }
-    percentResult.percent = 100 * percentResult.percent / pixCount;
-    percentResult.flagged = percentResult.percent >= diffsPerc;
+    percentResult.percent = 100 * percentResult.percent / dimensions.pixelCount;
+    percentResult.flagged = percentResult.percent >= all.percent;
+    return percentResult;
 }
 
-// rgb mask percent
-void
-RgbMaskPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, PercentResult &percentResult) {
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        if (bitsetVec[p] == 0 || pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
-        ++percentResult.percent;
+// rgb region percent
+PercentResult
+RgbRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    PercentResult percentResult = {region.name, 0, false};// initialize results
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
+            ++percentResult.percent;
+        }
     }
-    percentResult.percent = 100 * percentResult.percent / bitsetCount;
-    percentResult.flagged = percentResult.percent >= diffsPerc;
+    percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+    percentResult.flagged = percentResult.percent >= region.percent;
+    return percentResult;
 }
 
 // rgb regions percent
-uint_fast32_t
-RgbRegionsPercent(const uint_fast32_t pixDepth, const uint_fast32_t pixCount, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<PercentResult> &percentResultVec) {
-    uint_fast32_t flaggedCount = 0;
-    for (uint_fast32_t p = 0; p < pixCount; ++p) {
-        const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
-        if (minDiff > diff) continue;
-        for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-            if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
-            ++percentResultVec[r].percent;
-        }
-    }
+std::vector<PercentResult>
+RgbRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<PercentResult> percentResultVec;
+    percentResultVec.reserve(regionsLen);
     for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        percentResultVec[r].name = regionsVec[r].name;
-        percentResultVec[r].percent = percentResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (percentResultVec[r].percent >= regionsVec[r].percent) {
-            percentResultVec[r].flagged = true;
-            ++flaggedCount;
-        }
+        PercentResult percentResult = RgbRegionPercent(dimensions, regions.regions[r], buf0, buf1);
+        if (!percentResult.flagged) continue;
+        percentResultVec.push_back(percentResult);
     }
-    return flaggedCount;
+    percentResultVec.shrink_to_fit();
+    return percentResultVec;
 }
 
 // rgb all bounds
-void
-RgbAllBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const uint_fast32_t pixCount, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            if (pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
-            SetMin(x, boundsResult.minX);
-            SetMax(x, boundsResult.maxX);
-            SetMin(y, boundsResult.minY);
-            SetMax(y, boundsResult.maxY);
+BoundsResult
+RgbAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false};// initialize results
+    for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
+        for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
+            if (all.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
+            SetMin(x, boundsResult.bounds.minX);
+            SetMax(x, boundsResult.bounds.maxX);
+            SetMin(y, boundsResult.bounds.minY);
+            SetMax(y, boundsResult.bounds.maxY);
             ++boundsResult.percent;
         }
     }
-    boundsResult.percent = 100 * boundsResult.percent / pixCount;
-    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+    boundsResult.percent = 100 * boundsResult.percent / dimensions.pixelCount;
+    boundsResult.flagged = boundsResult.percent >= all.percent;
+    return boundsResult;
 }
 
-// rgb mask bounds
-void
-RgbMaskBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t pixDiff, const uint_fast32_t diffsPerc, const uint_fast32_t bitsetCount, const std::vector<bool> &bitsetVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, BoundsResult &boundsResult) {
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            if (bitsetVec[p] == 0 || pixDiff > RgbDiff(buf0, buf1, p * pixDepth)) continue;
-            SetMin(x, boundsResult.minX);
-            SetMax(x, boundsResult.maxX);
-            SetMin(y, boundsResult.minY);
-            SetMax(y, boundsResult.maxY);
+// rgb region bounds
+BoundsResult
+RgbRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
+            SetMin(x, boundsResult.bounds.minX);
+            SetMax(x, boundsResult.bounds.maxX);
+            SetMin(y, boundsResult.bounds.minY);
+            SetMax(y, boundsResult.bounds.maxY);
             ++boundsResult.percent;
         }
     }
-    boundsResult.percent = 100 * boundsResult.percent / bitsetCount;
-    boundsResult.flagged = boundsResult.percent >= diffsPerc;
+    boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+    boundsResult.flagged = boundsResult.percent >= region.percent;
+    return boundsResult;
 }
 
 // rgb regions bounds
-uint_fast32_t
-RgbRegionsBounds(const uint_fast32_t pixDepth, const uint_fast32_t width, const uint_fast32_t height, const int_fast32_t minDiff, const uint_fast32_t regionsLen, const std::vector<Region> &regionsVec, const uint_fast8_t *buf0, const uint_fast8_t *buf1, std::vector<BoundsResult> &boundsResultVec) {
-    uint_fast32_t flaggedCount = 0;
-    for (uint_fast32_t y = 0, p = 0; y < height; ++y) {
-        for (uint_fast32_t x = 0; x < width; ++x, ++p) {
-            const int_fast32_t diff = RgbDiff(buf0, buf1, p * pixDepth);
-            if (minDiff > diff) continue;
-            for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-                if (regionsVec[r].bitset[p] == 0 || regionsVec[r].pixDiff > diff) continue;
-                SetMin(x, boundsResultVec[r].minX);
-                SetMax(x, boundsResultVec[r].maxX);
-                SetMin(y, boundsResultVec[r].minY);
-                SetMax(y, boundsResultVec[r].maxY);
-                ++boundsResultVec[r].percent;
+std::vector<BoundsResult>
+RgbRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<BoundsResult> boundsResultVec;
+    boundsResultVec.reserve(regionsLen);
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        BoundsResult boundsResult = RgbRegionBounds(dimensions, regions.regions[r], buf0, buf1);
+        if (!boundsResult.flagged) continue;
+        boundsResultVec.push_back(boundsResult);
+    }
+    boundsResultVec.shrink_to_fit();
+    return boundsResultVec;
+}
+
+// rgb all blobs
+BlobsResult
+RgbAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
+    for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
+        for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
+            if (all.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
             }
         }
     }
-    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
-        boundsResultVec[r].name = regionsVec[r].name;
-        boundsResultVec[r].percent = boundsResultVec[r].percent * 100 / regionsVec[r].bitsetCount;
-        if (boundsResultVec[r].percent >= regionsVec[r].percent) {
-            boundsResultVec[r].flagged = true;
-            ++flaggedCount;
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / dimensions.pixelCount;
+    // initial percent level has been met, check the sizes of blobs
+    if (blobsResult.percent >= all.percent) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
+                SetMin(x, blob.bounds.minX);
+                SetMax(x, blob.bounds.maxX);
+                SetMin(y, blob.bounds.minY);
+                SetMax(y, blob.bounds.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / dimensions.pixelCount;
+            if (all.percent > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
         }
     }
-    return flaggedCount;
+    return blobsResult;
+}
+
+
+
+// rgb region blobs
+BlobsResult
+RgbRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
+    for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
+        for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
+            if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
+
+        }
+    }
+    // calculate percent size of blobbed pixels
+    blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+    // percent level has been met, check the sizes of blobs
+    if (blobsResult.percent >= region.percent) {
+        // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
+        // create vector using blobCount size
+        blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
+        // count and group labels
+        for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+            for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
+                SetMin(x, blob.bounds.minX);
+                SetMax(x, blob.bounds.maxX);
+                SetMin(y, blob.bounds.minY);
+                SetMax(y, blob.bounds.maxY);
+                ++blob.percent;
+            }
+        }
+        // convert blob size to percent and check against threshold and flag
+        for (uint_fast32_t b = 0; b < blobCount; ++b) {
+            Blob &blob = blobsResult.blobs[b];
+            blob.percent = 100 * blob.percent / region.bitsetCount;
+            if (region.percent > blob.percent) continue;
+            blob.label = b;
+            blobsResult.flagged = blob.flagged = true;
+        }
+    }
+    return blobsResult;
+}
+
+// rgb regions blobs
+std::vector<BlobsResult>
+RgbRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    auto regionsLen = regions.regions.size();
+    std::vector<BlobsResult> blobsResultVec;
+    blobsResultVec.reserve(regionsLen);
+    for (uint_fast32_t r = 0; r < regionsLen; ++r) {
+        BlobsResult blobsResult = RgbRegionBlobs(dimensions, regions.regions[r], buf0, buf1);
+        if (!blobsResult.flagged) continue;
+        blobsResultVec.push_back(blobsResult);
+    }
+    blobsResultVec.shrink_to_fit();
+    return blobsResultVec;
 }
