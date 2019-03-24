@@ -102,7 +102,7 @@ void GrayAllBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->boundsResult_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->boundsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -140,7 +140,7 @@ void GrayRegionBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->boundsResult_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->boundsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -178,7 +178,7 @@ void GrayRegionsBoundsWorker::Execute() {
     if (!this->boundsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->boundsResultVec_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->boundsResultVec_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -216,7 +216,7 @@ void GrayAllBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->blobsResult_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->blobsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -254,7 +254,7 @@ void GrayRegionBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->blobsResult_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->blobsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -292,7 +292,7 @@ void GrayRegionsBlobsWorker::Execute() {
     if (!this->blobsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawGray(this->blobsResultVec_, this->dimensions_.width, this->pixels_);
+        DrawGray(this->blobsResultVec_, this->dimensions_, this->pixels_);
     }
 }
 

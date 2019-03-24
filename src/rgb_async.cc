@@ -102,7 +102,7 @@ void RgbAllBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->boundsResult_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->boundsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -140,7 +140,7 @@ void RgbRegionBoundsWorker::Execute() {
     if (this->boundsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->boundsResult_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->boundsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -178,7 +178,7 @@ void RgbRegionsBoundsWorker::Execute() {
     if (!this->boundsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->boundsResultVec_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->boundsResultVec_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -216,7 +216,7 @@ void RgbAllBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->blobsResult_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->blobsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -254,7 +254,7 @@ void RgbRegionBlobsWorker::Execute() {
     if (this->blobsResult_.flagged && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->blobsResult_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->blobsResult_, this->dimensions_, this->pixels_);
     }
 }
 
@@ -292,7 +292,7 @@ void RgbRegionsBlobsWorker::Execute() {
     if (!this->blobsResultVec_.empty() && this->draw_) {
         this->pixels_ = new uint_fast8_t[this->dimensions_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->dimensions_.byteLength, this->pixels_);
-        DrawRgb(this->blobsResultVec_, this->dimensions_.width, this->dimensions_.depth, this->pixels_);
+        DrawRgb(this->blobsResultVec_, this->dimensions_, this->pixels_);
     }
 }
 

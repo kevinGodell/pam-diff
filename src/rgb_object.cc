@@ -344,7 +344,7 @@ Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, boundsResult, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(boundsResult, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(boundsResult, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
@@ -447,7 +447,7 @@ Napi::Value RgbRegionBoundsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, boundsResult, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(boundsResult, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(boundsResult, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
@@ -555,7 +555,7 @@ Napi::Value RgbRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, boundsResultVec, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(boundsResultVec, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(boundsResultVec, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
@@ -667,7 +667,7 @@ RgbAllBlobsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, blobsResult, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(blobsResult, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(blobsResult, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
@@ -773,7 +773,7 @@ Napi::Value RgbRegionBlobsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, blobsResult, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(blobsResult, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(blobsResult, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
@@ -881,7 +881,7 @@ Napi::Value RgbRegionsBlobsSync::Compare(const Napi::CallbackInfo &info) {
         ToJs(env, blobsResultVec, resultsJs);
         if (this->draw_) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->dimensions_.byteLength);
-            DrawRgb(blobsResultVec, this->dimensions_.width, this->dimensions_.depth, pixels.Data());
+            DrawRgb(blobsResultVec, this->dimensions_, pixels.Data());
             cb.Call({env.Null(), resultsJs, pixels});
             return env.Undefined();
         }
