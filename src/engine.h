@@ -34,8 +34,6 @@ enum Engines {
     GRAY_REGIONS_BLOBS_SYNC = 220,
     GRAY_REGIONS_BLOBS_ASYNC = 1220,
 
-    //////////
-
     RGB_ALL_PERCENT_SYNC = 1,
     RGB_ALL_PERCENT_ASYNC = 1001,
 
