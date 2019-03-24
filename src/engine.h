@@ -62,6 +62,17 @@ enum Engines {
     RGB_REGIONS_BLOBS_ASYNC = 1221
 };
 
+/*using DiffFuncPtr = uint_fast32_t (*)(const uint_fast8_t *, const uint_fast8_t *, const uint_fast32_t);
+
+struct Dimensions2 {
+    uint_fast32_t width;
+    uint_fast32_t height;
+    uint_fast32_t depth;
+    uint_fast32_t pixelCount;
+    uint_fast32_t byteLength;
+    DiffFuncPtr diff;
+};*/
+
 struct Dimensions {
     uint_fast32_t width;
     uint_fast32_t height;
