@@ -52,10 +52,10 @@ const params = [
     '-hwaccel',
     'auto',//vda, videotoolbox, none, auto
 
-    '-stream_loop', '1',//-1 for infinite
+    '-stream_loop', '-1',//-1 for infinite
 
     /* use a pre-recorded mp4 video as input */
-    //'-re',//comment out to have ffmpeg read video as fast as possible
+    '-re',//comment out to have ffmpeg read video as fast as possible
     '-i',
     `${__dirname}/in/circle_star.mp4`,
 
@@ -124,7 +124,7 @@ pamDiff.on('diff', data => {
 
     ++diffCounter;
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
-    //if(true){return;}
+    if(true){return;}
 
     const date = new Date();
     let name = `${pixFmt}-${toBool(async) ? 'async' : 'sync'}-${diffCounter}`;
