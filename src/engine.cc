@@ -12,22 +12,10 @@
 uint_fast32_t
 EngineType(const uint_fast32_t pixDepth, const std::string &response, const bool async, const uint_fast32_t regionsLength) {
     uint_fast32_t value = 0;
-    if (pixDepth == 3 || pixDepth == 4) {//dont add for pixDepth == 1
-        value += 1;
-    }
-    if (regionsLength == 1) {//dont add for regionsLength == 0
-        value += 10;
-    } else if (regionsLength > 1) {
-        value += 20;
-    }
-    if (response == "bounds") {//dont add for target == "percent"
-        value += 100;
-    } else if (response == "blobs") {
-        value += 200;
-    }
-    if (async) {
-        value += 1000;
-    }
+    value += pixDepth == 4 || pixDepth == 3 ? 1 : 0;
+    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
+    value += response == "blobs" ? 200 : response == "bounds" ? 100 : 0;
+    value += async ? 1000 : 0;
     return value;
 }
 
@@ -186,19 +174,23 @@ GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const ui
 BlobsResult
 GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
-    // fill with -2
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
-    // all elements changed to -1 will be labelled while -2 will be ignored
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
         for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
-            if (all.difference > GrayDiff(buf0, buf1, p)) continue;
-            //change from -2 to -1 to mark as pixel of interest
-            labelsVec[p] = -1;
-            SetMin(x, blobsResult.bounds.minX);
-            SetMax(x, blobsResult.bounds.maxX);
-            SetMin(y, blobsResult.bounds.minY);
-            SetMax(y, blobsResult.bounds.maxY);
-            ++blobsResult.percent;
+            if (all.difference > GrayDiff(buf0, buf1, p)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
         }
     }
     // calculate percent size of blobbed pixels
@@ -206,14 +198,14 @@ GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *b
     // initial percent level has been met, check the sizes of blobs
     if (blobsResult.percent >= all.percent) {
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labelsVec);
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
         // create vector using blobCount size
         blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
         // count and group labels
         for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
             for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
                 SetMin(x, blob.bounds.minX);
                 SetMax(x, blob.bounds.maxX);
                 SetMin(y, blob.bounds.minY);
@@ -239,19 +231,24 @@ GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *b
 BlobsResult
 GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
-    // fill with -2
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
-    // all elements changed to -1 will be labelled while -2 will be ignored
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
-            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-            //change from -2 to -1 to mark as pixel of interest
-            labelsVec[p] = -1;
-            SetMin(x, blobsResult.bounds.minX);
-            SetMax(x, blobsResult.bounds.maxX);
-            SetMin(y, blobsResult.bounds.minY);
-            SetMax(y, blobsResult.bounds.maxY);
-            ++blobsResult.percent;
+            if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
+
         }
     }
     // calculate percent size of blobbed pixels
@@ -259,14 +256,14 @@ GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_f
     // percent level has been met, check the sizes of blobs
     if (blobsResult.percent >= region.percent) {
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labelsVec);
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
         // create vector using blobCount size
         blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
         // count and group labels
         for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
             for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
                 SetMin(x, blob.bounds.minX);
                 SetMax(x, blob.bounds.maxX);
                 SetMin(y, blob.bounds.minY);
@@ -405,19 +402,23 @@ RgbRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uin
 BlobsResult
 RgbAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {"all", {dimensions.width - 1, 0, dimensions.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
-    // fill with -2
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
-    // all elements changed to -1 will be labelled while -2 will be ignored
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < dimensions.height; ++y) {
         for (uint_fast32_t x = 0; x < dimensions.width; ++x, ++p) {
-            if (all.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
-            //change from -2 to -1 to mark as pixel of interest
-            labelsVec[p] = -1;
-            SetMin(x, blobsResult.bounds.minX);
-            SetMax(x, blobsResult.bounds.maxX);
-            SetMin(y, blobsResult.bounds.minY);
-            SetMax(y, blobsResult.bounds.maxY);
-            ++blobsResult.percent;
+            if (all.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
         }
     }
     // calculate percent size of blobbed pixels
@@ -425,14 +426,14 @@ RgbAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *bu
     // initial percent level has been met, check the sizes of blobs
     if (blobsResult.percent >= all.percent) {
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labelsVec);
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
         // create vector using blobCount size
         blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
         // count and group labels
         for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
             for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
                 SetMin(x, blob.bounds.minX);
                 SetMax(x, blob.bounds.maxX);
                 SetMin(y, blob.bounds.minY);
@@ -452,23 +453,30 @@ RgbAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *bu
     return blobsResult;
 }
 
+
+
 // rgb region blobs
 BlobsResult
 RgbRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
-    // fill with -2
-    std::vector<int_fast32_t> labelsVec = std::vector<int_fast32_t>(dimensions.pixelCount, -2);
-    // all elements changed to -1 will be labelled while -2 will be ignored
+    // reserve memory for labels array on heap
+    auto *labels = new int_fast32_t[dimensions.pixelCount];
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<int_fast32_t[]> up(labels);
+    // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * dimensions.width + x; x <= region.bounds.maxX; ++x, ++p) {
-            if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) continue;
-            //change from -2 to -1 to mark as pixel of interest
-            labelsVec[p] = -1;
-            SetMin(x, blobsResult.bounds.minX);
-            SetMax(x, blobsResult.bounds.maxX);
-            SetMin(y, blobsResult.bounds.minY);
-            SetMax(y, blobsResult.bounds.maxY);
-            ++blobsResult.percent;
+            if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * dimensions.depth)) {
+                labels[p] = -2;// set to -2 to mark as pixel to ignore
+            } else {
+                labels[p] = -1;// set to -1 to mark as pixel of interest
+                SetMin(x, blobsResult.bounds.minX);
+                SetMax(x, blobsResult.bounds.maxX);
+                SetMin(y, blobsResult.bounds.minY);
+                SetMax(y, blobsResult.bounds.maxY);
+                ++blobsResult.percent;
+            }
+
         }
     }
     // calculate percent size of blobbed pixels
@@ -476,14 +484,14 @@ RgbRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fa
     // percent level has been met, check the sizes of blobs
     if (blobsResult.percent >= region.percent) {
         // assign label to each indexed pixel that has a -1 instead of -2, returns the total unique labels count
-        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labelsVec);
+        uint_fast32_t blobCount = LabelImage(dimensions, blobsResult.bounds, labels);
         // create vector using blobCount size
         blobsResult.blobs = std::vector<Blob>(blobCount, {0, {blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}, 0, false});
         // count and group labels
         for (uint_fast32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
             for (uint_fast32_t x = blobsResult.bounds.minX, p = y * dimensions.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
-                if (labelsVec[p] == -2) continue;// ignored(-2) or unlabelled(-1)
-                Blob &blob = blobsResult.blobs[labelsVec[p]];
+                if (labels[p] == -2) continue;// ignored(-2) or unlabeled(-1)
+                Blob &blob = blobsResult.blobs[labels[p]];
                 SetMin(x, blob.bounds.minX);
                 SetMax(x, blob.bounds.maxX);
                 SetMin(y, blob.bounds.minY);
