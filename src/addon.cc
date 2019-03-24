@@ -20,8 +20,14 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     cout << "size of uint_fast32_t : " << sizeof(uint_fast32_t) << endl;
     cout << "size of std::vector<bool> : " << sizeof(std::vector<bool>) << endl;
     cout << "size of std::vector<uint_fast8_t> : " << sizeof(std::vector<uint_fast8_t>) << endl;
+    cout << "size of Dimensions struct : " << sizeof(Dimensions) << endl;
+    cout << "size of All struct : " << sizeof(All) << endl;
+    cout << "size of Bounds struct : " << sizeof(Bounds) << endl;
     cout << "size of Region struct : " << sizeof(Region) << endl;
+    cout << "size of Regions struct : " << sizeof(Regions) << endl;
     cout << "size of PercentResult struct : " << sizeof(PercentResult) << endl;
+    cout << "size of Blob struct : " << sizeof(Blob) << endl;
+    cout << "size of BlobsResult struct : " << sizeof(BlobsResult) << endl;
     cout << "size of BoundsResult struct : " << sizeof(BoundsResult) << endl;
 
     if (config.HasOwnProperty("depth")) cout << "depth : " << config.Get("depth").As<Napi::Number>().Uint32Value() << endl;
