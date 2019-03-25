@@ -149,61 +149,42 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
 
 Napi::Object Init(Napi::Env env, Napi::Object exports) {
     exports = Napi::Function::New(env, CreateObject, "CreateObject");
-
     GrayAllPercentSync::Init(env);
     GrayAllPercentAsync::Init(env);
-
     GrayRegionPercentSync::Init(env);
     GrayRegionPercentAsync::Init(env);
-
     GrayRegionsPercentSync::Init(env);
     GrayRegionsPercentAsync::Init(env);
-
     GrayAllBoundsSync::Init(env);
     GrayAllBoundsAsync::Init(env);
-
     GrayRegionBoundsSync::Init(env);
     GrayRegionBoundsAsync::Init(env);
-
     GrayRegionsBoundsSync::Init(env);
     GrayRegionsBoundsAsync::Init(env);
-
     GrayAllBlobsSync::Init(env);
     GrayAllBlobsAsync::Init(env);
-
     GrayRegionBlobsSync::Init(env);
     GrayRegionBlobsAsync::Init(env);
-
     GrayRegionsBlobsSync::Init(env);
     GrayRegionsBlobsAsync::Init(env);
-
     RgbAllPercentSync::Init(env);
     RgbAllPercentAsync::Init(env);
-
     RgbRegionPercentSync::Init(env);
     RgbRegionPercentAsync::Init(env);
-
     RgbRegionsPercentSync::Init(env);
     RgbRegionsPercentAsync::Init(env);
-
     RgbAllBoundsSync::Init(env);
     RgbAllBoundsAsync::Init(env);
-
     RgbRegionBoundsSync::Init(env);
     RgbRegionBoundsAsync::Init(env);
-
     RgbRegionsBoundsSync::Init(env);
     RgbRegionsBoundsAsync::Init(env);
-
     RgbAllBlobsSync::Init(env);
     RgbAllBlobsAsync::Init(env);
-
     RgbRegionBlobsSync::Init(env);
     RgbRegionBlobsAsync::Init(env);
-
     RgbRegionsBlobsSync::Init(env);
     RgbRegionsBlobsAsync::Init(env);
-
     return exports;
 }
 
