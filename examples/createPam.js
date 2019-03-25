@@ -20,7 +20,7 @@ const target = getVal(argv.target, process.env.TARGET,'all');// all || region(s)
 
 const mask = getVal(argv.mask, process.env.MASK, false);// true || false
 
-const async = getVal(argv.async, process.env.ASYNC, false);// true || false
+const sync = getVal(argv.sync, process.env.SYNC, false);// true || false
 
 const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
 
@@ -117,7 +117,7 @@ if (target === 'all') {
     regions = [region1, region2, region3];
 }
 
-const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, async: async, draw: draw});
+const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, sync: sync, draw: draw});
 
 pamDiff.on('diff', data => {
     //console.log(data);
@@ -127,7 +127,7 @@ pamDiff.on('diff', data => {
     //if(true){return;}
 
     const date = new Date();
-    let name = `${pixFmt}-${toBool(async) ? 'async' : 'sync'}-${diffCounter}`;
+    let name = `${pixFmt}-${toBool(sync) ? 'sync' : 'sync'}-${diffCounter}`;
     for (const region of data.trigger) {
         if (response === 'bounds') {
             name += `--${region.name}-percent${region.percent}-minX${region.minX}-maxX${region.maxX}-minY${region.minY}-maxY${region.maxY}`;

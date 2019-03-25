@@ -29,7 +29,7 @@
 #define Y (stack[stackPointer-2])
 
 void
-LabelComponent(uint_fast32_t *stack, const Config &config, const Bounds &bounds, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, int_fast32_t *labels) {
+LabelComponent(const Config &config, const Bounds &bounds, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, uint_fast32_t *stack, int_fast32_t *labels) {
     stack[0] = x;
     stack[1] = y;
     stack[2] = 0;
@@ -59,11 +59,11 @@ LabelComponent(uint_fast32_t *stack, const Config &config, const Bounds &bounds,
 uint_fast32_t
 LabelImage(const Config &config, const Bounds &bounds, int_fast32_t *labels) {
 
-    // reserve memory for stack array on heap
-    auto *stack = new uint_fast32_t[3 * (config.pixelCount + 1)];
+    // have unique_ptr reserve memory for stack array on heap and manage destruction
+    std::unique_ptr<uint_fast32_t[]> up(new uint_fast32_t[3 * (config.pixelCount + 1)]);
 
-    // have unique_ptr manage destruction of array
-    std::unique_ptr<uint_fast32_t[]> up(stack);
+    // get pointer
+    auto *stack = up.get();
 
     // label number
     int_fast32_t labelNumber = -1;
@@ -79,7 +79,7 @@ LabelImage(const Config &config, const Bounds &bounds, int_fast32_t *labels) {
             ++labelNumber;
 
             // send to C function for recursive labelling
-            LabelComponent(stack, config, bounds, labelNumber, x, y, labels);
+            LabelComponent(config, bounds, labelNumber, x, y, stack, labels);
 
         }
     }

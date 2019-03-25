@@ -10,12 +10,12 @@
 
 // determine engine type
 uint_fast32_t
-EngineType(const uint_fast32_t depth, const uint_fast32_t regionsLength, const std::string &response, const bool async) {
+EngineType(const uint_fast32_t depth, const uint_fast32_t regionsLength, const std::string &response, const bool sync) {
     uint_fast32_t value = 0;
     value += depth == 4 || depth == 3 ? 1000 : 0;
     value += regionsLength > 1 ? 200 : regionsLength == 1 ? 100 : 0;
     value += response == "blobs" ? 20 : response == "bounds" ? 10 : 0;
-    value += async ? 1 : 0;
+    value += sync ? 0 : 1;
     return value;
 }
 
@@ -174,10 +174,10 @@ GrayRegionsBounds(const Config &config, const Regions &regions, const uint_fast8
 BlobsResult
 GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
-    // reserve memory for labels array on heap
-    auto *labels = new int_fast32_t[config.pixelCount];
-    // have unique_ptr manage destruction of array
-    std::unique_ptr<int_fast32_t[]> up(labels);
+    // have unique_ptr reserve memory for stack array on heap and manage destruction
+    std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
+    // get pointer
+    auto *labels = up.get();
     // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint_fast32_t x = 0; x < config.width; ++x, ++p) {
@@ -231,10 +231,10 @@ GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, con
 BlobsResult
 GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
-    // reserve memory for labels array on heap
-    auto *labels = new int_fast32_t[config.pixelCount];
-    // have unique_ptr manage destruction of array
-    std::unique_ptr<int_fast32_t[]> up(labels);
+    // have unique_ptr reserve memory for stack array on heap and manage destruction
+    std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
+    // get pointer
+    auto *labels = up.get();
     // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
@@ -402,10 +402,10 @@ RgbRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_
 BlobsResult
 RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
-    // reserve memory for labels array on heap
-    auto *labels = new int_fast32_t[config.pixelCount];
-    // have unique_ptr manage destruction of array
-    std::unique_ptr<int_fast32_t[]> up(labels);
+    // have unique_ptr reserve memory for stack array on heap and manage destruction
+    std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
+    // get pointer
+    auto *labels = up.get();
     // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint_fast32_t x = 0; x < config.width; ++x, ++p) {
@@ -459,10 +459,10 @@ RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, cons
 BlobsResult
 RgbRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
     BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
-    // reserve memory for labels array on heap
-    auto *labels = new int_fast32_t[config.pixelCount];
-    // have unique_ptr manage destruction of array
-    std::unique_ptr<int_fast32_t[]> up(labels);
+    // have unique_ptr reserve memory for stack array on heap and manage destruction
+    std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
+    // get pointer
+    auto *labels = up.get();
     // all elements set to -1 will be labeled while -2 will be ignored
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {

@@ -6,10 +6,11 @@ Measure differences between pixel arrays extracted from pam images. Works well w
 npm install pam-diff@latest --save
 ```
 #### *Important Note:* The js-only version will no longer receive any updates. All future work will be dedicated to the n-api version because it is much more efficient.
-#### *New Feature:* Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor.
+#### *New Feature:* Async made default in 0.13.6. ~~Starting with version 0.13.0, the option to use worker threads can be enabled by passing `{async: true}` to the pam-diff constructor.~~
 #### *New Feature:* Starting with version 0.13.2, the option to get x y bounding box coordinates can be set by passing `{response: "bounds"}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.5, the option to get the pixel buffer containing the drawn x y bounding box can be set by passing `{draw: true}` to the pam-diff constructor.
-#### *New Feature:* Starting with version 0.13.6, the option to filter results by connected pixels(blobs) can be set by passing `{response: blobs}` to the pam-diff constructor.
+#### *New Feature:* Starting with version 0.13.6, the option to filter results by connected component labelling can be set by passing `{response: "blobs"}` to the pam-diff constructor.
+#### *New Feature:* Starting with version 0.13.6, async behavior will now be default. If you need the pixel difference measurements to block the event loop, use `{sync: true}`.
 ### Usage Options:
 ##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
 1. all (default)
@@ -106,8 +107,9 @@ pamDiff.callback = null;
 ### Other Resources:
 View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests), or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
 ### Future Plans:
-- [ ] Add node-pre-gyp as an option for installing pre-built binaries for those who are unable to use node-gyp. (Not a priority at this point)
+- [ ] Make pre-built binaries available when using node-gyp is not an option.
 - [x] Include option to return coordinates for bounding box of changed pixels.
 - [x] Include option to return pixel buffer containing bounding boxes.
 - [x] Introduce blob filtering to group changed pixels with their neighbors.
 - [x] Include option to return pixel buffer containing bounding boxes around blobs.
+- [x] Make async worker threads the default. Can be overridden with {sync: true}.

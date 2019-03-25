@@ -6,11 +6,21 @@ dotenv.config();
 
 const argv = require('minimist')(process.argv.slice(2));
 
-const async = argv.async || process.env.ASYNC || false;
+function getVal(...vals) {//returns first defined val or undefined
+    for (let val of vals) {
+        if (val === undefined) {continue;}
+        return val;
+    }
+    return undefined;
+}
 
-const response = argv.response || process.env.RESPONSE || 'percent';
+//get vals in order of priority, args || env || default
 
-const draw = argv.draw || process.env.DRAW || false;
+const sync = getVal(argv.sync, process.env.SYNC, false);// true || false
+
+const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
+
+const draw = getVal(argv.draw, process.env.DRAW, false);// true || false
 
 const {cpus} = require('os');
 
@@ -70,7 +80,7 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, async: async, response: response, draw: draw});
+const pamDiff = new PamDiff({difference: 1, percent: 1, sync: sync, response: response, draw: draw});
 
 pamDiff.on('diff', data => {
     assert(data.trigger[0].name === 'all', 'trigger name is not correct');

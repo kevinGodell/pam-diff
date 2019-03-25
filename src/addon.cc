@@ -35,7 +35,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.HasOwnProperty("height")) std::cout << "height : " << config.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("response")) std::cout << "response : " << config.Get("response").As<Napi::String>().Utf8Value() << std::endl;
     if (config.HasOwnProperty("draw")) std::cout << "draw : " << config.Get("draw").As<Napi::Boolean>().Value() << std::endl;
-    if (config.HasOwnProperty("async")) std::cout << "async : " << config.Get("async").As<Napi::Boolean>().Value() << std::endl;
+    if (config.HasOwnProperty("sync")) std::cout << "sync : " << config.Get("sync").As<Napi::Boolean>().Value() << std::endl;
     if (config.HasOwnProperty("target")) std::cout << "target : " << config.Get("target").As<Napi::String>().Utf8Value() << std::endl;
     if (config.HasOwnProperty("difference")) std::cout << "difference : " << config.Get("difference").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("percent")) std::cout << "percent : " << config.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
@@ -67,8 +67,8 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
     const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
-    const bool async = config.HasOwnProperty("async") && config.Get("async").As<Napi::Boolean>().Value();
-    const uint_fast32_t engineType = EngineType(depth, regionsLength, response, async);
+    const bool sync = config.HasOwnProperty("sync") && config.Get("sync").As<Napi::Boolean>().Value();
+    const uint_fast32_t engineType = EngineType(depth, regionsLength, response, sync);
     switch (engineType) {
         case GRAY_ALL_PERCENT_SYNC :
             return GrayAllPercentSync::NewInstance(env, config);

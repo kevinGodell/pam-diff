@@ -6,11 +6,21 @@ dotenv.config();
 
 const argv = require('minimist')(process.argv.slice(2));
 
-const async = argv.async || process.env.ASYNC || false;
+function getVal(...vals) {//returns first defined val or undefined
+    for (let val of vals) {
+        if (val === undefined) {continue;}
+        return val;
+    }
+    return undefined;
+}
 
-const response = argv.response || process.env.RESPONSE || 'percent';
+//get vals in order of priority, args || env || default
 
-const draw = argv.draw || process.env.DRAW || false;
+const sync = getVal(argv.sync, process.env.SYNC, false);// true || false
+
+const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
+
+const draw = getVal(argv.draw, process.env.DRAW, false);// true || false
 
 const {cpus} = require('os');
 
@@ -76,7 +86,7 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 224}, {x: 199, y: 224}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, async: async, response: response, draw: draw});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, sync: sync, response: response, draw: draw});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);
