@@ -18,7 +18,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
 };
 
@@ -37,7 +37,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
 };
 
@@ -55,7 +55,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
 };
 
@@ -73,7 +73,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
 };
 
@@ -91,7 +91,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
 };
 
@@ -109,7 +109,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
 };
 
@@ -127,7 +127,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
     bool draw_;
 };
@@ -146,7 +146,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
     bool draw_;
 };
@@ -165,7 +165,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
     bool draw_;
 };
@@ -185,7 +185,7 @@ private:
 
     static Napi::FunctionReference constructor;
 
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
     bool draw_;
 };
@@ -204,7 +204,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
     bool draw_;
 };
@@ -223,7 +223,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
     bool draw_;
 };
@@ -243,7 +243,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
     bool draw_;
 };
@@ -262,7 +262,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     All all_;
     bool draw_;
 };
@@ -281,7 +281,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
     bool draw_;
 };
@@ -300,7 +300,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Region region_;
     bool draw_;
 };
@@ -319,7 +319,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
     bool draw_;
 };
@@ -339,7 +339,7 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Dimensions dimensions_;
+    Config config_;
     Regions regions_;
     bool draw_;
 };

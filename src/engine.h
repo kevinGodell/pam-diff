@@ -50,18 +50,7 @@ enum Engines {// ordered by depth -> target -> response -> synchronicity
     RGB_REGIONS_BLOBS_ASYNC = 1221,
 };
 
-/*using DiffFuncPtr = uint_fast32_t (*)(const uint_fast8_t *, const uint_fast8_t *, const uint_fast32_t);
-
-struct Dimensions2 {
-    uint_fast32_t width;
-    uint_fast32_t height;
-    uint_fast32_t depth;
-    uint_fast32_t pixelCount;
-    uint_fast32_t byteLength;
-    DiffFuncPtr diff;
-};*/
-
-struct Dimensions {
+struct Config {
     uint_fast32_t width;
     uint_fast32_t height;
     uint_fast32_t depth;
@@ -167,74 +156,74 @@ RegionsJsToCpp(const Napi::Array &regionsJs);
 
 // gray all percent
 PercentResult
-GrayAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region percent
 PercentResult
-GrayRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions percent
 std::vector<PercentResult>
-GrayRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionsPercent(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray all bounds
 BoundsResult
-GrayAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region bounds
 BoundsResult
-GrayRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions bounds
 std::vector<BoundsResult>
-GrayRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray all blobs
 BlobsResult
-GrayAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region blobs
 BlobsResult
-GrayRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions blobs
 std::vector<BlobsResult>
-GrayRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+GrayRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb all percent
 PercentResult
-RgbAllPercent(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb region percent
 PercentResult
-RgbRegionPercent(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb regions percent
 std::vector<PercentResult>
-RgbRegionsPercent(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionsPercent(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb all bounds
 BoundsResult
-RgbAllBounds(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb region bounds
 BoundsResult
-RgbRegionBounds(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb regions bounds
 std::vector<BoundsResult>
-RgbRegionsBounds(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb all blobs
 BlobsResult
-RgbAllBlobs(const Dimensions &dimensions, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb region blobs
 BlobsResult
-RgbRegionBlobs(const Dimensions &dimensions, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb regions blobs
 std::vector<BlobsResult>
-RgbRegionsBlobs(const Dimensions &dimensions, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+RgbRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 #endif

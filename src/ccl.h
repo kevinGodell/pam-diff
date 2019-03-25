@@ -6,10 +6,10 @@
 #include <vector>
 
 void
-LabelComponent(uint_fast32_t *stack, const Dimensions &dimensions, const Bounds &bounds, int_fast32_t labelNumber, uint_fast32_t x, uint_fast32_t y, int_fast32_t *labels);
+LabelComponent(uint_fast32_t *stack, const Config &config, const Bounds &bounds, int_fast32_t labelNumber, uint_fast32_t x, uint_fast32_t y, int_fast32_t *labels);
 
 // assign label value to each pixel, return number of labels (highest label number +1)
 uint_fast32_t
-LabelImage(const Dimensions &dimensions, const Bounds &bounds, int_fast32_t *labels);
+LabelImage(const Config &config, const Bounds &bounds, int_fast32_t *labels);
 
 #endif //SRC_CCL_H

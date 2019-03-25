@@ -72,42 +72,42 @@ SetGrayPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fas
 }*/
 
 /*inline void
-SetGrayPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
-    uint_fast8_t *firstPtr = &pixels[bounds.minY * dimensions.width + bounds.minX];
-    uint_fast8_t *secondPtr = &pixels[bounds.maxY * dimensions.width + bounds.minX];
+SetGrayPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
+    uint_fast8_t *firstPtr = &pixels[bounds.minY * config.width + bounds.minX];
+    uint_fast8_t *secondPtr = &pixels[bounds.maxY * config.width + bounds.minX];
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, ++firstPtr, ++secondPtr) {
         *firstPtr = 0x80;// top
         *secondPtr = 0x80;// bottom
     }
-    firstPtr = &pixels[(bounds.minY + 1) * dimensions.width + bounds.minX];
-    secondPtr = &pixels[(bounds.minY + 1) * dimensions.width + bounds.maxX];
-    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, firstPtr += dimensions.width, secondPtr += dimensions.width) {
+    firstPtr = &pixels[(bounds.minY + 1) * config.width + bounds.minX];
+    secondPtr = &pixels[(bounds.minY + 1) * config.width + bounds.maxX];
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, firstPtr += config.width, secondPtr += config.width) {
         *firstPtr = 0x80;// left
         *secondPtr = 0x80;// right
     }
 }*/
 
 inline void
-SetGrayPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
-    uint_fast32_t i = bounds.minY * dimensions.width + bounds.minX;
-    uint_fast32_t j = bounds.maxY * dimensions.width + bounds.minX;
+SetGrayPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
+    uint_fast32_t i = bounds.minY * config.width + bounds.minX;
+    uint_fast32_t j = bounds.maxY * config.width + bounds.minX;
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, ++i, ++j) {
         pixels[i] = 0x80;// top
         pixels[j] = 0x80;// bottom
     }
-    i = (bounds.minY + 1) * dimensions.width + bounds.minX;
-    j = (bounds.minY + 1) * dimensions.width + bounds.maxX;
-    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += dimensions.width, j += dimensions.width) {
+    i = (bounds.minY + 1) * config.width + bounds.minX;
+    j = (bounds.minY + 1) * config.width + bounds.maxX;
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += config.width, j += config.width) {
         pixels[i] = 0x80;// left
         pixels[j] = 0x80;// right
     }
 }
 
 /*inline void
-SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
-    uint_fast32_t inc = dimensions.depth == 4 ? 2 : dimensions.depth == 3 ? 1 : 0;
-    uint_fast8_t *firstPtr = &pixels[bounds.minY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth];
-    uint_fast8_t *secondPtr = &pixels[bounds.maxY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth];
+SetRgbPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
+    uint_fast32_t inc = config.depth == 4 ? 2 : config.depth == 3 ? 1 : 0;
+    uint_fast8_t *firstPtr = &pixels[bounds.minY * config.width * config.depth + bounds.minX * config.depth];
+    uint_fast8_t *secondPtr = &pixels[bounds.maxY * config.width * config.depth + bounds.minX * config.depth];
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, firstPtr += inc, secondPtr += inc) {
         *firstPtr = 0xAF;// top
         *(++firstPtr) = 0x33;
@@ -116,9 +116,9 @@ SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *p
         *(++secondPtr) = 0x33;
         *(++secondPtr) = 0xFF;
     }
-    inc = dimensions.width * dimensions.depth;
-    firstPtr = &pixels[(bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth];
-    secondPtr = &pixels[(bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.maxX * dimensions.depth];
+    inc = config.width * config.depth;
+    firstPtr = &pixels[(bounds.minY + 1) * config.width * config.depth + bounds.minX * config.depth];
+    secondPtr = &pixels[(bounds.minY + 1) * config.width * config.depth + bounds.maxX * config.depth];
     for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, firstPtr += inc, secondPtr += inc) {
         *firstPtr = 0xAF;// left
         *(firstPtr + 1) = 0x33;
@@ -130,10 +130,10 @@ SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *p
 }*/
 
 inline void
-SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
-    uint_fast32_t inc = dimensions.depth;
-    uint_fast32_t i = bounds.minY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
-    uint_fast32_t j = bounds.maxY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
+SetRgbPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
+    uint_fast32_t inc = config.depth;
+    uint_fast32_t i = bounds.minY * config.width * config.depth + bounds.minX * config.depth;
+    uint_fast32_t j = bounds.maxY * config.width * config.depth + bounds.minX * config.depth;
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, i += inc, j += inc) {
         pixels[i] = 0xAF;// top
         pixels[i + 1] = 0x33;
@@ -142,9 +142,9 @@ SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *p
         pixels[j + 1] = 0x33;
         pixels[j + 2] = 0xFF;
     }
-    inc = dimensions.width * dimensions.depth;
-    i = (bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
-    j = (bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.maxX * dimensions.depth;
+    inc = config.width * config.depth;
+    i = (bounds.minY + 1) * config.width * config.depth + bounds.minX * config.depth;
+    j = (bounds.minY + 1) * config.width * config.depth + bounds.maxX * config.depth;
     for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += inc, j += inc) {
         pixels[i] = 0xAF;// left
         pixels[i + 1] = 0x33;
@@ -181,35 +181,35 @@ ToJs(const Napi::Env &env, const std::vector<BlobsResult> &blobsResultVec, Napi:
 
 // draw bounding box in gray pixels for all/mask
 void
-DrawGray(const BoundsResult &boundsResult, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawGray(const BoundsResult &boundsResult, const Config &config, uint_fast8_t *pixels);
 
 // draw bounding box in gray pixels for regions
 void
-DrawGray(const std::vector<BoundsResult> &boundsResultVec, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawGray(const std::vector<BoundsResult> &boundsResultVec, const Config &config, uint_fast8_t *pixels);
 
 // draw blobs bounding box in gray pixels for all/mask
 void
-DrawGray(const BlobsResult &blobsResult, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawGray(const BlobsResult &blobsResult, const Config &config, uint_fast8_t *pixels);
 
 // draw blobs bounding box in gray pixels for regions
 void
-DrawGray(const std::vector<BlobsResult> &blobsResultVec, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawGray(const std::vector<BlobsResult> &blobsResultVec, const Config &config, uint_fast8_t *pixels);
 
 // draw bounding box in rgb pixels for all/mask
 void
-DrawRgb(const BoundsResult &boundsResult, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawRgb(const BoundsResult &boundsResult, const Config &config, uint_fast8_t *pixels);
 
 // draw bounding box in rgb pixels for regions
 void
-DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawRgb(const std::vector<BoundsResult> &boundsResultVec, const Config &config, uint_fast8_t *pixels);
 
 // draw blobs bounding box in rgb pixels for all/mask
 void
-DrawRgb(const BlobsResult &blobsResult, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawRgb(const BlobsResult &blobsResult, const Config &config, uint_fast8_t *pixels);
 
 // draw blobs bounding box in rgb pixels for regions
 void
-DrawRgb(const std::vector<BlobsResult> &blobsResultVec, const Dimensions &dimensions, uint_fast8_t *pixels);
+DrawRgb(const std::vector<BlobsResult> &blobsResultVec, const Config &config, uint_fast8_t *pixels);
 
 // free memory from heap allocated array used as Buffer data
 void

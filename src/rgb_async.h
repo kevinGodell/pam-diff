@@ -10,7 +10,7 @@
 
 class RgbAllPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbAllPercentWorker(const Dimensions &dimensions, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllPercentWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -18,7 +18,7 @@ public:
 
 private:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const All &all_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
@@ -33,7 +33,7 @@ private:
 
 class RgbRegionPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionPercentWorker(const Dimensions &dimensions, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionPercentWorker(const Config &config, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -41,7 +41,7 @@ public:
 
 private:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Region &region_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
@@ -56,7 +56,7 @@ private:
 
 class RgbRegionsPercentWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsPercentWorker(const Dimensions &dimensions, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsPercentWorker(const Config &config, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -64,7 +64,7 @@ public:
 
 private:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Regions &regions_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
@@ -79,7 +79,7 @@ private:
 
 class RgbAllBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbAllBoundsWorker(const Dimensions &dimensions, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllBoundsWorker(const Config &config, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -87,7 +87,7 @@ public:
 
 protected:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const All &all_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -104,7 +104,7 @@ protected:
 
 class RgbRegionBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionBoundsWorker(const Dimensions &dimensions, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionBoundsWorker(const Config &config, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -112,7 +112,7 @@ public:
 
 private:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Region &region_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -129,7 +129,7 @@ private:
 
 class RgbRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBoundsWorker(const Dimensions &dimensions, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsBoundsWorker(const Config &config, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -137,7 +137,7 @@ public:
 
 private:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Regions &regions_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -154,7 +154,7 @@ private:
 
 class RgbAllBlobsWorker : public Napi::AsyncWorker {
 public:
-    RgbAllBlobsWorker(const Dimensions &dimensions, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbAllBlobsWorker(const Config &config, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -162,7 +162,7 @@ public:
 
 protected:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const All &all_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -179,7 +179,7 @@ protected:
 
 class RgbRegionBlobsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionBlobsWorker(const Dimensions &dimensions, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionBlobsWorker(const Config &config, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -187,7 +187,7 @@ public:
 
 protected:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Region &region_;
     const bool draw_;
     const uint_fast8_t *buf0_;
@@ -205,7 +205,7 @@ protected:
 
 class RgbRegionsBlobsWorker : public Napi::AsyncWorker {
 public:
-    RgbRegionsBlobsWorker(const Dimensions &dimensions, const Regions &regions, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    RgbRegionsBlobsWorker(const Config &config, const Regions &regions, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -213,7 +213,7 @@ public:
 
 protected:
     // in
-    const Dimensions &dimensions_;
+    const Config &config_;
     const Regions &regions_;
     const bool draw_;
     const uint_fast8_t *buf0_;

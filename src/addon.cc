@@ -20,7 +20,7 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     cout << "size of uint_fast32_t : " << sizeof(uint_fast32_t) << endl;
     cout << "size of std::vector<bool> : " << sizeof(std::vector<bool>) << endl;
     cout << "size of std::vector<uint_fast8_t> : " << sizeof(std::vector<uint_fast8_t>) << endl;
-    cout << "size of Dimensions struct : " << sizeof(Dimensions) << endl;
+    cout << "size of Config struct : " << sizeof(Config) << endl;
     cout << "size of All struct : " << sizeof(All) << endl;
     cout << "size of Bounds struct : " << sizeof(Bounds) << endl;
     cout << "size of Region struct : " << sizeof(Region) << endl;
