@@ -57,39 +57,13 @@ LabelComponent(uint_fast32_t *stack, const Dimensions &dimensions, const Bounds 
 
 // assign label value to each pixel, return number of labels (highest label number +1)
 uint_fast32_t
-LabelImage(const Dimensions &dimensions, const Bounds &bounds, std::vector<int_fast32_t> &labelsVec) {
-
-    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (dimensions.pixelCount + 1)]);
-
-    // label number
-    int_fast32_t labelNumber = -1;
-
-    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
-
-        for (uint_fast32_t x = bounds.minX, p = y * dimensions.width + x; x <= bounds.maxX; ++x, ++p) {
-
-            // ignored == -2, unlabeled == -1, labeled >= 0
-            if (labelsVec[p] != -1) continue;// pixel does not need to be labelled
-
-            // increment label for next blob
-            ++labelNumber;
-
-            // send to C function for recursive labelling
-            LabelComponent(stack.get(), dimensions, bounds, labelNumber, x, y, labelsVec.data());
-
-        }
-    }
-
-    return static_cast<uint_fast32_t>(labelNumber + 1);
-}
-
-// assign label value to each pixel, return number of labels (highest label number +1)
-uint_fast32_t
 LabelImage(const Dimensions &dimensions, const Bounds &bounds, int_fast32_t *labels) {
 
-    std::unique_ptr<uint_fast32_t[]> stack(new uint_fast32_t[3 * (dimensions.pixelCount + 1)]);
+    // reserve memory for stack array on heap
+    auto *stack = new uint_fast32_t[3 * (dimensions.pixelCount + 1)];
 
-    uint_fast32_t *stackPtr = stack.get();
+    // have unique_ptr manage destruction of array
+    std::unique_ptr<uint_fast32_t[]> up(stack);
 
     // label number
     int_fast32_t labelNumber = -1;
@@ -105,7 +79,7 @@ LabelImage(const Dimensions &dimensions, const Bounds &bounds, int_fast32_t *lab
             ++labelNumber;
 
             // send to C function for recursive labelling
-            LabelComponent(stackPtr, dimensions, bounds, labelNumber, x, y, labels);
+            LabelComponent(stack, dimensions, bounds, labelNumber, x, y, labels);
 
         }
     }
