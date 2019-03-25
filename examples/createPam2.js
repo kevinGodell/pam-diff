@@ -117,7 +117,7 @@ if (target === 'all') {
     regions = [region1, region2, region3];
 }
 
-const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, async: async, draw: draw});
+const pamDiff = new PamDiff({percent: 2, regions: regions, mask: mask, response: response, async: async, draw: draw});
 
 pamDiff.on('diff', data => {
     //console.log(data);
