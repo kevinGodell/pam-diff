@@ -35,8 +35,8 @@
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
            "MACOSX_DEPLOYMENT_TARGET": "10.7",
            "GCC_ENABLE_CPP_RTTI" : "YES",
-           # "fast", "3", "2", "1", "0", "", "s"
-           "GCC_OPTIMIZATION_LEVEL": "2",
+           # "fastest,smallest","fastest","faster","fast", "3", "2", "1", "0", "", "s"
+           "GCC_OPTIMIZATION_LEVEL": "3",
            # only passed to C files
            "OTHER_CFLAGS": [ "-fvisibility=hidden" ],
            # remove defaults passed to C files
