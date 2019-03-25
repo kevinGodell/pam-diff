@@ -71,7 +71,7 @@ SetGrayPixels(const uint_fast32_t minX, const uint_fast32_t maxX, const uint_fas
     }
 }*/
 
-inline void
+/*inline void
 SetGrayPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
     uint_fast8_t *firstPtr = &pixels[bounds.minY * dimensions.width + bounds.minX];
     uint_fast8_t *secondPtr = &pixels[bounds.maxY * dimensions.width + bounds.minX];
@@ -85,9 +85,25 @@ SetGrayPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *
         *firstPtr = 0x80;// left
         *secondPtr = 0x80;// right
     }
-}
+}*/
 
 inline void
+SetGrayPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
+    uint_fast32_t i = bounds.minY * dimensions.width + bounds.minX;
+    uint_fast32_t j = bounds.maxY * dimensions.width + bounds.minX;
+    for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, ++i, ++j) {
+        pixels[i] = 0x80;// top
+        pixels[j] = 0x80;// bottom
+    }
+    i = (bounds.minY + 1) * dimensions.width + bounds.minX;
+    j = (bounds.minY + 1) * dimensions.width + bounds.maxX;
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += dimensions.width, j += dimensions.width) {
+        pixels[i] = 0x80;// left
+        pixels[j] = 0x80;// right
+    }
+}
+
+/*inline void
 SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
     uint_fast32_t inc = dimensions.depth == 4 ? 2 : dimensions.depth == 3 ? 1 : 0;
     uint_fast8_t *firstPtr = &pixels[bounds.minY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth];
@@ -110,6 +126,32 @@ SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *p
         *secondPtr = 0xAF;// right
         *(secondPtr + 1) = 0x33;
         *(secondPtr + 2) = 0xFF;
+    }
+}*/
+
+inline void
+SetRgbPixels(const Bounds &bounds, const Dimensions &dimensions, uint_fast8_t *pixels) {
+    uint_fast32_t inc = dimensions.depth;
+    uint_fast32_t i = bounds.minY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
+    uint_fast32_t j = bounds.maxY * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
+    for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, i += inc, j += inc) {
+        pixels[i] = 0xAF;// top
+        pixels[i + 1] = 0x33;
+        pixels[i + 2] = 0xFF;
+        pixels[j] = 0xAF;// bottom
+        pixels[j + 1] = 0x33;
+        pixels[j + 2] = 0xFF;
+    }
+    inc = dimensions.width * dimensions.depth;
+    i = (bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.minX * dimensions.depth;
+    j = (bounds.minY + 1) * dimensions.width * dimensions.depth + bounds.maxX * dimensions.depth;
+    for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += inc, j += inc) {
+        pixels[i] = 0xAF;// left
+        pixels[i + 1] = 0x33;
+        pixels[i + 2] = 0xFF;
+        pixels[j] = 0xAF;// right
+        pixels[j+ 1] = 0x33;
+        pixels[j + 2] = 0xFF;
     }
 }
 
