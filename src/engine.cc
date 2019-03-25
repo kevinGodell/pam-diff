@@ -10,12 +10,12 @@
 
 // determine engine type
 uint_fast32_t
-EngineType(const uint_fast32_t pixDepth, const std::string &response, const bool async, const uint_fast32_t regionsLength) {
+EngineType(const uint_fast32_t depth, const uint_fast32_t regionsLength, const std::string &response, const bool async) {
     uint_fast32_t value = 0;
-    value += pixDepth == 4 || pixDepth == 3 ? 1 : 0;
-    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
-    value += response == "blobs" ? 200 : response == "bounds" ? 100 : 0;
-    value += async ? 1000 : 0;
+    value += depth == 4 || depth == 3 ? 1000 : 0;
+    value += regionsLength > 1 ? 200 : regionsLength == 1 ? 100 : 0;
+    value += response == "blobs" ? 20 : response == "bounds" ? 10 : 0;
+    value += async ? 1 : 0;
     return value;
 }
 
