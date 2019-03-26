@@ -356,6 +356,9 @@ class PamDiff extends Transform {
                 }
                 const pp = new PP(region.polygon);
                 const bitset = pp.getBitset(this._width, this._height);
+                if (bitset.count === 0) {
+                    throw new Error('Bitset count must be greater than 0.');
+                }
                 const bitsetBuffer = bitset.buffer;
                 for (let i = 0; i < wxh; ++i) {
                     if (bitsetBuffer[i] === 1) {
@@ -398,6 +401,9 @@ class PamDiff extends Transform {
                 }
                 const pp = new PP(region.polygon);
                 const bitset = pp.getBitset(this._width, this._height);
+                if (bitset.count === 0) {
+                    throw new Error('Bitset count must be greater than 0');
+                }
                 const difference = PamDiff._validateNumber(parseInt(region.difference), this._difference, 1, 255);
                 const percent = PamDiff._validateNumber(parseInt(region.percent), this._percent, 1, 100);
                 regions.push(
