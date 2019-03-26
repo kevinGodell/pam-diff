@@ -38,30 +38,28 @@ class PamDiff extends Transform {
     /**
      *
      * @param [options] {Object}
-     * @param [options.async=false] {Boolean} - Pixel change detection will be sent to a libuv worker thread.
+     * @param [options.sync=false] {Boolean} - If true, pixel change detection will block the event loop instead of using a worker
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
-     * @param [options.percent=5] {Number} - Percent of pixels that exceed difference value.
-     * @param [options.response=percent] {String} - Accepted values: percent or bounds.
-     * @param [options.draw=false] {Boolean} - Return a pixel buffer with drawn bounding box. Must also set {response: 'bounds'}.
-     * @param [options.regions] {Array} - Array of regions.
-     * @param options.regions[i].name {String} - Name of region.
-     * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region.
-     * @param [options.regions[i].percent=options.percent] {Number} - Percent value for region.
+     * @param [options.percent=5] {Number} - Percent of pixels or blobs that exceed difference value
+     * @param [options.response=percent] {String} - Accepted values: percent or bounds or blobs
+     * @param [options.draw=false] {Boolean} - If true and response to 'bounds' or 'blobs', return a pixel buffer with drawn bounding box
+     * @param [options.regions] {Array} - Array of region objects
+     * @param options.regions[i].name {String} - Name of region
+     * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region
+     * @param [options.regions[i].percent=options.percent] {Number} - Percent value for region
      * @param options.regions[i].polygon {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
-     * @param [options.mask=false] {Boolean} - Indicate if regions should be used as masks of pixels to ignore.
-     * @param [callback] {Function} - Function to be called when diff event occurs.
+     * @param [options.mask=false] {Boolean} - Indicate if regions should be used as masks of pixels to ignore
+     * @param [callback] {Function} - Function to be called when diff event occurs
      */
-    //[options.blob] {Number} - Number of pixels connected at top, right, bottom, left to be considered a blob.
     constructor(options, callback) {
         super(options);
         Transform.call(this, {objectMode: true});
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
-        this.draw = PamDiff._parseOptions('draw', options);// return pixels with bounding box if response is bounds
-        this.async = PamDiff._parseOptions('async', options);// should be processed before regions
+        this.draw = PamDiff._parseOptions('draw', options);// return pixels with bounding box if response is bounds or blobs
+        this.sync = PamDiff._parseOptions('sync', options);// should be processed before regions
         this.difference = PamDiff._parseOptions('difference', options);// global value, can be overridden per region
         this.percent = PamDiff._parseOptions('percent', options);// global value, can be overridden per region
         this.mask = PamDiff._parseOptions('mask', options);// should be processed before regions
-        //this.blobSize = PamDiff._parseOptions('blobSize', options);// should be processed before regions
         this.regions = PamDiff._parseOptions('regions', options);// can be zero regions, a single region, or multiple regions. if no regions, all pixels will be compared.
         this.callback = callback;// callback function to be called when pixel difference is detected
         this._parseChunk = this._parseFirstChunk;// first parsing will be reading settings and configuring internal pixel reading
@@ -141,7 +139,7 @@ class PamDiff extends Transform {
      * @return {String}
      */
     get response() {
-        return this._response || null;
+        return this._response;
     }
 
     /**
@@ -158,8 +156,8 @@ class PamDiff extends Transform {
      *
      * @param bool {Boolean}
      */
-    set async(bool) {
-        this._async = PamDiff._validateBoolean(bool);
+    set sync(bool) {
+        this._sync = PamDiff._validateBoolean(bool);
         this._processRegions();
         this._configurePixelDiffEngine();
     }
@@ -168,8 +166,8 @@ class PamDiff extends Transform {
      *
      * @return {Boolean}
      */
-    get async() {
-        return this._async || false;
+    get sync() {
+        return this._sync;
     }
 
     /**
@@ -177,8 +175,8 @@ class PamDiff extends Transform {
      * @param bool {Boolean}
      * @return {PamDiff}
      */
-    setAsync(bool) {
-        this.async = bool;
+    setSync(bool) {
+        this.sync = bool;
         return this;
     }
 
@@ -197,7 +195,7 @@ class PamDiff extends Transform {
      * @return {Boolean}
      */
     get draw() {
-        return this._draw || false;
+        return this._draw;
     }
 
     /**
@@ -312,33 +310,6 @@ class PamDiff extends Transform {
 
     setMask(bool) {
         this.mask = bool;
-        return this;
-    }
-
-    /**
-     *
-     * @param number {Number}
-     */
-    set blobSize(number) {
-        this._blobSize = PamDiff._validateNumber(parseInt(number), 0, 0, 100000);
-        this._configurePixelDiffEngine();
-    }
-
-    /**
-     *
-     * @return {Number}
-     */
-    get blobSize() {
-        return this._blobSize || 0;
-    }
-
-    /**
-     *
-     * @param number
-     * @return {PamDiff}
-     */
-    setBlobSize(number) {
-        this.blobSize = number;
         return this;
     }
 
@@ -512,7 +483,7 @@ class PamDiff extends Transform {
         }
         let engine = this._tupltype;
         engine += `_${this._width}_x_${this._height}`;
-        const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, async: this._async};
+        const config = {width: this._width, height: this._height, depth: this._depth, response: this._response, sync: this._sync};
         if (this._regionObj) {
             engine += '_region';
             //config.target = 'region';
@@ -538,7 +509,7 @@ class PamDiff extends Transform {
             config.draw = this._draw;
             engine += '_draw';
         }
-        engine += this._async ? '_async' : '_sync';
+        engine += this._sync ? '_sync' : '_async';
         this._engine = addon(config);
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
@@ -668,7 +639,7 @@ module.exports = PamDiff;</code></pre>
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Sun Mar 24 2019 06:31:05 GMT-0500 (Central Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Mon Mar 25 2019 19:56:30 GMT-0500 (Central Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
