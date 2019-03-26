@@ -73,7 +73,9 @@ pamDiff.callback = null;
     trigger: [
         {name: 'all', percent: 13}
     ],
-    pam: <Buffer>
+    pam: <Buffer>,
+    headers: <Buffer>,
+    pixels: <Buffer>
 }
 ```
 2. When targeting regions of pixels:
@@ -83,7 +85,9 @@ pamDiff.callback = null;
         {name: 'region1', percent: 13},
         {name: 'region2', percent: 22}
     ],
-    pam: <Buffer>
+    pam: <Buffer>,
+    headers: <Buffer>,
+    pixels: <Buffer>
 }
 ```
 3. When targeting all pixels ignored by mask:
@@ -92,7 +96,9 @@ pamDiff.callback = null;
     trigger: [
         {name: 'mask', percent: 13}
     ],
-    pam: <Buffer>
+    pam: <Buffer>,
+    headers: <Buffer>,
+    pixels: <Buffer>
 }
 ```
 4. When targeting all pixels and setting {response: "bounds"}:
@@ -101,7 +107,45 @@ pamDiff.callback = null;
     trigger: [
         {name: 'all', percent: 13, minX: 42, maxX: 399, minY: 113, maxY: 198}
     ],
-    pam: <Buffer>
+    pam: <Buffer>,
+    headers: <Buffer>,
+    pixels: <Buffer>
+}
+```
+5. When targeting all pixels and setting {response: "blobs"}:
+```
+{
+    trigger: [
+        {
+            name: "all",
+            percent: 9,
+            minX: 137,
+            maxX: 1782,
+            minY: 392,
+            maxY: 695,
+            blobs: [
+                {
+                    label: 0,
+                    percent: 3,
+                    minX: 1192,
+                    maxX: 1486,
+                    minY: 392,
+                    maxY: 695
+                },
+                {
+                    label: 1,
+                    percent: 3,
+                    minX: 1488,
+                    maxX: 1782,
+                    minY: 392,
+                    maxY: 695
+                }
+            ]
+        }
+    ],
+    pam: <Buffer>,
+    headers: <Buffer>,
+    pixels: <Buffer>
 }
 ```
 ### Other Resources:
