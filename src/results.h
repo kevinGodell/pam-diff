@@ -92,14 +92,14 @@ SetGrayPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) 
     uint_fast32_t i = bounds.minY * config.width + bounds.minX;
     uint_fast32_t j = bounds.maxY * config.width + bounds.minX;
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, ++i, ++j) {
-        pixels[i] = 0x80;// top
-        pixels[j] = 0x80;// bottom
+        pixels[i] = 0xF0;// top
+        pixels[j] = 0xF0;// bottom
     }
     i = (bounds.minY + 1) * config.width + bounds.minX;
     j = (bounds.minY + 1) * config.width + bounds.maxX;
     for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += config.width, j += config.width) {
-        pixels[i] = 0x80;// left
-        pixels[j] = 0x80;// right
+        pixels[i] = 0xF0;// left
+        pixels[j] = 0xF0;// right
     }
 }
 
@@ -135,23 +135,23 @@ SetRgbPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
     uint_fast32_t i = bounds.minY * config.width * config.depth + bounds.minX * config.depth;
     uint_fast32_t j = bounds.maxY * config.width * config.depth + bounds.minX * config.depth;
     for (uint_fast32_t x = bounds.minX; x <= bounds.maxX; ++x, i += inc, j += inc) {
-        pixels[i] = 0xAF;// top
-        pixels[i + 1] = 0x33;
-        pixels[i + 2] = 0xFF;
-        pixels[j] = 0xAF;// bottom
-        pixels[j + 1] = 0x33;
-        pixels[j + 2] = 0xFF;
+        pixels[i] = 0xFF;// top
+        pixels[i + 1] = 0xFF;
+        pixels[i + 2] = 0x00;
+        pixels[j] = 0xFF;// bottom
+        pixels[j + 1] = 0xFF;
+        pixels[j + 2] = 0x00;
     }
     inc = config.width * config.depth;
     i = (bounds.minY + 1) * config.width * config.depth + bounds.minX * config.depth;
     j = (bounds.minY + 1) * config.width * config.depth + bounds.maxX * config.depth;
     for (uint_fast32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += inc, j += inc) {
-        pixels[i] = 0xAF;// left
-        pixels[i + 1] = 0x33;
-        pixels[i + 2] = 0xFF;
-        pixels[j] = 0xAF;// right
-        pixels[j+ 1] = 0x33;
-        pixels[j + 2] = 0xFF;
+        pixels[i] = 0xFF;// left
+        pixels[i + 1] = 0xFF;
+        pixels[i + 2] = 0x00;
+        pixels[j] = 0xFF;// right
+        pixels[j+ 1] = 0xFF;
+        pixels[j + 2] = 0x00;
     }
 }
 
