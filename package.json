@@ -160,6 +160,7 @@
   "private": false,
   "files": [
     "binding.gyp",
-    "src"
+    "src/*.cc",
+    "src/*.h"
   ]
 }
