@@ -35,6 +35,10 @@ class PamDiff extends Transform {
         this.regions = PamDiff._parseOptions('regions', options);// can be zero regions, a single region, or multiple regions. if no regions, all pixels will be compared.
         this.callback = callback;// callback function to be called when pixel difference is detected
         this._parseChunk = this._parseFirstChunk;// first parsing will be reading settings and configuring internal pixel reading
+        //output some details if in development
+        if (process.env.NODE_ENV === 'development') {
+            console.dir(this, {showHidden: true, depth: 1, colors: true});
+        }
     }
 
     /**
