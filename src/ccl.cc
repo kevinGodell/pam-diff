@@ -6,16 +6,16 @@
 #include <vector>
 
 #define CALL_LabelComponent(x, y, returnLabel) {\
-            stack[stackPointer] = x;\
-            stack[stackPointer+1] = y;\
-            stack[stackPointer+2] = returnLabel;\
-            stackPointer += 3;\
+            stack[stackIndex] = x;\
+            stack[stackIndex+1] = y;\
+            stack[stackIndex+2] = returnLabel;\
+            stackIndex += 3;\
             goto START;\
         }
 
 #define RETURN {\
-            stackPointer -= 3;\
-            switch (stack[stackPointer+2]) {\
+            stackIndex -= 3;\
+            switch (stack[stackIndex+2]) {\
                 case 1 : goto RETURN1;\
                 case 2 : goto RETURN2;\
                 case 3 : goto RETURN3;\
@@ -24,22 +24,22 @@
             }\
         }
 
-#define X (stack[stackPointer-3])
+#define X (stack[stackIndex-3])
 
-#define Y (stack[stackPointer-2])
+#define Y (stack[stackIndex-2])
 
 void
 LabelComponent(const Config &config, const Bounds &bounds, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, uint_fast32_t *stack, int_fast32_t *labels) {
     stack[0] = x;
     stack[1] = y;
     stack[2] = 0;
-    int_fast32_t stackPointer = 3;
-    int_fast32_t index;
+    uint_fast32_t stackIndex = 3;
+    uint_fast32_t labelsIndex;
 
     START:// recursive routine starts here
-    index = config.width * Y + X;
-    if (labels[index] != -1) RETURN;// pixel is ignored(-2) or previously labelled(>= 0)
-    labels[index] = labelNumber;
+    labelsIndex = config.width * Y + X;
+    if (labels[labelsIndex] != -1) RETURN;// pixel is ignored(-2) or previously labelled(>= 0)
+    labels[labelsIndex] = labelNumber;
     if (X > bounds.minX) CALL_LabelComponent(X - 1, Y, 1);// left  pixel
 
     RETURN1:
