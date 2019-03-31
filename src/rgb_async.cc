@@ -85,11 +85,10 @@ void RgbRegionsPercentWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbAllBoundsWorker::RgbAllBoundsWorker(const Config &config, const All &all, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbAllBoundsWorker::RgbAllBoundsWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           all_(all),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -99,7 +98,7 @@ RgbAllBoundsWorker::RgbAllBoundsWorker(const Config &config, const All &all, con
 
 void RgbAllBoundsWorker::Execute() {
     this->boundsResult_ = RgbAllBounds(this->config_, this->all_, this->buf0_, this->buf1_);
-    if (this->boundsResult_.flagged && this->draw_) {
+    if (this->boundsResult_.flagged && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->boundsResult_, this->config_, this->pixels_);
@@ -112,7 +111,7 @@ void RgbAllBoundsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->boundsResult_.flagged) {
         ToJs(env, this->boundsResult_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
@@ -123,11 +122,10 @@ void RgbAllBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionBoundsWorker::RgbRegionBoundsWorker(const Config &config, const Region &region, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionBoundsWorker::RgbRegionBoundsWorker(const Config &config, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           region_(region),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -137,7 +135,7 @@ RgbRegionBoundsWorker::RgbRegionBoundsWorker(const Config &config, const Region 
 
 void RgbRegionBoundsWorker::Execute() {
     this->boundsResult_ = RgbRegionBounds(this->config_, this->region_, this->buf0_, this->buf1_);
-    if (this->boundsResult_.flagged && this->draw_) {
+    if (this->boundsResult_.flagged && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->boundsResult_, this->config_, this->pixels_);
@@ -150,7 +148,7 @@ void RgbRegionBoundsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->boundsResult_.flagged) {
         ToJs(env, this->boundsResult_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
@@ -161,11 +159,10 @@ void RgbRegionBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const Config &config, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const Config &config, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           regions_(regions),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -175,7 +172,7 @@ RgbRegionsBoundsWorker::RgbRegionsBoundsWorker(const Config &config, const Regio
 
 void RgbRegionsBoundsWorker::Execute() {
     this->boundsResultVec_ = RgbRegionsBounds(this->config_, this->regions_, this->buf0_, this->buf1_);
-    if (!this->boundsResultVec_.empty() && this->draw_) {
+    if (!this->boundsResultVec_.empty() && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->boundsResultVec_, this->config_, this->pixels_);
@@ -188,7 +185,7 @@ void RgbRegionsBoundsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (!this->boundsResultVec_.empty()) {
         ToJs(env, this->boundsResultVec_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
@@ -199,11 +196,10 @@ void RgbRegionsBoundsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbAllBlobsWorker::RgbAllBlobsWorker(const Config &config, const All &all, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbAllBlobsWorker::RgbAllBlobsWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           all_(all),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -213,7 +209,7 @@ RgbAllBlobsWorker::RgbAllBlobsWorker(const Config &config, const All &all, const
 
 void RgbAllBlobsWorker::Execute() {
     this->blobsResult_ = RgbAllBlobs(this->config_, this->all_, this->buf0_, this->buf1_);
-    if (this->blobsResult_.flagged && this->draw_) {
+    if (this->blobsResult_.flagged && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->blobsResult_, this->config_, this->pixels_);
@@ -226,7 +222,7 @@ void RgbAllBlobsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->blobsResult_.flagged) {
         ToJs(env, this->blobsResult_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
@@ -237,11 +233,10 @@ void RgbAllBlobsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionBlobsWorker::RgbRegionBlobsWorker(const Config &config, const Region &region, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionBlobsWorker::RgbRegionBlobsWorker(const Config &config, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           region_(region),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -251,7 +246,7 @@ RgbRegionBlobsWorker::RgbRegionBlobsWorker(const Config &config, const Region &r
 
 void RgbRegionBlobsWorker::Execute() {
     this->blobsResult_ = RgbRegionBlobs(this->config_, this->region_, this->buf0_, this->buf1_);
-    if (this->blobsResult_.flagged && this->draw_) {
+    if (this->blobsResult_.flagged && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->blobsResult_, this->config_, this->pixels_);
@@ -264,7 +259,7 @@ void RgbRegionBlobsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (this->blobsResult_.flagged) {
         ToJs(env, this->blobsResult_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;
@@ -275,11 +270,10 @@ void RgbRegionBlobsWorker::OnOK() {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RgbRegionsBlobsWorker::RgbRegionsBlobsWorker(const Config &config, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+RgbRegionsBlobsWorker::RgbRegionsBlobsWorker(const Config &config, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           config_(config),
           regions_(regions),
-          draw_(draw),
           buf0_(napiBuf0.Data()),
           buf1_(napiBuf1.Data()),
           buf0Ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
@@ -289,7 +283,7 @@ RgbRegionsBlobsWorker::RgbRegionsBlobsWorker(const Config &config, const Regions
 
 void RgbRegionsBlobsWorker::Execute() {
     this->blobsResultVec_ = RgbRegionsBlobs(this->config_, this->regions_, this->buf0_, this->buf1_);
-    if (!this->blobsResultVec_.empty() && this->draw_) {
+    if (!this->blobsResultVec_.empty() && this->config_.draw) {
         this->pixels_ = new uint_fast8_t[this->config_.byteLength]();
         std::copy(this->buf1_, this->buf1_ + this->config_.byteLength, this->pixels_);
         DrawRgb(this->blobsResultVec_, this->config_, this->pixels_);
@@ -302,7 +296,7 @@ void RgbRegionsBlobsWorker::OnOK() {
     Napi::Array resultsJs = Napi::Array::New(env);
     if (!this->blobsResultVec_.empty()) {
         ToJs(env, this->blobsResultVec_, resultsJs);
-        if (this->draw_) {
+        if (this->config_.draw) {
             const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, this->pixels_, this->config_.byteLength, DeleteExternalData);
             Callback().Call({env.Null(), resultsJs, pixels});
             return;

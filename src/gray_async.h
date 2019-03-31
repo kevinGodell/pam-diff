@@ -79,7 +79,7 @@ private:
 
 class GrayAllBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayAllBoundsWorker(const Config &config, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayAllBoundsWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -89,7 +89,6 @@ protected:
     // in
     const Config &config_;
     const All &all_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
@@ -104,7 +103,7 @@ protected:
 
 class GrayRegionBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionBoundsWorker(const Config &config, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionBoundsWorker(const Config &config, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -114,7 +113,6 @@ private:
     // in
     const Config &config_;
     const Region &region_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
@@ -129,7 +127,7 @@ private:
 
 class GrayRegionsBoundsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsBoundsWorker(const Config &config, const Regions &regions, const bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionsBoundsWorker(const Config &config, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -139,7 +137,6 @@ private:
     // in
     const Config &config_;
     const Regions &regions_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
@@ -154,7 +151,7 @@ private:
 
 class GrayAllBlobsWorker : public Napi::AsyncWorker {
 public:
-    GrayAllBlobsWorker(const Config &config, const All &all, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayAllBlobsWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -164,7 +161,6 @@ protected:
     // in
     const Config &config_;
     const All &all_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
@@ -179,7 +175,7 @@ protected:
 
 class GrayRegionBlobsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionBlobsWorker(const Config &config, const Region &region, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionBlobsWorker(const Config &config, const Region &region, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -189,7 +185,6 @@ protected:
     // in
     const Config &config_;
     const Region &region_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;
@@ -205,7 +200,7 @@ protected:
 
 class GrayRegionsBlobsWorker : public Napi::AsyncWorker {
 public:
-    GrayRegionsBlobsWorker(const Config &config, const Regions &regions, bool draw, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    GrayRegionsBlobsWorker(const Config &config, const Regions &regions, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -215,7 +210,6 @@ protected:
     // in
     const Config &config_;
     const Regions &regions_;
-    const bool draw_;
     const uint_fast8_t *buf0_;
     const uint_fast8_t *buf1_;
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0Ref_;

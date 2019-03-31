@@ -56,6 +56,7 @@ struct Config {
     uint_fast32_t depth;
     uint_fast32_t pixelCount;
     uint_fast32_t byteLength;
+    bool draw;
 };
 
 struct All {
