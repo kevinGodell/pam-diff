@@ -6,6 +6,33 @@
 #include <cstdint>
 #include <vector>
 
+
+typedef std::function<const Results(const uint_fast8_t *buf0, const uint_fast8_t *buf1)> ExecuteFunc;
+
+typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
+
+class AsyncWorker : public Napi::AsyncWorker {
+public:
+    AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+
+    void Execute() override;
+
+    void OnOK() override;
+
+private:
+    // in
+
+    const ExecuteFunc execute_;
+    const CallbackFunc callback_;
+    const uint_fast8_t *buf0_;
+    const uint_fast8_t *buf1_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
+    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+
+    // out
+    Results results_;
+};
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GrayAllPercentWorker : public Napi::AsyncWorker {
@@ -26,7 +53,8 @@ private:
     const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
 
     // out
-    PercentResult percentResult_;
+    //PercentResult percentResult_;
+    Results results_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,3 +1,5 @@
+#include <utility>
+
 #ifndef SRC_ENGINE_H_
 #define SRC_ENGINE_H_
 
@@ -60,6 +62,7 @@ struct Config {
 };
 
 struct All {
+    std::string name;
     uint_fast32_t difference;
     uint_fast32_t percent;
 };
@@ -88,13 +91,15 @@ struct Regions {
 };
 
 struct PercentResult {
-    std::string name;// 24
+    //std::string name;// 24
+    const char * name;
     uint_fast32_t percent;// 4
     bool flagged;// 1
 };
 
 struct BoundsResult {
-    std::string name;
+    //std::string name;
+    const char * name;
     Bounds bounds;
     uint_fast32_t percent;
     bool flagged;
@@ -108,11 +113,22 @@ struct Blob {
 };
 
 struct BlobsResult {
-    std::string name;// 24
+    //std::string name;// 24
+    const char * name;
     Bounds bounds;
     uint_fast32_t percent;// 4
     bool flagged;// 1
     std::vector<Blob> blobs;
+};
+
+struct Results {
+    PercentResult percentResult;
+    BoundsResult boundsResult;
+    BlobsResult blobsResult;
+    std::vector<PercentResult> percentResults;
+    std::vector<BoundsResult> boundsResults;
+    std::vector<BlobsResult> blobsResults;
+    uint_fast8_t * pixels;
 };
 
 // measure difference of gray bytes
@@ -159,13 +175,25 @@ RegionsJsToCpp(const Napi::Array &regionsJs);
 PercentResult
 GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+// gray all percent
+Results
+GrayAllPercentExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 // gray region percent
 PercentResult
 GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+// gray region percent
+Results
+GrayRegionPercentExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 // gray regions percent
 std::vector<PercentResult>
 GrayRegionsPercent(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+// gray regions percent
+Results
+GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray all bounds
 BoundsResult

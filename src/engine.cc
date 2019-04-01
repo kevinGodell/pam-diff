@@ -65,7 +65,7 @@ RegionsJsToCpp(const Napi::Array &regionsJs) {
 // gray all percent
 PercentResult
 GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    PercentResult percentResult = {"all", 0, false};// initialize results
+    PercentResult percentResult = {all.name.data(), 0, false};// initialize results
     for (uint_fast32_t p = 0; p < config.pixelCount; ++p) {
         if (all.difference > GrayDiff(buf0, buf1, p)) continue;
         ++percentResult.percent;
@@ -75,12 +75,18 @@ GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, c
     return percentResult;
 }
 
+// gray all percent
+Results
+GrayAllPercentExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    return {GrayAllPercent(config, all, buf0, buf1), {}, {}, {}, {}, {}, nullptr};
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray region percent
 PercentResult
 GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    PercentResult percentResult = {region.name, 0, false};// initialize results
+    PercentResult percentResult = {region.name.data(), 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -90,6 +96,12 @@ GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t
     percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
     percentResult.flagged = percentResult.percent >= region.percent;
     return percentResult;
+}
+
+// gray region percent
+Results
+GrayRegionPercentExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    return {GrayRegionPercent(config, region, buf0, buf1), {}, {}, {}, {}, {}, nullptr};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +119,12 @@ GrayRegionsPercent(const Config &config, const Regions &regions, const uint_fast
     }
     percentResultVec.shrink_to_fit();
     return percentResultVec;
+}
+
+// gray regions percent
+Results
+GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    return {{}, {}, {}, GrayRegionsPercent(config, regions, buf0, buf1), {}, {}, nullptr};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -135,7 +153,7 @@ GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, co
 // gray region bounds
 BoundsResult
 GrayRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BoundsResult boundsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
+    BoundsResult boundsResult = {region.name.data(), {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -230,7 +248,7 @@ GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, con
 // gray region blobs
 BlobsResult
 GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
+    BlobsResult blobsResult = {region.name.data(), {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
     // get pointer
@@ -318,7 +336,7 @@ RgbAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, co
 // rgb region percent
 PercentResult
 RgbRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    PercentResult percentResult = {region.name, 0, false};// initialize results
+    PercentResult percentResult = {region.name.data(), 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
@@ -367,7 +385,7 @@ RgbAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, con
 // rgb region bounds
 BoundsResult
 RgbRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BoundsResult boundsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
+    BoundsResult boundsResult = {region.name.data(), {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false};// initialize results
     for (uint_fast32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint_fast32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
@@ -458,7 +476,7 @@ RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, cons
 // rgb region blobs
 BlobsResult
 RgbRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BlobsResult blobsResult = {region.name, {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
+    BlobsResult blobsResult = {region.name.data(), {region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()};// initialize results
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
     // get pointer

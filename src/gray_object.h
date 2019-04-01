@@ -4,6 +4,10 @@
 #include "engine.h"
 #include "napi.h"
 
+typedef std::function<const Results(const uint_fast8_t *buf0, const uint_fast8_t *buf1)> ExecuteFunc;
+
+typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GrayAllPercentSync : public Napi::ObjectWrap<GrayAllPercentSync> {
@@ -18,8 +22,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +41,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,8 +59,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,8 +77,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +95,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +113,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

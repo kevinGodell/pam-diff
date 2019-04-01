@@ -13,15 +13,18 @@ GrayAllPercentSync::GrayAllPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {difference, percent};
+    const Config config = {width, height, depth, width * height, width * height * depth, false};
+    const All all = {"all", difference, percent};
+
+    this->execute_ = std::bind(&GrayAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayAllPercentCallback;
 }
 
 Napi::FunctionReference GrayAllPercentSync::constructor;
@@ -46,12 +49,7 @@ Napi::Value GrayAllPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const PercentResult percentResult = GrayAllPercent(this->config_, this->all_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResult.flagged) {
-        ToJs(env, percentResult, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    this->callback_(env, cb, this->execute_(buf0, buf1));
     return env.Undefined();
 }
 
@@ -62,15 +60,18 @@ GrayAllPercentAsync::GrayAllPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {difference, percent};
+    const Config config = {width, height, depth, width * height, width * height * depth, false};
+    const All all = {"all", difference, percent};
+
+    this->execute_ = std::bind(&GrayAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayAllPercentCallback;
 }
 
 Napi::FunctionReference GrayAllPercentAsync::constructor;
@@ -95,8 +96,10 @@ Napi::Value GrayAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayAllPercentWorker = new GrayAllPercentWorker(this->config_, this->all_, napiBuf0, napiBuf1, cb);
-    grayAllPercentWorker->Queue();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -107,14 +110,17 @@ GrayRegionPercentSync::GrayRegionPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = {width, height, depth, width * height, width * height * depth, false};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&GrayRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayRegionPercentCallback;
 }
 
 Napi::FunctionReference GrayRegionPercentSync::constructor;
@@ -139,12 +145,7 @@ Napi::Value GrayRegionPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const PercentResult percentResult = GrayRegionPercent(this->config_, this->region_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResult.flagged) {
-        ToJs(env, percentResult, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    this->callback_(env, cb, this->execute_(buf0, buf1));
     return env.Undefined();
 }
 
@@ -155,14 +156,17 @@ GrayRegionPercentAsync::GrayRegionPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = {width, height, depth, width * height, width * height * depth, false};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&GrayRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayRegionPercentCallback;
 }
 
 Napi::FunctionReference GrayRegionPercentAsync::constructor;
@@ -187,8 +191,10 @@ Napi::Value GrayRegionPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayRegionPercentWorker = new GrayRegionPercentWorker(this->config_, this->region_, napiBuf0, napiBuf1, cb);
-    grayRegionPercentWorker->Queue();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -199,20 +205,23 @@ GrayRegionsPercentSync::GrayRegionsPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint_fast32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    Config config = {width, height, depth, width * height, width * height * depth, false};
+    Regions regions = {RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&GrayRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayRegionsPercentCallback;
 }
 
 Napi::FunctionReference GrayRegionsPercentSync::constructor;
@@ -237,12 +246,7 @@ Napi::Value GrayRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
     const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
     const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<PercentResult> percentResultVec = GrayRegionsPercent(this->config_, this->regions_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (!percentResultVec.empty()) {
-        ToJs(env, percentResultVec, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    this->callback_(env, cb, this->execute_(buf0, buf1));
     return env.Undefined();
 }
 
@@ -253,20 +257,23 @@ GrayRegionsPercentAsync::GrayRegionsPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint_fast32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint_fast32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint_fast32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    Config config = {width, height, depth, width * height, width * height * depth, false};
+    Regions regions = {RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&GrayRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2);
+    this->callback_ = &GrayRegionsPercentCallback;
 }
 
 Napi::FunctionReference GrayRegionsPercentAsync::constructor;
@@ -291,8 +298,10 @@ Napi::Value GrayRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
     const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
     const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *grayRegionsPercentWorker = new GrayRegionsPercentWorker(this->config_, this->regions_, napiBuf0, napiBuf1, cb);
-    grayRegionsPercentWorker->Queue();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -312,7 +321,7 @@ GrayAllBoundsSync::GrayAllBoundsSync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference GrayAllBoundsSync::constructor;
@@ -368,7 +377,7 @@ GrayAllBoundsAsync::GrayAllBoundsAsync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference GrayAllBoundsAsync::constructor;
@@ -626,7 +635,7 @@ GrayAllBlobsSync::GrayAllBlobsSync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference GrayAllBlobsSync::constructor;
@@ -685,7 +694,7 @@ GrayAllBlobsAsync::GrayAllBlobsAsync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference GrayAllBlobsAsync::constructor;

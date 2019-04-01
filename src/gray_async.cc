@@ -5,6 +5,24 @@
 #include <cstdint>
 #include <vector>
 
+AsyncWorker::AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
+        : Napi::AsyncWorker(cb),
+          execute_(execute),
+          callback_(callback),
+          buf0_(napiBuf0.Data()),
+          buf1_(napiBuf1.Data()),
+          buf0ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf0, 1)),
+          buf1ref_(Napi::Reference<Napi::Buffer<uint_fast8_t>>::New(napiBuf1, 1)) {
+}
+
+void AsyncWorker::Execute() {
+    this->results_ = this->execute_(this->buf0_, this->buf1_);
+}
+
+void AsyncWorker::OnOK() {
+    this->callback_(Env(), Callback().Value(), this->results_);
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 GrayAllPercentWorker::GrayAllPercentWorker(const Config &config, const All &all, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb)
@@ -18,15 +36,15 @@ GrayAllPercentWorker::GrayAllPercentWorker(const Config &config, const All &all,
 }
 
 void GrayAllPercentWorker::Execute() {
-    this->percentResult_ = GrayAllPercent(this->config_, this->all_, this->buf0_, this->buf1_);
+    this->results_ = GrayAllPercentExecute(this->config_, this->all_, this->buf0_, this->buf1_);
 }
 
 void GrayAllPercentWorker::OnOK() {
     const Napi::Env env = Env();
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    if (this->percentResult_.flagged) {
-        ToJs(env, this->percentResult_, resultsJs);
+    if (this->results_.percentResult.flagged) {
+        ToJs(env, this->results_.percentResult, resultsJs);
     }
     Callback().Call({env.Null(), resultsJs});
 }

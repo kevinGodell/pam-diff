@@ -159,9 +159,18 @@ SetRgbPixels(const Bounds &bounds, const Config &config, uint_fast8_t *pixels) {
 void
 ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs);
 
+void
+GrayAllPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
+void
+GrayRegionPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
 // regions percent to js
 void
 ToJs(const Napi::Env &env, const std::vector<PercentResult> &percentResultVec, Napi::Array &resultsJs);
+
+void
+GrayRegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
 
 // all/mask bounds to js
 void

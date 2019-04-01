@@ -11,6 +11,26 @@ ToJs(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resu
     SetPercentResult(env, percentResult, resultsJs);
 }
 
+void
+GrayAllPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.percentResult.flagged) {
+        ToJs(env, results.percentResult, resultsJs);
+    }
+    cb.Call({env.Null(), resultsJs});
+}
+
+void
+GrayRegionPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.percentResult.flagged) {
+        ToJs(env, results.percentResult, resultsJs);
+    }
+    cb.Call({env.Null(), resultsJs});
+}
+
 // regions percent to js
 void
 ToJs(const Napi::Env &env, const std::vector<PercentResult> &percentResultVec, Napi::Array &resultsJs) {
@@ -18,6 +38,14 @@ ToJs(const Napi::Env &env, const std::vector<PercentResult> &percentResultVec, N
     for (const auto &percentResult : percentResultVec) {
         SetPercentResult(env, percentResult, resultsJs, j++);
     }
+}
+
+void
+GrayRegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    ToJs(env, results.percentResults, resultsJs);
+    cb.Call({env.Null(), resultsJs});
 }
 
 // all/mask bounds to js
