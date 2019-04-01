@@ -16,7 +16,9 @@ before_script:
   - npm --version
   - node --version
 script:
-  - npm test
+#  - npm test
+  - npm run gray:regions:5
+  - npm run gray:regions:6
 cache:
   directories:
     - node_modules

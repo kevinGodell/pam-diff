@@ -37,7 +37,7 @@ class PamDiff extends Transform {
         this._parseChunk = this._parseFirstChunk;// first parsing will be reading settings and configuring internal pixel reading
         //output some details if in development
         if (process.env.NODE_ENV === 'development') {
-            console.dir(this, {showHidden: true, depth: 1, colors: true});
+            console.dir(this, {showHidden: true, depth: 0, colors: true});
         }
     }
 
