@@ -69,6 +69,9 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
     const bool sync = config.HasOwnProperty("sync") && config.Get("sync").As<Napi::Boolean>().Value();
     const uint_fast32_t engineType = EngineType(depth, regionsLength, response, sync);
+#ifdef NAPI_DEBUG
+    cout << "engine type " << engineType << endl;
+#endif
     switch (engineType) {
         case GRAY_ALL_PERCENT_SYNC :
             return GrayAllPercentSync::NewInstance(env, config);
