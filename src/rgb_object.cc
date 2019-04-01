@@ -21,7 +21,7 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
     const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllPercentSync::constructor;
@@ -70,7 +70,7 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
     const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllPercentAsync::constructor;
@@ -312,7 +312,7 @@ RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllBoundsSync::constructor;
@@ -368,7 +368,7 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllBoundsAsync::constructor;
@@ -626,7 +626,7 @@ RgbAllBlobsSync::RgbAllBlobsSync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllBlobsSync::constructor;
@@ -685,7 +685,7 @@ RgbAllBlobsAsync::RgbAllBlobsAsync(const Napi::CallbackInfo &info)
     const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
 
     this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {difference, percent};
+    this->all_ = {"all", difference, percent};
 }
 
 Napi::FunctionReference RgbAllBlobsAsync::constructor;
