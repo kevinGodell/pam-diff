@@ -123,11 +123,17 @@ pamDiff.on('diff', data => {
     //console.log(data);
 
     ++diffCounter;
+
+    if (global.gc) {
+        global.gc();
+    }
+
+
     //comment out the following line if you want to use ffmpeg to create a jpeg from the pam image that triggered an image difference event
     if(true){return;}
 
     const date = new Date();
-    let name = `${pixFmt}-${toBool(sync) ? 'sync' : 'sync'}-${diffCounter}`;
+    let name = `${pixFmt}-${toBool(sync) ? 'sync' : 'async'}-${diffCounter}`;
     for (const region of data.trigger) {
         if (response === 'bounds') {
             name += `--${region.name}-percent${region.percent}-minX${region.minX}-maxX${region.maxX}-minY${region.minY}-maxY${region.maxY}`;
