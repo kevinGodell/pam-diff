@@ -127,7 +127,7 @@ pamDiff.on('diff', data => {
     //if(true){return;}
 
     const date = new Date();
-    let name = `${pixFmt}-${toBool(sync) ? 'sync' : 'sync'}-${diffCounter}`;
+    let name = `${pixFmt}-${toBool(sync) ? 'sync' : 'async'}-${diffCounter}`;
     for (const region of data.trigger) {
         if (response === 'bounds') {
             name += `--${region.name}-percent${region.percent}-minX${region.minX}-maxX${region.maxX}-minY${region.minY}-maxY${region.maxY}`;
