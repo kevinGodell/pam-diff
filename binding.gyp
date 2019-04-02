@@ -33,7 +33,7 @@
            "CLANG_CXX_LANGUAGE_STANDARD": "c++11",
            "CLANG_CXX_LIBRARY": "libc++",
            "GCC_ENABLE_CPP_EXCEPTIONS": "YES",
-           "MACOSX_DEPLOYMENT_TARGET": "10.14",
+           "MACOSX_DEPLOYMENT_TARGET": "10.13",
            "GCC_ENABLE_CPP_RTTI" : "YES",
            # "fastest,smallest","fastest","faster","fast", "3", "2", "1", "0", "", "s"
            "GCC_OPTIMIZATION_LEVEL": "2",
