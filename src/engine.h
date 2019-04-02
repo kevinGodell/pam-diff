@@ -119,6 +119,11 @@ struct BlobsResult {
     std::vector<Blob> blobs;
 };
 
+struct Pixels {
+    uint_fast8_t * ptr;
+    uint_fast32_t size;
+};
+
 struct Results {
     PercentResult percentResult;
     BoundsResult boundsResult;
@@ -126,8 +131,12 @@ struct Results {
     std::vector<PercentResult> percentResults;
     std::vector<BoundsResult> boundsResults;
     std::vector<BlobsResult> blobsResults;
-    uint_fast8_t * pixels;
+    Pixels pixels;
 };
+
+typedef std::function<const Results(const uint_fast8_t *buf0, const uint_fast8_t *buf1)> ExecuteFunc;
+
+typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
 
 // measure difference of gray bytes
 inline uint_fast32_t
@@ -197,25 +206,49 @@ GrayRegionsPercentExecute(const Config &config, const Regions &regions, const ui
 BoundsResult
 GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+// gray all bounds
+Results
+GrayAllBoundsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 // gray region bounds
 BoundsResult
 GrayRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+// gray region bounds
+Results
+GrayRegionBoundsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray regions bounds
 std::vector<BoundsResult>
 GrayRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+// gray regions bounds
+Results
+GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 // gray all blobs
 BlobsResult
 GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+// gray all blobs
+Results
+GrayAllBlobsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // gray region blobs
 BlobsResult
 GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
+// gray region blobs
+Results
+GrayRegionBlobsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
 // gray regions blobs
 std::vector<BlobsResult>
 GrayRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+
+// gray regions blobs
+Results
+GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
 
 // rgb all percent
 PercentResult

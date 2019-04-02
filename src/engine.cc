@@ -1,5 +1,6 @@
 #include "engine.h"
 #include "ccl.h"
+#include "results.h"
 #include "napi.h"
 #include <cstdint>
 #include <string>
@@ -78,7 +79,7 @@ GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, c
 // gray all percent
 Results
 GrayAllPercentExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    return {GrayAllPercent(config, all, buf0, buf1), {}, {}, {}, {}, {}, nullptr};
+    return {GrayAllPercent(config, all, buf0, buf1), {}, {}, {}, {}, {}, {}};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -101,7 +102,7 @@ GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t
 // gray region percent
 Results
 GrayRegionPercentExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    return {GrayRegionPercent(config, region, buf0, buf1), {}, {}, {}, {}, {}, nullptr};
+    return {GrayRegionPercent(config, region, buf0, buf1), {}, {}, {}, {}, {}, {}};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,7 +125,7 @@ GrayRegionsPercent(const Config &config, const Regions &regions, const uint_fast
 // gray regions percent
 Results
 GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    return {{}, {}, {}, GrayRegionsPercent(config, regions, buf0, buf1), {}, {}, nullptr};
+    return {{}, {}, {}, GrayRegionsPercent(config, regions, buf0, buf1), {}, {}, {}};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +133,7 @@ GrayRegionsPercentExecute(const Config &config, const Regions &regions, const ui
 // gray all bounds
 BoundsResult
 GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BoundsResult boundsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false};// initialize results
+    BoundsResult boundsResult = {all.name.data(), {config.width - 1, 0, config.height - 1, 0}, 0, false};// initialize results
     for (uint_fast32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint_fast32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > GrayDiff(buf0, buf1, p)) continue;
@@ -146,6 +147,19 @@ GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, co
     boundsResult.percent = 100 * boundsResult.percent / config.pixelCount;
     boundsResult.flagged = boundsResult.percent >= all.percent;
     return boundsResult;
+}
+
+// gray all bounds
+Results
+GrayAllBoundsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = GrayAllBounds(config, all, buf0, buf1);
+    if (boundsResult.flagged && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(boundsResult, config, pixels);
+        return {{}, boundsResult, {}, {}, {}, {}, {pixels, config.byteLength}};
+    }
+    return {{}, boundsResult, {}, {}, {}, {}, {}};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -169,6 +183,19 @@ GrayRegionBounds(const Config &config, const Region &region, const uint_fast8_t 
     return boundsResult;
 }
 
+// gray region bounds
+Results
+GrayRegionBoundsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BoundsResult boundsResult = GrayRegionBounds(config, region, buf0, buf1);
+    if (boundsResult.flagged && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(boundsResult, config, pixels);
+        return {{}, boundsResult, {}, {}, {}, {}, {pixels, config.byteLength}};
+    }
+    return {{}, boundsResult, {}, {}, {}, {}, {}};
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray regions bounds
@@ -186,12 +213,25 @@ GrayRegionsBounds(const Config &config, const Regions &regions, const uint_fast8
     return boundsResultVec;
 }
 
+// gray regions bounds
+Results
+GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    std::vector<BoundsResult> boundsResultVec = GrayRegionsBounds(config, regions, buf0, buf1);
+    if (!boundsResultVec.empty() && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(boundsResultVec, config, pixels);
+        return {{}, {}, {}, {}, boundsResultVec, {}, {pixels, config.byteLength}};
+    }
+    return {{}, {}, {}, {}, boundsResultVec, {}, {}};
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray all blobs
 BlobsResult
 GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BlobsResult blobsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
+    BlobsResult blobsResult = {all.name.data(), {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
     // get pointer
@@ -241,6 +281,19 @@ GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, con
         }
     }
     return blobsResult;
+}
+
+// gray all blobs
+Results
+GrayAllBlobsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = GrayAllBlobs(config, all, buf0, buf1);
+    if (blobsResult.flagged && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(blobsResult, config, pixels);
+        return {{}, {}, blobsResult, {}, {}, {}, {pixels, config.byteLength}};
+    }
+    return {{}, {}, blobsResult, {}, {}, {}, {}};
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -301,6 +354,19 @@ GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *
     return blobsResult;
 }
 
+// gray region blobs
+Results
+GrayRegionBlobsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    BlobsResult blobsResult = GrayRegionBlobs(config, region, buf0, buf1);
+    if (blobsResult.flagged && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(blobsResult, config, pixels);
+        return {{}, {}, blobsResult, {}, {}, {}, {pixels, config.byteLength}};
+    }
+    return {{}, {}, blobsResult, {}, {}, {}, {}};
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray regions blobs
@@ -318,12 +384,25 @@ GrayRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_
     return blobsResultVec;
 }
 
+// gray regions blobs
+Results
+GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
+    std::vector<BlobsResult> blobsResultVec = GrayRegionsBlobs(config, regions, buf0, buf1);
+    if (!blobsResultVec.empty() && config.draw) {
+        auto *pixels = new uint_fast8_t[config.byteLength]();
+        std::copy(buf1, buf1 + config.byteLength, pixels);
+        DrawGray(blobsResultVec, config, pixels);
+        return {{}, {}, {}, {}, {}, blobsResultVec, {pixels, config.byteLength}};
+    }
+    return {{}, {}, {}, {}, {}, blobsResultVec, {}};
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // rgb all percent
 PercentResult
 RgbAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    PercentResult percentResult = {"all", 0, false};// initialize results
+    PercentResult percentResult = {all.name.data(), 0, false};// initialize results
     for (uint_fast32_t p = 0; p < config.pixelCount; ++p) {
         if (all.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
         ++percentResult.percent;
@@ -366,7 +445,7 @@ RgbRegionsPercent(const Config &config, const Regions &regions, const uint_fast8
 // rgb all bounds
 BoundsResult
 RgbAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BoundsResult boundsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false};// initialize results
+    BoundsResult boundsResult = {all.name.data(), {config.width - 1, 0, config.height - 1, 0}, 0, false};// initialize results
     for (uint_fast32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint_fast32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
@@ -419,7 +498,7 @@ RgbRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_
 // rgb all blobs
 BlobsResult
 RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1) {
-    BlobsResult blobsResult = {"all", {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
+    BlobsResult blobsResult = {all.name.data(), {config.width - 1, 0, config.height - 1, 0}, 0, false, std::vector<Blob>()};// initialize results
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int_fast32_t[]> up(new int_fast32_t[config.pixelCount]);
     // get pointer

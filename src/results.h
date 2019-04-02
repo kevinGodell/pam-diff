@@ -176,17 +176,35 @@ GrayRegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const
 void
 ToJs(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs);
 
+void
+GrayAllBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
+void
+GrayRegionBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
 // regions bounds to js
 void
 ToJs(const Napi::Env &env, const std::vector<BoundsResult> &boundsResultVec, Napi::Array &resultsJs);
+
+void
+GrayRegionsBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
 
 // all/mask blobs to js
 void
 ToJs(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJs);
 
+void
+GrayAllBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
+void
+GrayRegionBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+
 // regions blobs to js
 void
 ToJs(const Napi::Env &env, const std::vector<BlobsResult> &blobsResultVec, Napi::Array &resultsJs);
+
+void
+GrayRegionsBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
 
 // draw bounding box in gray pixels for all/mask
 void

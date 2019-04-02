@@ -44,7 +44,9 @@ void
 GrayRegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
     const Napi::HandleScope scope(env);
     Napi::Array resultsJs = Napi::Array::New(env);
-    ToJs(env, results.percentResults, resultsJs);
+    if (!results.percentResults.empty()) {
+        ToJs(env, results.percentResults, resultsJs);
+    }
     cb.Call({env.Null(), resultsJs});
 }
 
@@ -52,6 +54,36 @@ GrayRegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const
 void
 ToJs(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs) {
     SetBoundsResult(env, boundsResult, resultsJs);
+}
+
+void
+GrayAllBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.boundsResult.flagged) {
+        ToJs(env, results.boundsResult, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
+}
+
+void
+GrayRegionBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.boundsResult.flagged) {
+        ToJs(env, results.boundsResult, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixelBuffer = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixelBuffer});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
 }
 
 // regions bounds to js
@@ -63,10 +95,55 @@ ToJs(const Napi::Env &env, const std::vector<BoundsResult> &boundsResultVec, Nap
     }
 }
 
+void
+GrayRegionsBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (!results.boundsResults.empty()) {
+        ToJs(env, results.boundsResults, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
+}
+
 // all/mask blobs to js
 void
 ToJs(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJs) {
     SetBlobsResult(env, blobsResult, resultsJs);
+}
+
+void
+GrayAllBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.blobsResult.flagged) {
+        ToJs(env, results.blobsResult, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
+}
+
+void
+GrayRegionBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (results.blobsResult.flagged) {
+        ToJs(env, results.blobsResult, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
 }
 
 // regions blobs to js
@@ -76,6 +153,21 @@ ToJs(const Napi::Env &env, const std::vector<BlobsResult> &blobsResultVec, Napi:
     for (const auto &blobsResult : blobsResultVec) {
         SetBlobsResult(env, blobsResult, resultsJs, j++);
     }
+}
+
+void
+GrayRegionsBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results) {
+    const Napi::HandleScope scope(env);
+    Napi::Array resultsJs = Napi::Array::New(env);
+    if (!results.blobsResults.empty()) {
+        ToJs(env, results.blobsResults, resultsJs);
+        if (results.pixels.ptr) {
+            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::New(env, results.pixels.ptr, results.pixels.size, DeleteExternalData);
+            cb.Call({env.Null(), resultsJs, pixels});
+            return;
+        }
+    }
+    cb.Call({env.Null(), resultsJs});
 }
 
 // draw bounding box in gray pixels for all/mask
