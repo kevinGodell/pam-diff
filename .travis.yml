@@ -9,7 +9,7 @@ os:
   - osx
 #  - windows
 dist: xenial
-osx_image: xcode10.2
+#osx_image: xcode10.2
 before_script:
   - cat build/addon.target.mk
   - npm --version
