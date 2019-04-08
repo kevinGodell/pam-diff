@@ -23,7 +23,10 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, false};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllPercentExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllPercentCallback;
 }
 
@@ -74,7 +77,10 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, false};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllPercentExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllPercentCallback;
 }
 
@@ -123,7 +129,10 @@ RgbRegionPercentSync::RgbRegionPercentSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, false};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionPercentExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionPercentCallback;
 }
 
@@ -173,7 +182,10 @@ RgbRegionPercentAsync::RgbRegionPercentAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, false};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionPercentExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionPercentCallback;
 }
 
@@ -228,7 +240,10 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
     Config config = Config{width, height, depth, false};
     Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsPercentExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsPercentCallback;
 }
 
@@ -284,7 +299,10 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
     Config config = Config{width, height, depth, false};
     Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsPercentExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsPercentCallback;
 }
 
@@ -335,7 +353,10 @@ RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllBoundsExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllBoundsCallback;
 }
 
@@ -387,7 +408,10 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllBoundsExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllBoundsCallback;
 }
 
@@ -437,7 +461,10 @@ RgbRegionBoundsSync::RgbRegionBoundsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionBoundsExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionBoundsCallback;
 }
 
@@ -488,7 +515,10 @@ RgbRegionBoundsAsync::RgbRegionBoundsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionBoundsExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionBoundsCallback;
 }
 
@@ -544,7 +574,10 @@ RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBoundsCallback;
 }
 
@@ -601,7 +634,10 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBoundsCallback;
 }
 
@@ -652,7 +688,10 @@ RgbAllBlobsSync::RgbAllBlobsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllBlobsExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllBlobsCallback;
 }
 
@@ -707,7 +746,10 @@ RgbAllBlobsAsync::RgbAllBlobsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const All all = All{"all", difference, percent};
 
-    this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbAllBlobsExecute(config, all, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &AllBlobsCallback;
 }
 
@@ -760,7 +802,10 @@ RgbRegionBlobsSync::RgbRegionBlobsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionBlobsExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionBlobsCallback;
 }
 
@@ -811,7 +856,10 @@ RgbRegionBlobsAsync::RgbRegionBlobsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Region region = RegionJsToCpp(regionObj);
 
-    this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionBlobsExecute(config, region, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionBlobsCallback;
 }
 
@@ -867,7 +915,10 @@ RgbRegionsBlobsSync::RgbRegionsBlobsSync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBlobsCallback;
 }
 
@@ -924,7 +975,10 @@ RgbRegionsBlobsAsync::RgbRegionsBlobsAsync(const Napi::CallbackInfo &info)
     const Config config = Config{width, height, depth, draw};
     const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
 
-    this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+        RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);
+    };
+    //this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBlobsCallback;
 }
 
