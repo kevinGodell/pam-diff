@@ -216,18 +216,14 @@ GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
 
         // write bounds into pixels
         SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
-
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -273,18 +269,14 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
 
         // write bounds into pixels
         SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
-
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -341,7 +333,6 @@ GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uin
 
         // set flagged to true
         flagged = boundsResult.flagged = true;
-
     }
 
     //must be outside loop since all bounds will be draw to same pixels
@@ -350,7 +341,8 @@ GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uin
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -363,12 +355,7 @@ GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uin
 
             // write bounds into pixels
             SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
-
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -461,7 +448,8 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -475,10 +463,6 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
             // write bounds into pixels
             SetGrayPixels(blob.bounds, config, results.pixels.ptr);
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -571,7 +555,8 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -585,10 +570,6 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
             // write bounds into pixels
             SetGrayPixels(blob.bounds, config, results.pixels.ptr);
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -692,7 +673,6 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
             blob.label = b;
             flagged = blobsResult.flagged = blob.flagged = true;
         }
-
     }
 
     //must be outside loop since all blobs will be draw to same pixels
@@ -701,7 +681,8 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -722,10 +703,6 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
                 SetGrayPixels(blob.bounds, config, results.pixels.ptr);
             }
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -886,18 +863,14 @@ RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, c
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
 
         // write bounds into pixels
         SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
-
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -943,18 +916,14 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
 
         // write bounds into pixels
         SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
-
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -1011,7 +980,6 @@ RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint
 
         // set flagged to true
         flagged = boundsResult.flagged = true;
-
     }
 
     //must be outside loop since all bounds will be draw to same pixels
@@ -1020,7 +988,8 @@ RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -1033,12 +1002,7 @@ RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint
 
             // write bounds into pixels
             SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
-
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -1131,7 +1095,8 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -1145,10 +1110,6 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
             // write bounds into pixels
             SetRgbPixels(blob.bounds, config, results.pixels.ptr);
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -1241,7 +1202,8 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -1255,10 +1217,6 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
             // write bounds into pixels
             SetRgbPixels(blob.bounds, config, results.pixels.ptr);
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 
@@ -1362,7 +1320,6 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
             blob.label = b;
             flagged = blobsResult.flagged = blob.flagged = true;
         }
-
     }
 
     //must be outside loop since all blobs will be draw to same pixels
@@ -1371,7 +1328,8 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // set pixels data in results
-        results.pixels = Pixels{new uint8_t[config.byteLength](), config.byteLength};
+        results.pixels.ptr = new uint8_t[config.byteLength]();
+        results.pixels.size = config.byteLength;
 
         // copy buf1 into pixels
         std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
@@ -1392,10 +1350,6 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
                 SetRgbPixels(blob.bounds, config, results.pixels.ptr);
             }
         }
-    } else {
-
-        // set pixels to null
-        results.pixels = Pixels{nullptr, 0};
     }
 }
 

@@ -51,24 +51,16 @@ enum Engines {// ordered by depth -> target -> response -> synchronicity
 };
 
 struct Config {
-    Config() = default;
-
-    Config(uint32_t _width, uint32_t _height, uint32_t _depth, bool _draw)
-            :
-            width(_width),
-            height(_height),
-            depth(_depth),
-            pixelCount(_width * _height),
-            byteLength(_width * _height * _depth),
-            draw(_draw) {
-    }
-
     uint32_t width;
     uint32_t height;
     uint32_t depth;
     uint32_t pixelCount;
     uint32_t byteLength;
     bool draw;
+
+    Config() = default;
+
+    Config(uint32_t _width, uint32_t _height, uint32_t _depth, bool _draw) : width(_width), height(_height), depth(_depth), pixelCount(_width * _height), byteLength(_width * _height * _depth), draw(_draw) {}
 };
 
 struct All {
@@ -114,16 +106,14 @@ struct BoundsResult {
 };
 
 struct Blob {
-    Blob() = default;
-
-    explicit Blob(Bounds _bounds) : label(0), bounds(_bounds), percent(0), flagged(false) {
-        //cout << "Blob Bounds param constructor" << endl;
-    }
-
     uint32_t label;
     Bounds bounds;
     uint32_t percent;
     bool flagged;
+
+    Blob() = default;
+
+    explicit Blob(Bounds _bounds) : label(0), bounds(_bounds), percent(0), flagged(false) {}
 };
 
 struct BlobsResult {
@@ -137,6 +127,10 @@ struct BlobsResult {
 struct Pixels {
     uint8_t *ptr;
     uint32_t size;
+
+    Pixels() : ptr(nullptr), size(0) {}
+
+    Pixels(uint8_t *_ptr, uint32_t _size) : ptr(_ptr), size(_size) {}
 };
 
 struct Results {//192
