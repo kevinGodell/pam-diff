@@ -9,7 +9,7 @@
 
 class AsyncWorker : public Napi::AsyncWorker {
 public:
-    AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint_fast8_t> &napiBuf0, const Napi::Buffer<uint_fast8_t> &napiBuf1, const Napi::Function &cb);
+    AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint8_t> &napiBuf0, const Napi::Buffer<uint8_t> &napiBuf1, const Napi::Function &cb);
 
     void Execute() override;
 
@@ -20,10 +20,10 @@ private:
 
     const ExecuteFunc execute_;
     const CallbackFunc callback_;
-    const uint_fast8_t *buf0_;
-    const uint_fast8_t *buf1_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf0ref_;
-    const Napi::Reference<Napi::Buffer<uint_fast8_t>> buf1ref_;
+    const uint8_t *buf0_;
+    const uint8_t *buf1_;
+    const Napi::Reference<Napi::Buffer<uint8_t>> buf0ref_;
+    const Napi::Reference<Napi::Buffer<uint8_t>> buf1ref_;
 
     // out
     Results results_;

@@ -29,12 +29,12 @@
 #define Y (stack[stackIndex-2])
 
 void
-LabelComponent(const Config &config, const Bounds &bounds, const int_fast32_t labelNumber, const uint_fast32_t x, const uint_fast32_t y, uint_fast32_t *stack, int_fast32_t *labels) {
+LabelComponent(const Config &config, const Bounds &bounds, const int32_t labelNumber, const uint32_t x, const uint32_t y, uint32_t *stack, int32_t *labels) {
     stack[0] = x;
     stack[1] = y;
     stack[2] = 0;
-    uint_fast32_t stackIndex = 3;
-    uint_fast32_t labelsIndex;
+    uint32_t stackIndex = 3;
+    uint32_t labelsIndex;
 
     START:// recursive routine starts here
     labelsIndex = config.width * Y + X;
@@ -56,21 +56,21 @@ LabelComponent(const Config &config, const Bounds &bounds, const int_fast32_t la
 }
 
 // assign label value to each pixel, return number of labels (highest label number +1)
-uint_fast32_t
-LabelImage(const Config &config, const Bounds &bounds, int_fast32_t *labels) {
+uint32_t
+LabelImage(const Config &config, const Bounds &bounds, int32_t *labels) {
 
     // have unique_ptr reserve memory for stack array on heap and manage destruction
-    std::unique_ptr<uint_fast32_t[]> up(new uint_fast32_t[3 * (config.pixelCount + 1)]);
+    std::unique_ptr<uint32_t[]> up(new uint32_t[3 * (config.pixelCount + 1)]);
 
     // get pointer
     auto *stack = up.get();
 
     // label number
-    int_fast32_t labelNumber = -1;
+    int32_t labelNumber = -1;
 
-    for (uint_fast32_t y = bounds.minY; y <= bounds.maxY; ++y) {
+    for (uint32_t y = bounds.minY; y <= bounds.maxY; ++y) {
 
-        for (uint_fast32_t x = bounds.minX, p = y * config.width + x; x <= bounds.maxX; ++x, ++p) {
+        for (uint32_t x = bounds.minX, p = y * config.width + x; x <= bounds.maxX; ++x, ++p) {
 
             // ignored == -2, unlabeled == -1, labeled >= 0
             if (labels[p] != -1) continue;// pixel does not need to be labelled
@@ -84,5 +84,5 @@ LabelImage(const Config &config, const Bounds &bounds, int_fast32_t *labels) {
         }
     }
 
-    return static_cast<uint_fast32_t>(labelNumber + 1);
+    return static_cast<uint32_t>(labelNumber + 1);
 }

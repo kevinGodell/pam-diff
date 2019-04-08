@@ -1,5 +1,5 @@
 #include "rgb_object.h"
-#include "rgb_async.h"
+#include "async.h"
 #include "engine.h"
 #include "results.h"
 #include "napi.h"
@@ -13,15 +13,18 @@ RgbAllPercentSync::RgbAllPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, false};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllPercentCallback;
 }
 
 Napi::FunctionReference RgbAllPercentSync::constructor;
@@ -42,16 +45,15 @@ Napi::Object RgbAllPercentSync::NewInstance(const Napi::Env &env, const Napi::Ob
 }
 
 Napi::Value RgbAllPercentSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const PercentResult percentResult = RgbAllPercent(this->config_, this->all_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResult.flagged) {
-        ToJs(env, percentResult, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -62,15 +64,18 @@ RgbAllPercentAsync::RgbAllPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, false};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllPercentExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllPercentCallback;
 }
 
 Napi::FunctionReference RgbAllPercentAsync::constructor;
@@ -91,12 +96,14 @@ Napi::Object RgbAllPercentAsync::NewInstance(const Napi::Env &env, const Napi::O
 }
 
 Napi::Value RgbAllPercentAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllPercentWorker = new RgbAllPercentWorker(this->config_, this->all_, napiBuf0, napiBuf1, cb);
-    rgbAllPercentWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -107,14 +114,17 @@ RgbRegionPercentSync::RgbRegionPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, false};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionPercentCallback;
 }
 
 Napi::FunctionReference RgbRegionPercentSync::constructor;
@@ -135,16 +145,15 @@ Napi::Object RgbRegionPercentSync::NewInstance(const Napi::Env &env, const Napi:
 }
 
 Napi::Value RgbRegionPercentSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const PercentResult percentResult = RgbRegionPercent(this->config_, this->region_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (percentResult.flagged) {
-        ToJs(env, percentResult, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -155,14 +164,17 @@ RgbRegionPercentAsync::RgbRegionPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, false};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionPercentExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionPercentCallback;
 }
 
 Napi::FunctionReference RgbRegionPercentAsync::constructor;
@@ -183,12 +195,14 @@ Napi::Object RgbRegionPercentAsync::NewInstance(const Napi::Env &env, const Napi
 }
 
 Napi::Value RgbRegionPercentAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionPercentWorker = new RgbRegionPercentWorker(this->config_, this->region_, napiBuf0, napiBuf1, cb);
-    rgbRegionPercentWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -199,20 +213,23 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    Config config = Config{width, height, depth, false};
+    Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsPercentCallback;
 }
 
 Napi::FunctionReference RgbRegionsPercentSync::constructor;
@@ -233,16 +250,15 @@ Napi::Object RgbRegionsPercentSync::NewInstance(const Napi::Env &env, const Napi
 }
 
 Napi::Value RgbRegionsPercentSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<PercentResult> percentResultVec = RgbRegionsPercent(this->config_, this->regions_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (!percentResultVec.empty()) {
-        ToJs(env, percentResultVec, resultsJs);
-    }
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -253,20 +269,23 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, false};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    Config config = Config{width, height, depth, false};
+    Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsPercentCallback;
 }
 
 Napi::FunctionReference RgbRegionsPercentAsync::constructor;
@@ -287,12 +306,14 @@ Napi::Object RgbRegionsPercentAsync::NewInstance(const Napi::Env &env, const Nap
 }
 
 Napi::Value RgbRegionsPercentAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsPercentWorker = new RgbRegionsPercentWorker(this->config_, this->regions_, napiBuf0, napiBuf1, cb);
-    rgbRegionsPercentWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -303,16 +324,19 @@ RgbAllBoundsSync::RgbAllBoundsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, draw};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllBoundsCallback;
 }
 
 Napi::FunctionReference RgbAllBoundsSync::constructor;
@@ -333,22 +357,15 @@ Napi::Object RgbAllBoundsSync::NewInstance(const Napi::Env &env, const Napi::Obj
 }
 
 Napi::Value RgbAllBoundsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = RgbAllBounds(this->config_, this->all_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (boundsResult.flagged) {
-        ToJs(env, boundsResult, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(boundsResult, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs, env.Null()});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -359,16 +376,19 @@ RgbAllBoundsAsync::RgbAllBoundsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, draw};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllBoundsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllBoundsCallback;
 }
 
 Napi::FunctionReference RgbAllBoundsAsync::constructor;
@@ -389,12 +409,14 @@ Napi::Object RgbAllBoundsAsync::NewInstance(const Napi::Env &env, const Napi::Ob
 }
 
 Napi::Value RgbAllBoundsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllBoundsWorker = new RgbAllBoundsWorker(this->config_, this->all_, napiBuf0, napiBuf1, cb);
-    rgbAllBoundsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -405,15 +427,18 @@ RgbRegionBoundsSync::RgbRegionBoundsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, draw};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionBoundsCallback;
 }
 
 Napi::FunctionReference RgbRegionBoundsSync::constructor;
@@ -434,22 +459,15 @@ Napi::Object RgbRegionBoundsSync::NewInstance(const Napi::Env &env, const Napi::
 }
 
 Napi::Value RgbRegionBoundsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const BoundsResult boundsResult = RgbRegionBounds(this->config_, this->region_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (boundsResult.flagged) {
-        ToJs(env, boundsResult, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(boundsResult, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs, env.Null()});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -460,15 +478,18 @@ RgbRegionBoundsAsync::RgbRegionBoundsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, draw};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionBoundsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionBoundsCallback;
 }
 
 Napi::FunctionReference RgbRegionBoundsAsync::constructor;
@@ -489,12 +510,14 @@ Napi::Object RgbRegionBoundsAsync::NewInstance(const Napi::Env &env, const Napi:
 }
 
 Napi::Value RgbRegionBoundsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionBoundsWorker = new RgbRegionBoundsWorker(this->config_, this->region_, napiBuf0, napiBuf1, cb);
-    rgbRegionBoundsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -505,21 +528,24 @@ RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, draw};
+    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsBoundsCallback;
 }
 
 Napi::FunctionReference RgbRegionsBoundsSync::constructor;
@@ -540,22 +566,15 @@ Napi::Object RgbRegionsBoundsSync::NewInstance(const Napi::Env &env, const Napi:
 }
 
 Napi::Value RgbRegionsBoundsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<BoundsResult> boundsResultVec = RgbRegionsBounds(this->config_, this->regions_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (!boundsResultVec.empty()) {
-        ToJs(env, boundsResultVec, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(boundsResultVec, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs, env.Null()});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -566,21 +585,24 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, draw};
+    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsBoundsCallback;
 }
 
 Napi::FunctionReference RgbRegionsBoundsAsync::constructor;
@@ -601,12 +623,14 @@ Napi::Object RgbRegionsBoundsAsync::NewInstance(const Napi::Env &env, const Napi
 }
 
 Napi::Value RgbRegionsBoundsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsBoundsWorker = new RgbRegionsBoundsWorker(this->config_, this->regions_, napiBuf0, napiBuf1, cb);
-    rgbRegionsBoundsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -617,16 +641,19 @@ RgbAllBlobsSync::RgbAllBlobsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, draw};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllBlobsCallback;
 }
 
 Napi::FunctionReference RgbAllBlobsSync::constructor;
@@ -650,22 +677,15 @@ RgbAllBlobsSync::NewInstance(const Napi::Env &env, const Napi::Object &config) {
 
 Napi::Value
 RgbAllBlobsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const BlobsResult blobsResult = RgbAllBlobs(this->config_, this->all_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (blobsResult.flagged) {
-        ToJs(env, blobsResult, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(blobsResult, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -676,16 +696,19 @@ RgbAllBlobsAsync::RgbAllBlobsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t percent = config.Get("percent").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t percent = configObj.Get("percent").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->all_ = {"all", difference, percent};
+    const Config config = Config{width, height, depth, draw};
+    const All all = All{"all", difference, percent};
+
+    this->execute_ = std::bind(&RgbAllBlobsExecute, config, all, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &AllBlobsCallback;
 }
 
 Napi::FunctionReference RgbAllBlobsAsync::constructor;
@@ -709,12 +732,14 @@ RgbAllBlobsAsync::NewInstance(const Napi::Env &env, const Napi::Object &config) 
 
 Napi::Value
 RgbAllBlobsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbAllBlobsWorker = new RgbAllBlobsWorker(this->config_, this->all_, napiBuf0, napiBuf1, cb);
-    rgbAllBlobsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -725,15 +750,18 @@ RgbRegionBlobsSync::RgbRegionBlobsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, draw};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionBlobsCallback;
 }
 
 Napi::FunctionReference RgbRegionBlobsSync::constructor;
@@ -754,22 +782,15 @@ Napi::Object RgbRegionBlobsSync::NewInstance(const Napi::Env &env, const Napi::O
 }
 
 Napi::Value RgbRegionBlobsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const BlobsResult blobsResult = RgbRegionBlobs(this->config_, this->region_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (blobsResult.flagged) {
-        ToJs(env, blobsResult, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(blobsResult, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -780,15 +801,18 @@ RgbRegionBlobsAsync::RgbRegionBlobsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Object region = config.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Object regionObj = configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->region_ = RegionJsToCpp(region);
+    const Config config = Config{width, height, depth, draw};
+    const Region region = RegionJsToCpp(regionObj);
+
+    this->execute_ = std::bind(&RgbRegionBlobsExecute, config, region, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionBlobsCallback;
 }
 
 Napi::FunctionReference RgbRegionBlobsAsync::constructor;
@@ -809,12 +833,14 @@ Napi::Object RgbRegionBlobsAsync::NewInstance(const Napi::Env &env, const Napi::
 }
 
 Napi::Value RgbRegionBlobsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionBlobsWorker = new RgbRegionBlobsWorker(this->config_, this->region_, napiBuf0, napiBuf1, cb);
-    rgbRegionBlobsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 
@@ -825,21 +851,24 @@ RgbRegionsBlobsSync::RgbRegionsBlobsSync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, draw};
+    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsBlobsCallback;
 }
 
 Napi::FunctionReference RgbRegionsBlobsSync::constructor;
@@ -860,22 +889,15 @@ Napi::Object RgbRegionsBlobsSync::NewInstance(const Napi::Env &env, const Napi::
 }
 
 Napi::Value RgbRegionsBlobsSync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const uint_fast8_t *buf0 = info[0].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const uint_fast8_t *buf1 = info[1].As<Napi::Buffer<uint_fast8_t>>().Data();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    const std::vector<BlobsResult> blobsResultVec = RgbRegionsBlobs(this->config_, this->regions_, buf0, buf1);
-    Napi::Array resultsJs = Napi::Array::New(env);
-    if (!blobsResultVec.empty()) {
-        ToJs(env, blobsResultVec, resultsJs);
-        if (this->config_.draw) {
-            const Napi::Buffer<uint_fast8_t> pixels = Napi::Buffer<uint_fast8_t>::Copy(env, buf1, this->config_.byteLength);
-            DrawRgb(blobsResultVec, this->config_, pixels.Data());
-            cb.Call({env.Null(), resultsJs, pixels});
-            return env.Undefined();
-        }
-    }
-    cb.Call({env.Null(), resultsJs, env.Null()});
+    const Napi::Env &env = info.Env();
+    const uint8_t *buf0 = info[0].As<Napi::Buffer<uint8_t>>().Data();
+    const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    Results results;
+    this->execute_(buf0, buf1, results);
+    this->callback_(env, cb, results);
+
     return env.Undefined();
 }
 
@@ -886,21 +908,24 @@ RgbRegionsBlobsAsync::RgbRegionsBlobsAsync(const Napi::CallbackInfo &info)
     const Napi::Env env = info.Env();
     const Napi::HandleScope scope(env);
 
-    const Napi::Object config = info[0].As<Napi::Object>();
-    const uint_fast32_t width = config.Get("width").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t height = config.Get("height").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const Napi::Array regions = config.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = config.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint_fast32_t difference = config.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minX = config.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxX = config.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t minY = config.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t maxY = config.Get("maxY").As<Napi::Number>().Uint32Value();
-    const bool draw = config.HasOwnProperty("draw") && config.Get("draw").As<Napi::Boolean>().Value();
+    const Napi::Object configObj = info[0].As<Napi::Object>();
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+    const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
+    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
+    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
+    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
+    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
+    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
-    this->config_ = {width, height, depth, width * height, width * height * depth, draw};
-    this->regions_ = {RegionsJsToCpp(regions), BitsetJsToCpp(bitset), difference, {minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, draw};
+    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+
+    this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
+    this->callback_ = &RegionsBlobsCallback;
 }
 
 Napi::FunctionReference RgbRegionsBlobsAsync::constructor;
@@ -921,12 +946,14 @@ Napi::Object RgbRegionsBlobsAsync::NewInstance(const Napi::Env &env, const Napi:
 }
 
 Napi::Value RgbRegionsBlobsAsync::Compare(const Napi::CallbackInfo &info) {
-    const Napi::Env env = info.Env();
-    const Napi::Buffer<uint_fast8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Buffer<uint_fast8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint_fast8_t>>();
-    const Napi::Function cb = info[2].As<Napi::Function>();
-    auto *rgbRegionsBlobsWorker = new RgbRegionsBlobsWorker(this->config_, this->regions_, napiBuf0, napiBuf1, cb);
-    rgbRegionsBlobsWorker->Queue();
+    const Napi::Env &env = info.Env();
+    const Napi::Buffer<uint8_t> &napiBuf0 = info[0].As<Napi::Buffer<uint8_t>>();
+    const Napi::Buffer<uint8_t> &napiBuf1 = info[1].As<Napi::Buffer<uint8_t>>();
+    const Napi::Function &cb = info[2].As<Napi::Function>();
+
+    auto *asyncWorker = new AsyncWorker(this->execute_, this->callback_, napiBuf0, napiBuf1, cb);
+    asyncWorker->Queue();
+
     return env.Undefined();
 }
 

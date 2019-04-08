@@ -4,10 +4,6 @@
 #include "engine.h"
 #include "napi.h"
 
-typedef std::function<const Results(const uint_fast8_t *buf0, const uint_fast8_t *buf1)> ExecuteFunc;
-
-typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class GrayAllPercentSync : public Napi::ObjectWrap<GrayAllPercentSync> {

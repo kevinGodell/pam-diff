@@ -18,8 +18,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,8 +37,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -55,8 +55,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -73,8 +73,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -91,8 +91,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,8 +109,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,8 +127,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,8 +145,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,8 +163,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -181,9 +181,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,8 +199,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -218,8 +217,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -237,8 +236,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -255,8 +254,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    All all_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,8 +272,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -291,8 +290,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Region region_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,8 +308,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -328,8 +327,8 @@ private:
     Napi::Value Compare(const Napi::CallbackInfo &info);
 
     static Napi::FunctionReference constructor;
-    Config config_;
-    Regions regions_;
+    ExecuteFunc execute_;
+    CallbackFunc callback_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

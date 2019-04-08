@@ -51,80 +51,95 @@ enum Engines {// ordered by depth -> target -> response -> synchronicity
 };
 
 struct Config {
-    uint_fast32_t width;
-    uint_fast32_t height;
-    uint_fast32_t depth;
-    uint_fast32_t pixelCount;
-    uint_fast32_t byteLength;
+    Config() = default;
+
+    Config(uint32_t _width, uint32_t _height, uint32_t _depth, bool _draw)
+            :
+            width(_width),
+            height(_height),
+            depth(_depth),
+            pixelCount(_width * _height),
+            byteLength(_width * _height * _depth),
+            draw(_draw) {
+    }
+
+    uint32_t width;
+    uint32_t height;
+    uint32_t depth;
+    uint32_t pixelCount;
+    uint32_t byteLength;
     bool draw;
 };
 
 struct All {
     std::string name;
-    uint_fast32_t difference;
-    uint_fast32_t percent;
+    uint32_t difference;
+    uint32_t percent;
 };
 
 struct Bounds {
-    uint_fast32_t minX;
-    uint_fast32_t maxX;
-    uint_fast32_t minY;
-    uint_fast32_t maxY;
+    uint32_t minX;
+    uint32_t maxX;
+    uint32_t minY;
+    uint32_t maxY;
 };
 
 struct Region {
     std::string name;// 24
     std::vector<bool> bitset;// 24
-    uint_fast32_t bitsetCount;// 4
-    uint_fast32_t difference;// 4
-    uint_fast32_t percent;// 4
+    uint32_t bitsetCount;// 4
+    uint32_t difference;// 4
+    uint32_t percent;// 4
     Bounds bounds;
 };
 
 struct Regions {
     std::vector<Region> regions;
     std::vector<bool> bitset;
-    uint_fast32_t difference;
+    uint32_t difference;
     Bounds bounds;
 };
 
 struct PercentResult {
-    //std::string name;// 24
-    const char * name;
-    uint_fast32_t percent;// 4
+    const char *name;
+    uint32_t percent;// 4
     bool flagged;// 1
 };
 
 struct BoundsResult {
-    //std::string name;
-    const char * name;
+    const char *name;
     Bounds bounds;
-    uint_fast32_t percent;
+    uint32_t percent;
     bool flagged;
 };
 
 struct Blob {
-    uint_fast32_t label;
+    Blob() = default;
+
+    explicit Blob(Bounds _bounds) : label(0), bounds(_bounds), percent(0), flagged(false) {
+        //cout << "Blob Bounds param constructor" << endl;
+    }
+
+    uint32_t label;
     Bounds bounds;
-    uint_fast32_t percent;
+    uint32_t percent;
     bool flagged;
 };
 
 struct BlobsResult {
-    //std::string name;// 24
-    const char * name;
+    const char *name;
     Bounds bounds;
-    uint_fast32_t percent;// 4
+    uint32_t percent;// 4
     bool flagged;// 1
     std::vector<Blob> blobs;
 };
 
 struct Pixels {
-    uint_fast8_t * ptr;
-    uint_fast32_t size;
+    uint8_t *ptr;
+    uint32_t size;
 };
 
-struct Results {
+struct Results {//192
     PercentResult percentResult;
     BoundsResult boundsResult;
     BlobsResult blobsResult;
@@ -134,37 +149,37 @@ struct Results {
     Pixels pixels;
 };
 
-typedef std::function<const Results(const uint_fast8_t *buf0, const uint_fast8_t *buf1)> ExecuteFunc;
+typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, Results &results)> ExecuteFunc;
 
 typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
 
 // measure difference of gray bytes
-inline uint_fast32_t
-GrayDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, const uint_fast32_t i) {
-    return static_cast<uint_fast32_t>(std::abs(buf0[i] - buf1[i]));
+inline uint32_t
+GrayDiff(const uint8_t *buf0, const uint8_t *buf1, const uint32_t i) {
+    return static_cast<uint32_t>(std::abs(buf0[i] - buf1[i]));
 }
 
 // measure difference of rgb(a) bytes using average
-inline uint_fast32_t
-RgbDiff(const uint_fast8_t *buf0, const uint_fast8_t *buf1, uint_fast32_t i) {
+inline uint32_t
+RgbDiff(const uint8_t *buf0, const uint8_t *buf1, uint32_t i) {
     return std::abs(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3u;
 }
 
 // set minimum x or y coord
 inline void
-SetMin(const uint_fast32_t &val, uint_fast32_t &min) {
+SetMin(const uint32_t &val, uint32_t &min) {
     if (val < min) min = val;
 }
 
 // set maximum x or y coord
 inline void
-SetMax(const uint_fast32_t &val, uint_fast32_t &max) {
+SetMax(const uint32_t &val, uint32_t &max) {
     if (val > max) max = val;
 }
 
 // determine engine type
-uint_fast32_t
-EngineType(uint_fast32_t depth, uint_fast32_t regionsLength, const std::string &response, bool async);
+uint32_t
+EngineType(uint32_t depth, uint32_t regionsLength, const std::string &response, bool async);
 
 // convert js bitset to cpp
 std::vector<bool>
@@ -179,111 +194,75 @@ std::vector<Region>
 RegionsJsToCpp(const Napi::Array &regionsJs);
 
 // gray all percent
-PercentResult
-GrayAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray all percent
-Results
-GrayAllPercentExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray single region percent
+void
+GrayRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray region percent
-PercentResult
-GrayRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray region percent
-Results
-GrayRegionPercentExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions percent
-std::vector<PercentResult>
-GrayRegionsPercent(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions percent
-Results
-GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray multi regions bounds
+void
+GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 // gray all bounds
-BoundsResult
-GrayAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray all bounds
-Results
-GrayAllBoundsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray single region bounds
+void
+GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray region bounds
-BoundsResult
-GrayRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray region bounds
-Results
-GrayRegionBoundsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions bounds
-std::vector<BoundsResult>
-GrayRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions bounds
-Results
-GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray multi regions bounds
+void
+GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 // gray all blobs
-BlobsResult
-GrayAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray all blobs
-Results
-GrayAllBlobsExecute(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray single region blobs
+void
+GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// gray region blobs
-BlobsResult
-GrayRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray region blobs
-Results
-GrayRegionBlobsExecute(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions blobs
-std::vector<BlobsResult>
-GrayRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
-
-// gray regions blobs
-Results
-GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// gray multi regions blobs
+void
+GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 // rgb all percent
-PercentResult
-RgbAllPercent(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb region percent
-PercentResult
-RgbRegionPercent(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb single region percent
+void
+RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb regions percent
-std::vector<PercentResult>
-RgbRegionsPercent(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb multi regions bounds
+void
+RgbRegionsPercentExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 // rgb all bounds
-BoundsResult
-RgbAllBounds(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb region bounds
-BoundsResult
-RgbRegionBounds(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb single region bounds
+void
+RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb regions bounds
-std::vector<BoundsResult>
-RgbRegionsBounds(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb multi regions bounds
+void
+RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 // rgb all blobs
-BlobsResult
-RgbAllBlobs(const Config &config, const All &all, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+void
+RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb region blobs
-BlobsResult
-RgbRegionBlobs(const Config &config, const Region &region, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb single region blobs
+void
+RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
-// rgb regions blobs
-std::vector<BlobsResult>
-RgbRegionsBlobs(const Config &config, const Regions &regions, const uint_fast8_t *buf0, const uint_fast8_t *buf1);
+// rgb multi regions blobs
+void
+RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
 
 #endif

@@ -16,10 +16,10 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     // show system size values for types being used
     cout << "size of bool : " << sizeof(bool) << endl;
     cout << "size of std::string : " << sizeof(std::string) << endl;
-    cout << "size of int_fast32_t : " << sizeof(int_fast32_t) << endl;
-    cout << "size of uint_fast32_t : " << sizeof(uint_fast32_t) << endl;
+    cout << "size of int32_t : " << sizeof(int32_t) << endl;
+    cout << "size of uint32_t : " << sizeof(uint32_t) << endl;
     cout << "size of std::vector<bool> : " << sizeof(std::vector<bool>) << endl;
-    cout << "size of std::vector<uint_fast8_t> : " << sizeof(std::vector<uint_fast8_t>) << endl;
+    cout << "size of std::vector<uint8_t> : " << sizeof(std::vector<uint8_t>) << endl;
     cout << "size of Config struct : " << sizeof(Config) << endl;
     cout << "size of All struct : " << sizeof(All) << endl;
     cout << "size of Bounds struct : " << sizeof(Bounds) << endl;
@@ -27,8 +27,9 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     cout << "size of Regions struct : " << sizeof(Regions) << endl;
     cout << "size of PercentResult struct : " << sizeof(PercentResult) << endl;
     cout << "size of Blob struct : " << sizeof(Blob) << endl;
-    cout << "size of BlobsResult struct : " << sizeof(BlobsResult) << endl;
     cout << "size of BoundsResult struct : " << sizeof(BoundsResult) << endl;
+    cout << "size of Results struct : " << sizeof(Results) << endl;
+    cout << "size of Pixels struct : " << sizeof(Pixels) << endl;
 
     if (config.HasOwnProperty("depth")) cout << "depth : " << config.Get("depth").As<Napi::Number>().Uint32Value() << endl;
     if (config.HasOwnProperty("width")) cout << "width : " << config.Get("width").As<Napi::Number>().Uint32Value() << std::endl;
@@ -47,28 +48,28 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (config.HasOwnProperty("maxY")) std::cout << "maxY : " << config.Get("maxY").As<Napi::Number>().Uint32Value() << std::endl;
     if (config.HasOwnProperty("regions")) {
         const Napi::Array regionsJs = config.Get("regions").As<Napi::Array>();
-        //uint_fast32_t regionsLength = regionsJs.Length();
+        //uint32_t regionsLength = regionsJs.Length();
         cout << "regions length : " << regionsJs.Length() << endl;
-        for (uint_fast32_t r = 0; r < regionsJs.Length(); ++r) {
+        for (uint32_t r = 0; r < regionsJs.Length(); ++r) {
             Napi::Object obj = regionsJs.Get(r).As<Napi::Object>();
             const std::string name = obj.HasOwnProperty("name") ? obj.Get("name").As<Napi::String>() : std::string();
-            const uint_fast32_t difference = obj.HasOwnProperty("difference") ? obj.Get("difference").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t percent = obj.HasOwnProperty("percent") ? obj.Get("percent").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t bitsetCount = obj.HasOwnProperty("bitsetCount") ? obj.Get("bitsetCount").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t bitsetLength = obj.HasOwnProperty("bitset") ? static_cast<uint_fast32_t>(obj.Get("bitset").As<Napi::Buffer<bool>>().Length()) : 0;
-            const uint_fast32_t minX = obj.HasOwnProperty("minX") ? obj.Get("minX").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t maxX = obj.HasOwnProperty("maxX") ? obj.Get("maxX").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t minY = obj.HasOwnProperty("minY") ? obj.Get("minY").As<Napi::Number>().Uint32Value() : 0;
-            const uint_fast32_t maxY = obj.HasOwnProperty("maxY") ? obj.Get("maxY").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t difference = obj.HasOwnProperty("difference") ? obj.Get("difference").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t percent = obj.HasOwnProperty("percent") ? obj.Get("percent").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t bitsetCount = obj.HasOwnProperty("bitsetCount") ? obj.Get("bitsetCount").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t bitsetLength = obj.HasOwnProperty("bitset") ? static_cast<uint32_t>(obj.Get("bitset").As<Napi::Buffer<bool>>().Length()) : 0;
+            const uint32_t minX = obj.HasOwnProperty("minX") ? obj.Get("minX").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t maxX = obj.HasOwnProperty("maxX") ? obj.Get("maxX").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t minY = obj.HasOwnProperty("minY") ? obj.Get("minY").As<Napi::Number>().Uint32Value() : 0;
+            const uint32_t maxY = obj.HasOwnProperty("maxY") ? obj.Get("maxY").As<Napi::Number>().Uint32Value() : 0;
             cout << name << " - " << difference << " - " << minX << " - " << maxX << " - " << minY << " - " << maxY << " - " << percent << " - " << bitsetCount << " - " << bitsetLength << endl;
         }
     }
 #endif
-    const uint_fast32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
-    const uint_fast32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
+    const uint32_t depth = config.Get("depth").As<Napi::Number>().Uint32Value();
+    const uint32_t regionsLength = config.HasOwnProperty("regions") && config.Get("regions").IsArray() && config.Get("regions").As<Napi::Array>().Length() > 0 ? config.Get("regions").As<Napi::Array>().Length() : 0;
     const std::string response = config.Get("response").As<Napi::String>().Utf8Value();
     const bool sync = config.HasOwnProperty("sync") && config.Get("sync").As<Napi::Boolean>().Value();
-    const uint_fast32_t engineType = EngineType(depth, regionsLength, response, sync);
+    const uint32_t engineType = EngineType(depth, regionsLength, response, sync);
 #ifdef NAPI_DEBUG
     cout << "engine type " << engineType << endl;
 #endif
