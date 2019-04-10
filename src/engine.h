@@ -96,6 +96,8 @@ struct PercentResult {
     const char *name;
     uint32_t percent;// 4
     bool flagged;// 1
+    PercentResult() : name(nullptr), percent(0), flagged(false) {}
+    explicit PercentResult(const char *_name) : name(_name), percent(0), flagged(false) {}
 };
 
 struct BoundsResult {
@@ -103,6 +105,8 @@ struct BoundsResult {
     Bounds bounds;
     uint32_t percent;
     bool flagged;
+    BoundsResult() : name(nullptr), bounds(Bounds{0,0,0,0}), percent(0), flagged(false){}
+    BoundsResult(const char *_name, Bounds _bounds) : name(_name), bounds(_bounds), percent(0), flagged(false){}
 };
 
 struct Blob {
@@ -110,9 +114,7 @@ struct Blob {
     Bounds bounds;
     uint32_t percent;
     bool flagged;
-
     Blob() = default;
-
     explicit Blob(Bounds _bounds) : label(0), bounds(_bounds), percent(0), flagged(false) {}
 };
 
@@ -122,6 +124,8 @@ struct BlobsResult {
     uint32_t percent;// 4
     bool flagged;// 1
     std::vector<Blob> blobs;
+    BlobsResult() : name(nullptr), bounds(Bounds{0,0,0,0}), percent(0), flagged(false), blobs(std::vector<Blob>()){}
+    BlobsResult(const char *_name, Bounds _bounds) : name(_name), bounds(_bounds), percent(0), flagged(false), blobs(std::vector<Blob>()){}
 };
 
 struct Pixels {

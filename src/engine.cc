@@ -72,8 +72,6 @@ GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0,
 
     // configure percentResult
     percentResult.name = all.name.data();
-    percentResult.percent = 0;
-    percentResult.flagged = false;
 
     // loop pixels while tracking percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -104,8 +102,6 @@ GrayRegionPercentExecute(const Config &config, const Region &region, const uint8
 
     // configure percentResult
     percentResult.name = region.name.data();
-    percentResult.percent = 0;
-    percentResult.flagged = false;
 
     // loop pixels while tracking percent
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -150,10 +146,10 @@ GrayRegionsPercentExecute(const Config &config, const Regions &regions, const ui
         const Region &region = regionsVec[r];
 
         // create percentResults in vector
-        percentResultVec.emplace_back(PercentResult{region.name.data(), 0, false});
+        percentResultVec.emplace_back(PercentResult{region.name.data()});
 
         // get reference to percentResult that was just pushed into vector
-        PercentResult &percentResult = percentResultVec[r];
+        PercentResult &percentResult = percentResultVec.back();
 
         // loop pixels while tracking percent
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -186,8 +182,6 @@ GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, 
     // configure boundsResult
     boundsResult.name = all.name.data();
     boundsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
-    boundsResult.percent = 0;
-    boundsResult.flagged = false;
 
     // loop pixels while tracking bounds and percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -239,8 +233,6 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
     // configure boundsResult
     boundsResult.name = region.name.data();
     boundsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
-    boundsResult.percent = 0;
-    boundsResult.flagged = false;
 
     // loop pixels while tracking percent and bounds
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -308,10 +300,10 @@ GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uin
         const Region &region = regionsVec[r];
 
         // create boundsResults in vector
-        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false});
+        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
         // get reference to boundsResult that was just pushed into vector
-        BoundsResult &boundsResult = boundsResultVec[r];
+        BoundsResult &boundsResult = boundsResultVec.back();
 
         // loop pixels while tracking pixels and bounds
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -377,8 +369,6 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     // configure blobsResult
     blobsResult.name = all.name.data();
     blobsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
-    blobsResult.percent = 0;
-    blobsResult.flagged = false;
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -484,8 +474,6 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
     // configure blobsResult
     blobsResult.name = region.name.data();
     blobsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
-    blobsResult.percent = 0;
-    blobsResult.flagged = false;
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -607,10 +595,10 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
         const Region &region = regionsVec[r];
 
         // create blobsResultsEx in vector
-        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()});
+        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
         // get reference to blobsResult that was just pushed into vector
-        BlobsResult &blobsResult = blobsResultVec[r];
+        BlobsResult &blobsResult = blobsResultVec.back();
 
         // all pixels set to -1 will those set to -2 will be ignored
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -708,8 +696,6 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 // rgb all percent
 void
 RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
@@ -719,8 +705,6 @@ RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, 
 
     // configure percentResult
     percentResult.name = all.name.data();
-    percentResult.percent = 0;
-    percentResult.flagged = false;
 
     // loop pixels while tracking percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -751,8 +735,6 @@ RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_
 
     // configure percentResult
     percentResult.name = region.name.data();
-    percentResult.percent = 0;
-    percentResult.flagged = false;
 
     // loop pixels while tracking percent
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -797,10 +779,10 @@ RgbRegionsPercentExecute(const Config &config, const Regions &regions, const uin
         const Region &region = regionsVec[r];
 
         // create percentResults in vector
-        percentResultVec.emplace_back(PercentResult{region.name.data(), 0, false});
+        percentResultVec.emplace_back(PercentResult{region.name.data()});
 
         // get reference to percentResult that was just pushed into vector
-        PercentResult &percentResult = percentResultVec[r];
+        PercentResult &percentResult = percentResultVec.back();
 
         // loop pixels while tracking percent
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -833,8 +815,6 @@ RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     // configure boundsResult
     boundsResult.name = all.name.data();
     boundsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
-    boundsResult.percent = 0;
-    boundsResult.flagged = false;
 
     // loop pixels while tracking bounds and percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -886,8 +866,6 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
     // configure boundsResult
     boundsResult.name = region.name.data();
     boundsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
-    boundsResult.percent = 0;
-    boundsResult.flagged = false;
 
     // loop pixels while tracking percent and bounds
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -955,10 +933,10 @@ RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint
         const Region &region = regionsVec[r];
 
         // create boundsResults in vector
-        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false});
+        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
         // get reference to boundsResult that was just pushed into vector
-        BoundsResult &boundsResult = boundsResultVec[r];
+        BoundsResult &boundsResult = boundsResultVec.back();
 
         // loop pixels while tracking pixels and bounds
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -1024,8 +1002,6 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
     // configure blobsResult
     blobsResult.name = all.name.data();
     blobsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
-    blobsResult.percent = 0;
-    blobsResult.flagged = false;
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -1131,8 +1107,6 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
     // configure blobsResult
     blobsResult.name = region.name.data();
     blobsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
-    blobsResult.percent = 0;
-    blobsResult.flagged = false;
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -1254,10 +1228,10 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
         const Region &region = regionsVec[r];
 
         // create blobsResultsEx in vector
-        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}, 0, false, std::vector<Blob>()});
+        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
         // get reference to blobsResult that was just pushed into vector
-        BlobsResult &blobsResult = blobsResultVec[r];
+        BlobsResult &blobsResult = blobsResultVec.back();
 
         // all pixels set to -1 will those set to -2 will be ignored
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
