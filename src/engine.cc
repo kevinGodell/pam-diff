@@ -35,7 +35,7 @@ BitsetJsToCpp(const Napi::Buffer<bool> &bitsetJs) {
 
 Region
 RegionJsToCpp(const Napi::Object &regionJs) {
-    const std::string name = regionJs.Get("name").As<Napi::String>();
+    const std::string name = regionJs.Get("name").As<Napi::String>().Utf8Value();
     const std::vector<bool> bitset = BitsetJsToCpp(regionJs.Get("bitset").As<Napi::Buffer<bool>>());
     const uint32_t bitsetCount = regionJs.Get("bitsetCount").As<Napi::Number>().Uint32Value();
     const uint32_t difference = regionJs.Get("difference").As<Napi::Number>().Uint32Value();
