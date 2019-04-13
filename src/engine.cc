@@ -20,6 +20,15 @@ EngineType(const uint32_t depth, const uint32_t regionsLength, const std::string
     return value;
 }
 
+/*uint32_t
+EngineType2(const uint32_t depth, const uint32_t regionsLength, const std::string &response) {
+    uint32_t value = 0;
+    value += depth == 4 || depth == 3 ? 100 : 0;
+    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
+    value += response == "blobs" ? 2 : response == "bounds" ? 1 : 0;
+    return value;
+}*/
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 std::vector<bool>
@@ -125,13 +134,10 @@ GrayRegionPercentExecute(const Config &config, const Region &region, const uint8
 
 // gray multi regions percent
 void
-GrayRegionsPercentExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
+GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to percentResult vector
     std::vector<PercentResult> &percentResultVec = results.percentResults;
@@ -143,7 +149,7 @@ GrayRegionsPercentExecute(const Config &config, const Regions &regions, const ui
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create percentResults in vector
         percentResultVec.emplace_back(PercentResult{region.name.data()});
@@ -276,16 +282,13 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
 
 // gray multi regions bounds
 void
-GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
 
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
-
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to boundsResult vector
     std::vector<BoundsResult> &boundsResultVec = results.boundsResults;
@@ -297,7 +300,7 @@ GrayRegionsBoundsExecute(const Config &config, const Regions &regions, const uin
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create boundsResults in vector
         boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
@@ -565,7 +568,7 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
 
 // gray multi regions blobs
 void
-GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -576,11 +579,8 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
-
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to blobsResult vector
     std::vector<BlobsResult> &blobsResultVec = results.blobsResults;
@@ -592,7 +592,7 @@ GrayRegionsBlobsExecute(const Config &config, const Regions &regions, const uint
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create blobsResultsEx in vector
         blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
@@ -758,13 +758,10 @@ RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_
 
 // rgb multi regions percent
 void
-RgbRegionsPercentExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
+RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to percentResult vector
     std::vector<PercentResult> &percentResultVec = results.percentResults;
@@ -776,7 +773,7 @@ RgbRegionsPercentExecute(const Config &config, const Regions &regions, const uin
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create percentResults in vector
         percentResultVec.emplace_back(PercentResult{region.name.data()});
@@ -909,16 +906,13 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
 
 // rgb multi regions bounds
 void
-RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
 
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
-
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to boundsResult vector
     std::vector<BoundsResult> &boundsResultVec = results.boundsResults;
@@ -930,7 +924,7 @@ RgbRegionsBoundsExecute(const Config &config, const Regions &regions, const uint
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create boundsResults in vector
         boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
@@ -1198,7 +1192,7 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
 
 // rgb multi regions blobs
 void
-RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -1209,11 +1203,8 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to regions vector
-    const std::vector<Region> &regionsVec = regions.regions;
-
     // use size of regions to determine loop
-    const size_t regionsLength = regionsVec.size();
+    const size_t regionsLength = regions.size();
 
     // get reference to blobsResult vector
     std::vector<BlobsResult> &blobsResultVec = results.blobsResults;
@@ -1225,7 +1216,7 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
     for (uint32_t r = 0; r < regionsLength; ++r) {
 
         // get reference to region
-        const Region &region = regionsVec[r];
+        const Region &region = regions[r];
 
         // create blobsResultsEx in vector
         blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
@@ -1328,3 +1319,109 @@ RgbRegionsBlobsExecute(const Config &config, const Regions &regions, const uint8
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*void
+ConfigureFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFunc &callbackFunc) {
+
+    // width, height, depth. required.
+    const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
+    const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
+    const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
+
+    // difference 1-255. optional. default 1.
+    const uint32_t difference = configObj.HasOwnProperty("difference") ? configObj.Get("difference").As<Napi::Number>().Uint32Value() : 1;
+
+    // percent 1 - 100. optional. default 1.
+    const uint32_t percent = configObj.HasOwnProperty("percent") ? configObj.Get("percent").As<Napi::Number>().Uint32Value() : 1;
+
+    // draw pixels. optional. default false.
+    const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
+
+    // figure out target and response. optional. defaults to target "all" and response "percent"
+    const uint32_t regionsLength = configObj.HasOwnProperty("regions") && configObj.Get("regions").IsArray() && configObj.Get("regions").As<Napi::Array>().Length() > 0 ? configObj.Get("regions").As<Napi::Array>().Length() : 0;
+    const std::string response = configObj.HasOwnProperty("response") ? configObj.Get("response").As<Napi::String>().Utf8Value() : "percent";
+
+    // determine functions to assign
+    const uint32_t engineType = EngineType2(depth, regionsLength, response);
+
+    // create Config struct
+    //const Config config = Config{width, height, depth, draw};
+
+    std::cout << "engine type number " << engineType << std::endl;
+
+    switch (engineType) {
+        case GRAY_ALL_PERCENT://0
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+                //All all = All{"all", difference, percent};
+                GrayAllPercentExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
+            };
+            callbackFunc = &AllPercentCallback;
+            break;
+        case GRAY_ALL_BOUNDS://1
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+                GrayAllBoundsExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
+            };
+            callbackFunc = &AllBoundsCallback;
+            break;
+        case GRAY_ALL_BLOBS://2
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+                GrayAllBlobsExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
+            };
+            callbackFunc = &AllBlobsCallback;
+            break;
+
+        case GRAY_REGION_PERCENT://10
+        std::cout << " gray region percent switch" << std::endl;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+
+                std::cout << "get regions " << std::endl;
+
+                //const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
+
+                if (configObj.HasOwnProperty("regions")) {
+                    std::cout << " has regions" << std::endl;
+                }
+
+                const Napi::Array regionsJs = configObj.Get("regions").As<Napi::Array>();
+
+                std::cout << "show length" << std::endl;
+
+                std::cout << regionsJs.Length() << std::endl;
+
+                const Napi::Object regionObj = regionsJs.Get("0").As<Napi::Object>();//configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
+
+                Region region = RegionJsToCpp(regionObj);
+
+                GrayRegionPercentExecute(Config{width, height, depth, draw}, region, buf0, buf1, results);
+            };
+            callbackFunc = &RegionPercentCallback;
+            break;
+        case GRAY_REGION_BOUNDS://11
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+                GrayRegionBoundsExecute(Config{width, height, depth, draw}, RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>()), buf0, buf1, results);
+            };
+            callbackFunc = &RegionBoundsCallback;
+            break;
+        case GRAY_REGION_BLOBS://12
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+                GrayRegionBlobsExecute(Config{width, height, depth, draw}, RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>()), buf0, buf1, results);
+            };
+            callbackFunc = &RegionBlobsCallback;
+            break;
+
+            case GRAY_REGIONS_PERCENT://20
+                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsPercentExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
+                callbackFunc = &RegionsPercentCallback;
+                break;
+            case GRAY_REGIONS_BOUNDS://21
+                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBoundsExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
+                callbackFunc = &RegionsBoundsCallback;
+                break;
+            case GRAY_REGIONS_BLOBS://22
+                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBlobsExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
+                callbackFunc = &RegionsBlobsCallback;
+                break;
+        default:
+            std::cout << "did not find matching engine" << std::endl;
+    }
+}*/

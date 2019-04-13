@@ -24,7 +24,6 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     cout << "size of All struct : " << sizeof(All) << endl;
     cout << "size of Bounds struct : " << sizeof(Bounds) << endl;
     cout << "size of Region struct : " << sizeof(Region) << endl;
-    cout << "size of Regions struct : " << sizeof(Regions) << endl;
     cout << "size of PercentResult struct : " << sizeof(PercentResult) << endl;
     cout << "size of Blob struct : " << sizeof(Blob) << endl;
     cout << "size of BoundsResult struct : " << sizeof(BoundsResult) << endl;

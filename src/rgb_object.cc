@@ -230,19 +230,11 @@ RgbRegionsPercentSync::RgbRegionsPercentSync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    Config config = Config{width, height, depth, false};
-    Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, false};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsPercentExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsPercentExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsPercentCallback;
 }
@@ -289,19 +281,11 @@ RgbRegionsPercentAsync::RgbRegionsPercentAsync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
 
-    Config config = Config{width, height, depth, false};
-    Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const Config config = Config{width, height, depth, false};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsPercentExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsPercentExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsPercentExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsPercentCallback;
 }
@@ -563,20 +547,12 @@ RgbRegionsBoundsSync::RgbRegionsBoundsSync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
     const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
     const Config config = Config{width, height, depth, draw};
-    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsBoundsExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBoundsCallback;
 }
@@ -623,20 +599,12 @@ RgbRegionsBoundsAsync::RgbRegionsBoundsAsync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
     const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
     const Config config = Config{width, height, depth, draw};
-    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsBoundsExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsBoundsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBoundsCallback;
 }
@@ -904,20 +872,12 @@ RgbRegionsBlobsSync::RgbRegionsBlobsSync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
     const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
     const Config config = Config{width, height, depth, draw};
-    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsBlobsExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBlobsCallback;
 }
@@ -964,20 +924,12 @@ RgbRegionsBlobsAsync::RgbRegionsBlobsAsync(const Napi::CallbackInfo &info)
     const uint32_t height = configObj.Get("height").As<Napi::Number>().Uint32Value();
     const uint32_t depth = configObj.Get("depth").As<Napi::Number>().Uint32Value();
     const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-    const Napi::Buffer<bool> bitset = configObj.Get("bitset").As<Napi::Buffer<bool>>();
-    const uint32_t difference = configObj.Get("difference").As<Napi::Number>().Uint32Value();
-    const uint32_t minX = configObj.Get("minX").As<Napi::Number>().Uint32Value();
-    const uint32_t maxX = configObj.Get("maxX").As<Napi::Number>().Uint32Value();
-    const uint32_t minY = configObj.Get("minY").As<Napi::Number>().Uint32Value();
-    const uint32_t maxY = configObj.Get("maxY").As<Napi::Number>().Uint32Value();
     const bool draw = configObj.HasOwnProperty("draw") && configObj.Get("draw").As<Napi::Boolean>().Value();
 
     const Config config = Config{width, height, depth, draw};
-    const Regions regions = Regions{RegionsJsToCpp(regionsArr), BitsetJsToCpp(bitset), difference, Bounds{minX, maxX, minY, maxY}};
+    const std::vector<Region> regions = RegionsJsToCpp(regionsArr);
 
-    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-        RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);
-    };
+    this->execute_ = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) { RgbRegionsBlobsExecute(config, regions, buf0, buf1, results); };
     //this->execute_ = std::bind(&RgbRegionsBlobsExecute, config, regions, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3);
     this->callback_ = &RegionsBlobsCallback;
 }
