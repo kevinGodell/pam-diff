@@ -541,6 +541,7 @@ class PamDiff extends Transform {
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
         this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
+            console.timeEnd(`${this._debugEngine}-${debugCount}`);
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam, headers: chunk.headers};
                 if (pixels) {
@@ -558,7 +559,6 @@ class PamDiff extends Transform {
                     this.emit('diff', data);
                 }
             }
-            console.timeEnd(`${this._debugEngine}-${debugCount}`);
         });
         this._oldPix = this._newPix;
     }
