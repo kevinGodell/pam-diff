@@ -426,33 +426,6 @@ class PamDiff extends Transform {
             }
         }
         this._regionObj = {length: regions.length, regions: regions};
-        if (regions.length > 1) {
-            let minDiff = 255;
-            let minX = this._width;
-            let maxX = 0;
-            let minY = this._height;
-            let maxY = 0;
-            const wxh = this._width * this._height;
-            const mergedBitset = Buffer.alloc(wxh, 0);
-            for (const region of regions) {
-                minDiff = Math.min(minDiff, region.difference);
-                minX = Math.min(minX, region.minX);
-                maxX = Math.max(maxX, region.maxX);
-                minY = Math.min(minY, region.minY);
-                maxY = Math.max(maxY, region.maxY);
-                for (let i = 0; i < wxh; ++i) {
-                    if (region.bitset[i] === 1) {
-                        mergedBitset[i] = 1;
-                    }
-                }
-            }
-            this._regionObj.bitset = mergedBitset;
-            this._regionObj.difference = minDiff;
-            this._regionObj.minX = minX;
-            this._regionObj.maxX = maxX;
-            this._regionObj.minY = minY;
-            this._regionObj.maxY = maxY;
-        }
     }
 
     /**
@@ -472,13 +445,6 @@ class PamDiff extends Transform {
             config.regions = this._regionObj.regions;
             if (this._regionObj.length > 1) {
                 engine += 's';
-                //config.target += 's';
-                config.bitset = this._regionObj.bitset;
-                config.difference = this._regionObj.difference;
-                config.minX = this._regionObj.minX;
-                config.maxX = this._regionObj.maxX;
-                config.minY = this._regionObj.minY;
-                config.maxY = this._regionObj.maxY;
             }
         } else {
             engine += '_all';
@@ -492,7 +458,8 @@ class PamDiff extends Transform {
             engine += '_draw';
         }
         engine += this._sync ? '_sync' : '_async';
-        this._engine = addon(config);
+        const pixelChange = addon(config);
+        this._engine = this._sync ? pixelChange.compareSync.bind(pixelChange) : pixelChange.compare.bind(pixelChange);
         if (process.env.NODE_ENV === 'development') {
             this._parseChunk = this._parsePixelsDebug;
             this._debugEngine = engine;
@@ -509,7 +476,7 @@ class PamDiff extends Transform {
      */
     _parsePixels(chunk) {
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
+        this._engine(this._oldPix, this._newPix, (err, results, pixels) => {
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam, headers: chunk.headers};
                 if (pixels) {
@@ -540,7 +507,7 @@ class PamDiff extends Transform {
         const debugCount = this._debugCount++;
         console.time(`${this._debugEngine}-${debugCount}`);
         this._newPix = chunk.pixels;
-        this._engine.compare(this._oldPix, this._newPix, (err, results, pixels) => {
+        this._engine(this._oldPix, this._newPix, (err, results, pixels) => {
             console.timeEnd(`${this._debugEngine}-${debugCount}`);
             if (results.length) {
                 const data = {trigger: results, pam: chunk.pam, headers: chunk.headers};
