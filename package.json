@@ -152,7 +152,7 @@
   "devDependencies": {
     "dotenv": "^7.0.0",
     "ffmpeg-static": "^2.4.0",
-    "jsdoc": "^3.5.5",
+    "jsdoc": "github:jsdoc3/jsdoc",
     "minimist": "^1.2.0",
     "pipe2pam": "^0.6.2"
   },
