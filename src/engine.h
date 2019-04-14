@@ -6,51 +6,7 @@
 #include <string>
 #include <vector>
 
-enum Engines {// ordered by depth -> target -> response -> synchronicity
-    GRAY_ALL_PERCENT_SYNC = 0,
-    GRAY_ALL_PERCENT_ASYNC = 1,
-    GRAY_ALL_BOUNDS_SYNC = 10,
-    GRAY_ALL_BOUNDS_ASYNC = 11,
-    GRAY_ALL_BLOBS_SYNC = 20,
-    GRAY_ALL_BLOBS_ASYNC = 21,
-
-    GRAY_REGION_PERCENT_SYNC = 100,
-    GRAY_REGION_PERCENT_ASYNC = 101,
-    GRAY_REGION_BOUNDS_SYNC = 110,
-    GRAY_REGION_BOUNDS_ASYNC = 111,
-    GRAY_REGION_BLOBS_SYNC = 120,
-    GRAY_REGION_BLOBS_ASYNC = 121,
-
-    GRAY_REGIONS_PERCENT_SYNC = 200,
-    GRAY_REGIONS_PERCENT_ASYNC = 201,
-    GRAY_REGIONS_BOUNDS_SYNC = 210,
-    GRAY_REGIONS_BOUNDS_ASYNC = 211,
-    GRAY_REGIONS_BLOBS_SYNC = 220,
-    GRAY_REGIONS_BLOBS_ASYNC = 221,
-
-    RGB_ALL_PERCENT_SYNC = 1000,
-    RGB_ALL_PERCENT_ASYNC = 1001,
-    RGB_ALL_BOUNDS_SYNC = 1010,
-    RGB_ALL_BOUNDS_ASYNC = 1011,
-    RGB_ALL_BLOBS_SYNC = 1020,
-    RGB_ALL_BLOBS_ASYNC = 1021,
-
-    RGB_REGION_PERCENT_SYNC = 1100,
-    RGB_REGION_PERCENT_ASYNC = 1101,
-    RGB_REGION_BOUNDS_SYNC = 1110,
-    RGB_REGION_BOUNDS_ASYNC = 1111,
-    RGB_REGION_BLOBS_SYNC = 1120,
-    RGB_REGION_BLOBS_ASYNC = 1121,
-
-    RGB_REGIONS_PERCENT_SYNC = 1200,
-    RGB_REGIONS_PERCENT_ASYNC = 1201,
-    RGB_REGIONS_BOUNDS_SYNC = 1210,
-    RGB_REGIONS_BOUNDS_ASYNC = 1211,
-    RGB_REGIONS_BLOBS_SYNC = 1220,
-    RGB_REGIONS_BLOBS_ASYNC = 1221,
-};
-
-/*enum Engines2 {// ordered by depth -> target -> response -> synchronicity
+enum Engines {// ordered by depth -> target -> response
     GRAY_ALL_PERCENT = 0,
     GRAY_ALL_BOUNDS = 1,
     GRAY_ALL_BLOBS = 2,
@@ -59,9 +15,9 @@ enum Engines {// ordered by depth -> target -> response -> synchronicity
     GRAY_REGION_BOUNDS = 11,
     GRAY_REGION_BLOBS = 12,
 
-    GRAY_REGIONS_PERCENT = 020,
-    GRAY_REGIONS_BOUNDS = 021,
-    GRAY_REGIONS_BLOBS = 022,
+    GRAY_REGIONS_PERCENT = 20,
+    GRAY_REGIONS_BOUNDS = 21,
+    GRAY_REGIONS_BLOBS = 22,
 
     RGB_ALL_PERCENT = 100,
     RGB_ALL_BOUNDS = 101,
@@ -74,7 +30,7 @@ enum Engines {// ordered by depth -> target -> response -> synchronicity
     RGB_REGIONS_PERCENT = 120,
     RGB_REGIONS_BOUNDS = 121,
     RGB_REGIONS_BLOBS = 122,
-};*/
+};
 
 struct Config {
     uint32_t width;
@@ -91,7 +47,6 @@ struct Config {
 
 struct All {
     std::string name;
-    //const char *name;
     uint32_t difference;
     uint32_t percent;
 };
@@ -111,10 +66,6 @@ struct Region {
     uint32_t percent;// 4
     Bounds bounds;
 };
-
-//struct Regions {
-//std::vector<Region> regions;
-//};
 
 struct PercentResult {
     const char *name;
@@ -180,13 +131,9 @@ struct Results {//192
 
 typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, Results &results)> ExecuteFunc;
 
-//typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, const Napi::Env &env, const Napi::Function &cb)> ExecuteSyncFunc;
-
 typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
 
-//void
-//ConfigureFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFunc &callbackFunc);
-
+// absolute value
 inline uint32_t
 AbsInt(int32_t n) {
     return static_cast<uint32_t>(n < 0 ? -n : n);
@@ -217,13 +164,6 @@ inline void
 SetMax(const uint32_t &val, uint32_t &max) {
     if (val > max) max = val;
 }
-
-// determine engine type
-uint32_t
-EngineType(uint32_t depth, uint32_t regionsLength, const std::string &response, bool async);
-
-//uint32_t
-//EngineType2(uint32_t depth, uint32_t regionsLength, const std::string &response);
 
 // convert js bitset to cpp
 std::vector<bool>
@@ -308,5 +248,13 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
 // rgb multi regions blobs
 void
 RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+
+// determine engine type
+uint32_t
+EngineType(uint32_t depth, uint32_t regionsLength, const std::string &response);
+
+// set execute and callback functions
+void
+SetFunctions(const Napi::Object &config, ExecuteFunc &executeFunc, CallbackFunc &callbackFunc);
 
 #endif

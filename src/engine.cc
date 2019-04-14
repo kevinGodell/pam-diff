@@ -9,28 +9,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-// determine engine type
-uint32_t
-EngineType(const uint32_t depth, const uint32_t regionsLength, const std::string &response, const bool sync) {
-    uint32_t value = 0;
-    value += depth == 4 || depth == 3 ? 1000 : 0;
-    value += regionsLength > 1 ? 200 : regionsLength == 1 ? 100 : 0;
-    value += response == "blobs" ? 20 : response == "bounds" ? 10 : 0;
-    value += sync ? 0 : 1;
-    return value;
-}
-
-/*uint32_t
-EngineType2(const uint32_t depth, const uint32_t regionsLength, const std::string &response) {
-    uint32_t value = 0;
-    value += depth == 4 || depth == 3 ? 100 : 0;
-    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
-    value += response == "blobs" ? 2 : response == "bounds" ? 1 : 0;
-    return value;
-}*/
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 std::vector<bool>
 BitsetJsToCpp(const Napi::Buffer<bool> &bitsetJs) {
     const size_t length = bitsetJs.Length();
@@ -1320,8 +1298,21 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-/*void
-ConfigureFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFunc &callbackFunc) {
+// determine engine type
+uint32_t
+EngineType(const uint32_t depth, const uint32_t regionsLength, const std::string &response) {
+    uint32_t value = 0;
+    value += depth == 4 || depth == 3 ? 100 : 0;
+    value += regionsLength > 1 ? 20 : regionsLength == 1 ? 10 : 0;
+    value += response == "blobs" ? 2 : response == "bounds" ? 1 : 0;
+    return value;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// set execute and callback functions
+void
+SetFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFunc &callbackFunc) {
 
     // width, height, depth. required.
     const uint32_t width = configObj.Get("width").As<Napi::Number>().Uint32Value();
@@ -1342,86 +1333,123 @@ ConfigureFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, Call
     const std::string response = configObj.HasOwnProperty("response") ? configObj.Get("response").As<Napi::String>().Utf8Value() : "percent";
 
     // determine functions to assign
-    const uint32_t engineType = EngineType2(depth, regionsLength, response);
+    const uint32_t engineType = EngineType(depth, regionsLength, response);
 
     // create Config struct
-    //const Config config = Config{width, height, depth, draw};
-
-    std::cout << "engine type number " << engineType << std::endl;
+    const Config config = Config{width, height, depth, draw};
 
     switch (engineType) {
-        case GRAY_ALL_PERCENT://0
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-                //All all = All{"all", difference, percent};
-                GrayAllPercentExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
-            };
+        case GRAY_ALL_PERCENT: {//0
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllPercentExecute(config, {all}, buf0, buf1, results);};
             callbackFunc = &AllPercentCallback;
             break;
-        case GRAY_ALL_BOUNDS://1
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-                GrayAllBoundsExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
-            };
+        }
+        case GRAY_ALL_BOUNDS: {//1
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllBoundsExecute(config, {all}, buf0, buf1, results);};
             callbackFunc = &AllBoundsCallback;
             break;
-        case GRAY_ALL_BLOBS://2
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-                GrayAllBlobsExecute(Config{width, height, depth, draw}, All{"all", difference, percent}, buf0, buf1, results);
-            };
+        }
+        case GRAY_ALL_BLOBS:{//2
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllBlobsExecute(config, {all}, buf0, buf1, results);};
             callbackFunc = &AllBlobsCallback;
             break;
-
-        case GRAY_REGION_PERCENT://10
-        std::cout << " gray region percent switch" << std::endl;
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-
-                std::cout << "get regions " << std::endl;
-
-                //const Napi::Array regionsArr = configObj.Get("regions").As<Napi::Array>();
-
-                if (configObj.HasOwnProperty("regions")) {
-                    std::cout << " has regions" << std::endl;
-                }
-
-                const Napi::Array regionsJs = configObj.Get("regions").As<Napi::Array>();
-
-                std::cout << "show length" << std::endl;
-
-                std::cout << regionsJs.Length() << std::endl;
-
-                const Napi::Object regionObj = regionsJs.Get("0").As<Napi::Object>();//configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>();
-
-                Region region = RegionJsToCpp(regionObj);
-
-                GrayRegionPercentExecute(Config{width, height, depth, draw}, region, buf0, buf1, results);
-            };
+        }
+        case GRAY_REGION_PERCENT:{//10
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionPercentExecute(config, region, buf0, buf1, results);};
             callbackFunc = &RegionPercentCallback;
             break;
-        case GRAY_REGION_BOUNDS://11
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-                GrayRegionBoundsExecute(Config{width, height, depth, draw}, RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>()), buf0, buf1, results);
-            };
+        }
+        case GRAY_REGION_BOUNDS:{//11
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionBoundsExecute(config, region, buf0, buf1, results);};
             callbackFunc = &RegionBoundsCallback;
             break;
-        case GRAY_REGION_BLOBS://12
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {
-                GrayRegionBlobsExecute(Config{width, height, depth, draw}, RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get("0").As<Napi::Object>()), buf0, buf1, results);
-            };
+        }
+        case GRAY_REGION_BLOBS:{//12
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionBlobsExecute(config, region, buf0, buf1, results);};
             callbackFunc = &RegionBlobsCallback;
             break;
-
-            case GRAY_REGIONS_PERCENT://20
-                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsPercentExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
-                callbackFunc = &RegionsPercentCallback;
-                break;
-            case GRAY_REGIONS_BOUNDS://21
-                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBoundsExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
-                callbackFunc = &RegionsBoundsCallback;
-                break;
-            case GRAY_REGIONS_BLOBS://22
-                executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBlobsExecute(config, Regions{RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>())}, buf0, buf1, results);};
-                callbackFunc = &RegionsBlobsCallback;
-                break;
+        }
+        case GRAY_REGIONS_PERCENT:{//20
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsPercentExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsPercentCallback;
+            break;
+        }
+        case GRAY_REGIONS_BOUNDS:{//21
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBoundsExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsBoundsCallback;
+            break;
+        }
+        case GRAY_REGIONS_BLOBS:{//22
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBlobsExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsBlobsCallback;
+            break;
+        }
+        case RGB_ALL_PERCENT: {//100
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllPercentExecute(config, {all}, buf0, buf1, results);};
+            callbackFunc = &AllPercentCallback;
+            break;
+        }
+        case RGB_ALL_BOUNDS: {//101
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllBoundsExecute(config, {all}, buf0, buf1, results);};
+            callbackFunc = &AllBoundsCallback;
+            break;
+        }
+        case RGB_ALL_BLOBS:{//102
+            const All all = All{"all", difference, percent};
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllBlobsExecute(config, {all}, buf0, buf1, results);};
+            callbackFunc = &AllBlobsCallback;
+            break;
+        }
+        case RGB_REGION_PERCENT:{//110
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionPercentExecute(config, region, buf0, buf1, results);};
+            callbackFunc = &RegionPercentCallback;
+            break;
+        }
+        case RGB_REGION_BOUNDS:{//111
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionBoundsExecute(config, region, buf0, buf1, results);};
+            callbackFunc = &RegionBoundsCallback;
+            break;
+        }
+        case RGB_REGION_BLOBS:{//112
+            const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionBlobsExecute(config, region, buf0, buf1, results);};
+            callbackFunc = &RegionBlobsCallback;
+            break;
+        }
+        case RGB_REGIONS_PERCENT:{//20
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsPercentExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsPercentCallback;
+            break;
+        }
+        case RGB_REGIONS_BOUNDS:{//21
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsBoundsCallback;
+            break;
+        }
+        case RGB_REGIONS_BLOBS:{//22
+            const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);};
+            callbackFunc = &RegionsBlobsCallback;
+            break;
+        }
         default:
-            std::cout << "did not find matching engine" << std::endl;
+            throw Napi::Error::New(configObj.Env(), "Engine not found for type " + std::to_string(engineType));
     }
-}*/
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
