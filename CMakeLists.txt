@@ -18,6 +18,6 @@ include_directories(node_modules/node-addon-api/external-napi)
 #file(GLOB SOURCES "src/*.cc" "src/*.c")
 
 # use specific list of files
-set(SOURCES src/addon.cc src/ccl.cc src/engine.cc src/async.cc src/gray_object.cc src/results.cc src/rgb_object.cc)
+set(SOURCES src/addon.cc src/ccl.cc src/engine.cc src/object.cc src/results.cc src/worker.cc)
 
 add_executable(addon ${SOURCES})
