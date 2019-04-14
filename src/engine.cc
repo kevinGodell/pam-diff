@@ -188,10 +188,7 @@ GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, 
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, result.bounds.minX);
-            SetMax(x, result.bounds.maxX);
-            SetMin(y, result.bounds.minY);
-            SetMax(y, result.bounds.maxY);
+            result.bounds.expandTo(x, y);
             ++result.percent;
         }
     }
@@ -247,10 +244,7 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, result.bounds.minX);
-            SetMax(x, result.bounds.maxX);
-            SetMin(y, result.bounds.minY);
-            SetMax(y, result.bounds.maxY);
+            result.bounds.expandTo(x, y);
             ++result.percent;
         }
     }
@@ -318,10 +312,7 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -394,10 +385,7 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -432,10 +420,7 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
 
             // get blob and update its data
             Blob &blob = blobs[b];
-            SetMin(x, blob.bounds.minX);
-            SetMax(x, blob.bounds.maxX);
-            SetMin(y, blob.bounds.minY);
-            SetMax(y, blob.bounds.maxY);
+            blob.bounds.expandTo(x, y);
             ++blob.percent;
         }
     }
@@ -507,10 +492,7 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -545,10 +527,7 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
 
             // get blob and update its data
             Blob &blob = blobs[b];
-            SetMin(x, blob.bounds.minX);
-            SetMax(x, blob.bounds.maxX);
-            SetMin(y, blob.bounds.minY);
-            SetMax(y, blob.bounds.maxY);
+            blob.bounds.expandTo(x, y);
             ++blob.percent;
         }
     }
@@ -632,10 +611,7 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
                     labels[p] = -2;// set to -2 to mark as pixel to ignore
                 } else {
                     labels[p] = -1;// set to -1 to mark as pixel of interest
-                    SetMin(x, result.bounds.minX);
-                    SetMax(x, result.bounds.maxX);
-                    SetMin(y, result.bounds.minY);
-                    SetMax(y, result.bounds.maxY);
+                    result.bounds.expandTo(x, y);
                     ++result.percent;
                 }
             }
@@ -670,10 +646,7 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
 
                 // get blob and update its data
                 Blob &blob = blobs[b];
-                SetMin(x, blob.bounds.minX);
-                SetMax(x, blob.bounds.maxX);
-                SetMin(y, blob.bounds.minY);
-                SetMax(y, blob.bounds.maxY);
+                blob.bounds.expandTo(x, y);
                 ++blob.percent;
             }
         }
@@ -862,10 +835,7 @@ RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            SetMin(x, result.bounds.minX);
-            SetMax(x, result.bounds.maxX);
-            SetMin(y, result.bounds.minY);
-            SetMax(y, result.bounds.maxY);
+            result.bounds.expandTo(x, y);
             ++result.percent;
         }
     }
@@ -921,10 +891,7 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            SetMin(x, result.bounds.minX);
-            SetMax(x, result.bounds.maxX);
-            SetMin(y, result.bounds.minY);
-            SetMax(y, result.bounds.maxY);
+            result.bounds.expandTo(x, y);
             ++result.percent;
         }
     }
@@ -992,10 +959,7 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -1068,10 +1032,7 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -1106,10 +1067,7 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
 
             // get blob and update its data
             Blob &blob = blobs[b];
-            SetMin(x, blob.bounds.minX);
-            SetMax(x, blob.bounds.maxX);
-            SetMin(y, blob.bounds.minY);
-            SetMax(y, blob.bounds.maxY);
+            blob.bounds.expandTo(x, y);
             ++blob.percent;
         }
     }
@@ -1181,10 +1139,7 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, result.bounds.minX);
-                SetMax(x, result.bounds.maxX);
-                SetMin(y, result.bounds.minY);
-                SetMax(y, result.bounds.maxY);
+                result.bounds.expandTo(x, y);
                 ++result.percent;
             }
         }
@@ -1219,10 +1174,7 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
 
             // get blob and update its data
             Blob &blob = blobs[b];
-            SetMin(x, blob.bounds.minX);
-            SetMax(x, blob.bounds.maxX);
-            SetMin(y, blob.bounds.minY);
-            SetMax(y, blob.bounds.maxY);
+            blob.bounds.expandTo(x, y);
             ++blob.percent;
         }
     }
@@ -1306,10 +1258,7 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
                     labels[p] = -2;// set to -2 to mark as pixel to ignore
                 } else {
                     labels[p] = -1;// set to -1 to mark as pixel of interest
-                    SetMin(x, result.bounds.minX);
-                    SetMax(x, result.bounds.maxX);
-                    SetMin(y, result.bounds.minY);
-                    SetMax(y, result.bounds.maxY);
+                    result.bounds.expandTo(x, y);
                     ++result.percent;
                 }
             }
@@ -1344,10 +1293,7 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
 
                 // get blob and update its data
                 Blob &blob = blobs[b];
-                SetMin(x, blob.bounds.minX);
-                SetMax(x, blob.bounds.maxX);
-                SetMin(y, blob.bounds.minY);
-                SetMax(y, blob.bounds.maxY);
+                blob.bounds.expandTo(x, y);
                 ++blob.percent;
             }
         }

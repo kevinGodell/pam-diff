@@ -56,6 +56,13 @@ struct Bounds {
     uint32_t maxX;
     uint32_t minY;
     uint32_t maxY;
+
+    void expandTo(uint32_t x, uint32_t y) {
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    }
 };
 
 struct Region {
@@ -129,18 +136,6 @@ inline uint32_t
 RgbDiff(const uint8_t *buf0, const uint8_t *buf1, uint32_t i) {
     //return std::abs(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3u;
     return AbsInt(buf0[i] + buf0[i + 1] + buf0[i + 2] - buf1[i] - buf1[i + 1] - buf1[i + 2]) / 3u;
-}
-
-// set minimum x or y coord
-inline void
-SetMin(const uint32_t val, uint32_t &min) {
-    if (val < min) min = val;
-}
-
-// set maximum x or y coord
-inline void
-SetMax(const uint32_t val, uint32_t &max) {
-    if (val > max) max = val;
 }
 
 // convert js bitset to cpp
