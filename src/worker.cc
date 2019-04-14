@@ -1,4 +1,4 @@
-#include "async.h"
+#include "worker.h"
 #include "engine.h"
 #include "results.h"
 #include "napi.h"
@@ -6,7 +6,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-AsyncWorker::AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint8_t> &napiBuf0, const Napi::Buffer<uint8_t> &napiBuf1, const Napi::Function &cb)
+PixelChangeWorker::PixelChangeWorker(const ExecuteFunc &execute, const CallbackFunc &callback, const Napi::Buffer<uint8_t> &napiBuf0, const Napi::Buffer<uint8_t> &napiBuf1, const Napi::Function &cb)
         : Napi::AsyncWorker(cb),
           execute_(execute),
           callback_(callback),
@@ -16,11 +16,11 @@ AsyncWorker::AsyncWorker(const ExecuteFunc &execute, const CallbackFunc &callbac
           buf1ref_(Napi::Reference<Napi::Buffer<uint8_t>>::New(napiBuf1, 1)) {
 }
 
-void AsyncWorker::Execute() {
+void PixelChangeWorker::Execute() {
     this->execute_(this->buf0_, this->buf1_, this->results_);
 }
 
-void AsyncWorker::OnOK() {
+void PixelChangeWorker::OnOK() {
     this->callback_(Env(), Callback().Value(), this->results_);
 }
 
