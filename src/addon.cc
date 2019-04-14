@@ -19,15 +19,15 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     cout << "size of uint32_t : " << sizeof(uint32_t) << endl;
     cout << "size of std::vector<bool> : " << sizeof(std::vector<bool>) << endl;
     cout << "size of std::vector<uint8_t> : " << sizeof(std::vector<uint8_t>) << endl;
+    cout << "size of std::vector<Result> : " << sizeof(std::vector<Result>) << endl;
     cout << "size of Config struct : " << sizeof(Config) << endl;
     cout << "size of All struct : " << sizeof(All) << endl;
     cout << "size of Bounds struct : " << sizeof(Bounds) << endl;
     cout << "size of Region struct : " << sizeof(Region) << endl;
-    cout << "size of PercentResult struct : " << sizeof(PercentResult) << endl;
     cout << "size of Blob struct : " << sizeof(Blob) << endl;
-    cout << "size of BoundsResult struct : " << sizeof(BoundsResult) << endl;
-    cout << "size of Results struct : " << sizeof(Results) << endl;
+    cout << "size of Result struct : " << sizeof(Result) << endl;
     cout << "size of Pixels struct : " << sizeof(Pixels) << endl;
+    cout << "size of CallbackData struct : " << sizeof(CallbackData) << endl;
 
     if (configObj.HasOwnProperty("depth")) cout << "depth : " << configObj.Get("depth").As<Napi::Number>().Uint32Value() << endl;
     if (configObj.HasOwnProperty("width")) cout << "width : " << configObj.Get("width").As<Napi::Number>().Uint32Value() << std::endl;

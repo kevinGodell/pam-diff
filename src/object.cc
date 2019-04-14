@@ -4,7 +4,6 @@
 #include "results.h"
 #include "napi.h"
 #include <cstdint>
-#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,9 +51,9 @@ Napi::Value PixelChange::CompareSync(const Napi::CallbackInfo &info) {
     const uint8_t *buf1 = info[1].As<Napi::Buffer<uint8_t>>().Data();
     const Napi::Function &cb = info[2].As<Napi::Function>();
 
-    Results results;
-    this->execute_(buf0, buf1, results);
-    this->callback_(env, cb, results);
+    CallbackData callbackData;
+    this->execute_(buf0, buf1, callbackData);
+    this->callback_(env, cb, callbackData);
 
     return env.Undefined();
 }

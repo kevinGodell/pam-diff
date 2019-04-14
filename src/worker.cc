@@ -17,11 +17,11 @@ PixelChangeWorker::PixelChangeWorker(const ExecuteFunc &execute, const CallbackF
 }
 
 void PixelChangeWorker::Execute() {
-    this->execute_(this->buf0_, this->buf1_, this->results_);
+    this->execute_(this->buf0_, this->buf1_, this->callbackData_);
 }
 
 void PixelChangeWorker::OnOK() {
-    this->callback_(Env(), Callback().Value(), this->results_);
+    this->callback_(Env(), Callback().Value(), this->callbackData_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

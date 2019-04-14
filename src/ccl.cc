@@ -3,7 +3,6 @@
 #include "engine.h"
 #include <cstdint>
 #include <memory>
-#include <vector>
 
 #define CALL_LabelComponent(x, y, returnLabel) {\
             stack[stackIndex] = x;\

@@ -67,26 +67,6 @@ struct Region {
     Bounds bounds;
 };
 
-struct PercentResult {
-    const char *name;
-    uint32_t percent;// 4
-    bool flagged;// 1
-    PercentResult() : name(nullptr), percent(0), flagged(false) {}
-
-    explicit PercentResult(const char *_name) : name(_name), percent(0), flagged(false) {}
-};
-
-struct BoundsResult {
-    const char *name;
-    Bounds bounds;
-    uint32_t percent;
-    bool flagged;
-
-    BoundsResult() : name(nullptr), bounds(Bounds{0, 0, 0, 0}), percent(0), flagged(false) {}
-
-    BoundsResult(const char *_name, Bounds _bounds) : name(_name), bounds(_bounds), percent(0), flagged(false) {}
-};
-
 struct Blob {
     uint32_t label;
     Bounds bounds;
@@ -98,18 +78,6 @@ struct Blob {
     explicit Blob(Bounds _bounds) : label(0), bounds(_bounds), percent(0), flagged(false) {}
 };
 
-struct BlobsResult {
-    const char *name;
-    Bounds bounds;
-    uint32_t percent;// 4
-    bool flagged;// 1
-    std::vector<Blob> blobs;
-
-    BlobsResult() : name(nullptr), bounds(Bounds{0, 0, 0, 0}), percent(0), flagged(false), blobs(std::vector<Blob>()) {}
-
-    BlobsResult(const char *_name, Bounds _bounds) : name(_name), bounds(_bounds), percent(0), flagged(false), blobs(std::vector<Blob>()) {}
-};
-
 struct Pixels {
     uint8_t *ptr;
     uint32_t size;
@@ -119,19 +87,29 @@ struct Pixels {
     Pixels(uint8_t *_ptr, uint32_t _size) : ptr(_ptr), size(_size) {}
 };
 
-struct Results {//192
-    PercentResult percentResult;
-    BoundsResult boundsResult;
-    BlobsResult blobsResult;
-    std::vector<PercentResult> percentResults;
-    std::vector<BoundsResult> boundsResults;
-    std::vector<BlobsResult> blobsResults;
+struct Result {
+    const char *name;
+    uint32_t percent;
+    Bounds bounds;
+    std::vector<Blob> blobs;
+    bool flagged;
+
+    Result() : name(nullptr), percent(0), bounds(Bounds{0, 0, 0, 0}), blobs(std::vector<Blob>()), flagged(false) {}
+
+    explicit Result(const char *_name) : name(_name), percent(0), bounds(Bounds{0, 0, 0, 0}), blobs(std::vector<Blob>()), flagged(false) {}
+
+    Result(const char *_name, Bounds _bounds) : name(_name), percent(0), bounds(_bounds), blobs(std::vector<Blob>()), flagged(false) {}
+};
+
+// placeholder for CPP results that will be converted to JS values
+struct CallbackData {
+    std::vector<Result> results;
     Pixels pixels;
 };
 
-typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, Results &results)> ExecuteFunc;
+typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData)> ExecuteFunc;
 
-typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const Results &results)> CallbackFunc;
+typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const CallbackData &callbackData)> CallbackFunc;
 
 // absolute value
 inline uint32_t
@@ -155,13 +133,13 @@ RgbDiff(const uint8_t *buf0, const uint8_t *buf1, uint32_t i) {
 
 // set minimum x or y coord
 inline void
-SetMin(const uint32_t &val, uint32_t &min) {
+SetMin(const uint32_t val, uint32_t &min) {
     if (val < min) min = val;
 }
 
 // set maximum x or y coord
 inline void
-SetMax(const uint32_t &val, uint32_t &max) {
+SetMax(const uint32_t val, uint32_t &max) {
     if (val > max) max = val;
 }
 
@@ -179,75 +157,75 @@ RegionsJsToCpp(const Napi::Array &regionsJs);
 
 // gray all percent
 void
-GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray single region percent
 void
-GrayRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray multi regions bounds
 void
-GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray all bounds
 void
-GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray single region bounds
 void
-GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray multi regions bounds
 void
-GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray all blobs
 void
-GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray single region blobs
 void
-GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // gray multi regions blobs
 void
-GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb all percent
 void
-RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb single region percent
 void
-RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb multi regions bounds
 void
-RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb all bounds
 void
-RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb single region bounds
 void
-RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb multi regions bounds
 void
-RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb all blobs
 void
-RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb single region blobs
 void
-RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // rgb multi regions blobs
 void
-RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results);
+RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData);
 
 // determine engine type
 uint32_t

@@ -17,7 +17,6 @@ public:
 
 private:
     // in
-
     const ExecuteFunc execute_;
     const CallbackFunc callback_;
     const uint8_t *buf0_;
@@ -26,7 +25,7 @@ private:
     const Napi::Reference<Napi::Buffer<uint8_t>> buf1ref_;
 
     // out
-    Results results_;
+    CallbackData callbackData_;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

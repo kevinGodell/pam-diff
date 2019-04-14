@@ -52,76 +52,88 @@ RegionsJsToCpp(const Napi::Array &regionsJs) {
 
 // gray all percent
 void
-GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to percentResult
-    PercentResult &percentResult = results.percentResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure percentResult
-    percentResult.name = all.name.data();
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{all.name.data()});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > GrayDiff(buf0, buf1, p)) continue;
-            ++percentResult.percent;
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    percentResult.percent = 100 * percentResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, return
-    if (all.percent > percentResult.percent) return;
+    if (all.percent > result.percent) return;
 
     //needed for callback
-    percentResult.flagged = true;
+    result.flagged = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //gray single region percent
 void
-GrayRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to percentResult
-    PercentResult &percentResult = results.percentResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure percentResult
-    percentResult.name = region.name.data();
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data()});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-            ++percentResult.percent;
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, return
-    if (region.percent > percentResult.percent) return;
+    if (region.percent > result.percent) return;
 
     //needed for callback
-    percentResult.flagged = true;
+    result.flagged = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // gray multi regions percent
 void
-GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to percentResult vector
-    std::vector<PercentResult> &percentResultVec = results.percentResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for percentResult vector
-    percentResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -129,28 +141,28 @@ GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regio
         // get reference to region
         const Region &region = regions[r];
 
-        // create percentResults in vector
-        percentResultVec.emplace_back(PercentResult{region.name.data()});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data()});
 
-        // get reference to percentResult that was just pushed into vector
-        PercentResult &percentResult = percentResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // loop pixels while tracking percent
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-                ++percentResult.percent;
+                ++result.percent;
             }
         }
 
         // calculate percent size of changed pixels
-        percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, continue
-        if (region.percent > percentResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // set flagged to true
-        percentResult.flagged = true;
+        result.flagged = true;
     }
 }
 
@@ -158,50 +170,58 @@ GrayRegionsPercentExecute(const Config &config, const std::vector<Region> &regio
 
 // gray all bounds
 void
-GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to boundsResult
-    BoundsResult &boundsResult = results.boundsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure boundsResult
-    boundsResult.name = all.name.data();
-    boundsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{all.name.data(), Bounds{config.width - 1, 0, config.height - 1, 0}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking bounds and percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, boundsResult.bounds.minX);
-            SetMax(x, boundsResult.bounds.maxX);
-            SetMin(y, boundsResult.bounds.minY);
-            SetMax(y, boundsResult.bounds.maxY);
-            ++boundsResult.percent;
+            SetMin(x, result.bounds.minX);
+            SetMax(x, result.bounds.maxX);
+            SetMin(y, result.bounds.minY);
+            SetMax(y, result.bounds.maxY);
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    boundsResult.percent = 100 * boundsResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, return
-    if (all.percent > boundsResult.percent) return;
+    if (all.percent > result.percent) return;
 
     //needed for callback
-    boundsResult.flagged = true;
+    result.flagged = true;
 
     // draw bounds into pixels
     if (config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // write bounds into pixels
-        SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
+        SetGrayPixels(result.bounds, config, pixels.ptr);
     }
 }
 
@@ -209,50 +229,58 @@ GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, 
 
 //gray single region bounds
 void
-GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to boundsResult
-    BoundsResult &boundsResult = results.boundsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure boundsResult
-    boundsResult.name = region.name.data();
-    boundsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent and bounds
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-            SetMin(x, boundsResult.bounds.minX);
-            SetMax(x, boundsResult.bounds.maxX);
-            SetMin(y, boundsResult.bounds.minY);
-            SetMax(y, boundsResult.bounds.maxY);
-            ++boundsResult.percent;
+            SetMin(x, result.bounds.minX);
+            SetMax(x, result.bounds.maxX);
+            SetMin(y, result.bounds.minY);
+            SetMax(y, result.bounds.maxY);
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, return
-    if (region.percent > boundsResult.percent) return;
+    if (region.percent > result.percent) return;
 
     //needed for callback
-    boundsResult.flagged = true;
+    result.flagged = true;
 
     // draw bounds into pixels
     if (config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // write bounds into pixels
-        SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
+        SetGrayPixels(result.bounds, config, pixels.ptr);
     }
 }
 
@@ -260,7 +288,7 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
 
 // gray multi regions bounds
 void
-GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -268,11 +296,11 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to boundsResult vector
-    std::vector<BoundsResult> &boundsResultVec = results.boundsResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for boundsResult vector
-    boundsResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -280,32 +308,32 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
         // get reference to region
         const Region &region = regions[r];
 
-        // create boundsResults in vector
-        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
-        // get reference to boundsResult that was just pushed into vector
-        BoundsResult &boundsResult = boundsResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // loop pixels while tracking pixels and bounds
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > GrayDiff(buf0, buf1, p)) continue;
-                SetMin(x, boundsResult.bounds.minX);
-                SetMax(x, boundsResult.bounds.maxX);
-                SetMin(y, boundsResult.bounds.minY);
-                SetMax(y, boundsResult.bounds.maxY);
-                ++boundsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
 
         // calculate percent size of changed pixels
-        boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, continue
-        if (region.percent > boundsResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // set flagged to true
-        flagged = boundsResult.flagged = true;
+        flagged = result.flagged = true;
     }
 
     //must be outside loop since all bounds will be draw to same pixels
@@ -313,21 +341,24 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobsResults vector
-        for (auto &boundsResult : boundsResultVec) {
+        for (auto &result : results) {
 
             // skip if not flagged
-            if (!boundsResult.flagged) continue;
+            if (!result.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(boundsResult.bounds, config, results.pixels.ptr);
+            SetGrayPixels(result.bounds, config, pixels.ptr);
         }
     }
 }
@@ -336,7 +367,7 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
 
 // gray all blobs
 void
-GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int32_t[]> up(new int32_t[config.pixelCount]);
@@ -344,12 +375,17 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to blobsResult
-    BlobsResult &blobsResult = results.blobsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure blobsResult
-    blobsResult.name = all.name.data();
-    blobsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{all.name.data(), Bounds{config.width - 1, 0, config.height - 1, 0}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -358,35 +394,35 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, blobsResult.bounds.minX);
-                SetMax(x, blobsResult.bounds.maxX);
-                SetMin(y, blobsResult.bounds.minY);
-                SetMax(y, blobsResult.bounds.maxY);
-                ++blobsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
     }
 
     // calculate percent size of blobbed pixels
-    blobsResult.percent = 100 * blobsResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, skip blobbing the pixels
-    if (all.percent > blobsResult.percent) return;
+    if (all.percent > result.percent) return;
 
     // assign label to each pixel and return count of unique labels
-    uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+    uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
     // get reference to blobs vector
-    std::vector<Blob> &blobs = blobsResult.blobs;
+    std::vector<Blob> &blobs = result.blobs;
 
     // fill vector with blobs using the previous bounds results
-    blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+    blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
     // loop rows within upper and lower bounds
-    for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+    for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
         // loop columns within left and right bounds
-        for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+        for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
             // get pixel label as blob index
             int32_t b = labels[p];
@@ -410,29 +446,32 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
         blob.percent = 100 * blob.percent / config.pixelCount;
         if (all.percent > blob.percent) continue;
         blob.label = b;
-        blobsResult.flagged = blob.flagged = true;
+        result.flagged = blob.flagged = true;
     }
 
     //must be outside loop since all blobs will be draw to same pixels
-    if (blobsResult.flagged && config.draw) {
+    if (result.flagged && config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobs and draw bounds in pixels
-        for (auto &blob : blobsResult.blobs) {
+        for (auto &blob : result.blobs) {
 
             // skip if not flagged
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(blob.bounds, config, results.pixels.ptr);
+            SetGrayPixels(blob.bounds, config, pixels.ptr);
         }
     }
 }
@@ -441,7 +480,7 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
 
 // gray single region blobs
 void
-GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int32_t[]> up(new int32_t[config.pixelCount]);
@@ -449,12 +488,17 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to blobsResult
-    BlobsResult &blobsResult = results.blobsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure blobsResult
-    blobsResult.name = region.name.data();
-    blobsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -463,35 +507,35 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, blobsResult.bounds.minX);
-                SetMax(x, blobsResult.bounds.maxX);
-                SetMin(y, blobsResult.bounds.minY);
-                SetMax(y, blobsResult.bounds.maxY);
-                ++blobsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
     }
 
     // calculate percent size of blobbed pixels
-    blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, skip blobbing the pixels
-    if (region.percent > blobsResult.percent) return;
+    if (region.percent > result.percent) return;
 
     // assign label to each pixel and return count of unique labels
-    uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+    uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
     // get reference to blobs vector
-    std::vector<Blob> &blobs = blobsResult.blobs;
+    std::vector<Blob> &blobs = result.blobs;
 
     // fill vector with blobs using the previous bounds results
-    blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+    blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
     // loop rows within upper and lower bounds
-    for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+    for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
         // loop columns within left and right bounds
-        for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+        for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
             // get pixel label as blob index
             int32_t b = labels[p];
@@ -515,29 +559,32 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
         blob.percent = 100 * blob.percent / region.bitsetCount;
         if (region.percent > blob.percent) continue;
         blob.label = b;
-        blobsResult.flagged = blob.flagged = true;
+        result.flagged = blob.flagged = true;
     }
 
     //must be outside loop since all blobs will be draw to same pixels
-    if (blobsResult.flagged && config.draw) {
+    if (result.flagged && config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobs and draw bounds in pixels
-        for (auto &blob : blobsResult.blobs) {
+        for (auto &blob : result.blobs) {
 
             // skip if not flagged
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(blob.bounds, config, results.pixels.ptr);
+            SetGrayPixels(blob.bounds, config, pixels.ptr);
         }
     }
 }
@@ -546,7 +593,7 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
 
 // gray multi regions blobs
 void
-GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -560,11 +607,11 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to blobsResult vector
-    std::vector<BlobsResult> &blobsResultVec = results.blobsResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for blobsResult vector
-    blobsResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -572,11 +619,11 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
         // get reference to region
         const Region &region = regions[r];
 
-        // create blobsResultsEx in vector
-        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
-        // get reference to blobsResult that was just pushed into vector
-        BlobsResult &blobsResult = blobsResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // all pixels set to -1 will those set to -2 will be ignored
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -585,35 +632,35 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
                     labels[p] = -2;// set to -2 to mark as pixel to ignore
                 } else {
                     labels[p] = -1;// set to -1 to mark as pixel of interest
-                    SetMin(x, blobsResult.bounds.minX);
-                    SetMax(x, blobsResult.bounds.maxX);
-                    SetMin(y, blobsResult.bounds.minY);
-                    SetMax(y, blobsResult.bounds.maxY);
-                    ++blobsResult.percent;
+                    SetMin(x, result.bounds.minX);
+                    SetMax(x, result.bounds.maxX);
+                    SetMin(y, result.bounds.minY);
+                    SetMax(y, result.bounds.maxY);
+                    ++result.percent;
                 }
             }
         }
 
         // calculate percent size of blobbed pixels
-        blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, skip blobbing the pixels
-        if (region.percent > blobsResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // assign label to each pixel and return count of unique labels
-        uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+        uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
         // get reference to blobs vector
-        std::vector<Blob> &blobs = blobsResult.blobs;
+        std::vector<Blob> &blobs = result.blobs;
 
         // fill vector with blobs using the previous bounds results
-        blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+        blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
         // loop rows within upper and lower bounds
-        for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+        for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
             // loop columns within left and right bounds
-            for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+            for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
                 // get pixel label as blob index
                 int32_t b = labels[p];
@@ -637,7 +684,7 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
             blob.percent = 100 * blob.percent / region.bitsetCount;
             if (region.percent > blob.percent) continue;
             blob.label = b;
-            flagged = blobsResult.flagged = blob.flagged = true;
+            flagged = result.flagged = blob.flagged = true;
         }
     }
 
@@ -646,27 +693,30 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
-        // iterate blobsResults vector
-        for (auto &blobsResult : blobsResultVec) {
+        // iterate Result vector
+        for (auto &result : results) {
 
             // skip if not flagged
-            if (!blobsResult.flagged) continue;
+            if (!result.flagged) continue;
 
             // iterate blobs and draw bounds in pixels
-            for (auto &blob : blobsResult.blobs) {
+            for (auto &blob : result.blobs) {
 
                 // skip if not flagged
                 if (!blob.flagged) continue;
 
                 // write bounds into pixels
-                SetGrayPixels(blob.bounds, config, results.pixels.ptr);
+                SetGrayPixels(blob.bounds, config, pixels.ptr);
             }
         }
     }
@@ -676,76 +726,88 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
 
 // rgb all percent
 void
-RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbAllPercentExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to percentResult
-    PercentResult &percentResult = results.percentResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure percentResult
-    percentResult.name = all.name.data();
+    // reserve memory
+    results.reserve(1);
+
+    // create Result inside vector
+    results.emplace_back(Result{all.name.data()});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            ++percentResult.percent;
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    percentResult.percent = 100 * percentResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, return
-    if (all.percent > percentResult.percent) return;
+    if (all.percent > result.percent) return;
 
     //needed for callback
-    percentResult.flagged = true;
+    result.flagged = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 //rgb single region percent
 void
-RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionPercentExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to percentResult
-    PercentResult &percentResult = results.percentResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure percentResult
-    percentResult.name = region.name.data();
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data()});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            ++percentResult.percent;
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, return
-    if (region.percent > percentResult.percent) return;
+    if (region.percent > result.percent) return;
 
     //needed for callback
-    percentResult.flagged = true;
+    result.flagged = true;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // rgb multi regions percent
 void
-RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to percentResult vector
-    std::vector<PercentResult> &percentResultVec = results.percentResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for percentResult vector
-    percentResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -753,28 +815,28 @@ RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &region
         // get reference to region
         const Region &region = regions[r];
 
-        // create percentResults in vector
-        percentResultVec.emplace_back(PercentResult{region.name.data()});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data()});
 
-        // get reference to percentResult that was just pushed into vector
-        PercentResult &percentResult = percentResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // loop pixels while tracking percent
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-                ++percentResult.percent;
+                ++result.percent;
             }
         }
 
         // calculate percent size of changed pixels
-        percentResult.percent = 100 * percentResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, continue
-        if (region.percent > percentResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // set flagged to true
-        percentResult.flagged = true;
+        result.flagged = true;
     }
 }
 
@@ -782,50 +844,58 @@ RgbRegionsPercentExecute(const Config &config, const std::vector<Region> &region
 
 // rgb all bounds
 void
-RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to boundsResult
-    BoundsResult &boundsResult = results.boundsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure boundsResult
-    boundsResult.name = all.name.data();
-    boundsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{all.name.data(), Bounds{config.width - 1, 0, config.height - 1, 0}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking bounds and percent
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
         for (uint32_t x = 0; x < config.width; ++x, ++p) {
             if (all.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            SetMin(x, boundsResult.bounds.minX);
-            SetMax(x, boundsResult.bounds.maxX);
-            SetMin(y, boundsResult.bounds.minY);
-            SetMax(y, boundsResult.bounds.maxY);
-            ++boundsResult.percent;
+            SetMin(x, result.bounds.minX);
+            SetMax(x, result.bounds.maxX);
+            SetMin(y, result.bounds.minY);
+            SetMax(y, result.bounds.maxY);
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    boundsResult.percent = 100 * boundsResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, return
-    if (all.percent > boundsResult.percent) return;
+    if (all.percent > result.percent) return;
 
     //needed for callback
-    boundsResult.flagged = true;
+    result.flagged = true;
 
     // draw bounds into pixels
     if (config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // write bounds into pixels
-        SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
+        SetRgbPixels(result.bounds, config, pixels.ptr);
     }
 }
 
@@ -833,50 +903,58 @@ RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, c
 
 //rgb single region bounds
 void
-RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
-    // get reference to boundsResult
-    BoundsResult &boundsResult = results.boundsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure boundsResult
-    boundsResult.name = region.name.data();
-    boundsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // loop pixels while tracking percent and bounds
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
         for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
             if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-            SetMin(x, boundsResult.bounds.minX);
-            SetMax(x, boundsResult.bounds.maxX);
-            SetMin(y, boundsResult.bounds.minY);
-            SetMax(y, boundsResult.bounds.maxY);
-            ++boundsResult.percent;
+            SetMin(x, result.bounds.minX);
+            SetMax(x, result.bounds.maxX);
+            SetMin(y, result.bounds.minY);
+            SetMax(y, result.bounds.maxY);
+            ++result.percent;
         }
     }
 
     // calculate percent size of changed pixels
-    boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, return
-    if (region.percent > boundsResult.percent) return;
+    if (region.percent > result.percent) return;
 
     //needed for callback
-    boundsResult.flagged = true;
+    result.flagged = true;
 
     // draw bounds into pixels
     if (config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // write bounds into pixels
-        SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
+        SetRgbPixels(result.bounds, config, pixels.ptr);
     }
 }
 
@@ -884,7 +962,7 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
 
 // rgb multi regions bounds
 void
-RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -892,11 +970,11 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to boundsResult vector
-    std::vector<BoundsResult> &boundsResultVec = results.boundsResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for boundsResult vector
-    boundsResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -904,32 +982,32 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
         // get reference to region
         const Region &region = regions[r];
 
-        // create boundsResults in vector
-        boundsResultVec.emplace_back(BoundsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
-        // get reference to boundsResult that was just pushed into vector
-        BoundsResult &boundsResult = boundsResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // loop pixels while tracking pixels and bounds
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
             for (uint32_t x = region.bounds.minX, p = y * config.width + x; x <= region.bounds.maxX; ++x, ++p) {
                 if (region.bitset[p] == 0 || region.difference > RgbDiff(buf0, buf1, p * config.depth)) continue;
-                SetMin(x, boundsResult.bounds.minX);
-                SetMax(x, boundsResult.bounds.maxX);
-                SetMin(y, boundsResult.bounds.minY);
-                SetMax(y, boundsResult.bounds.maxY);
-                ++boundsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
 
         // calculate percent size of changed pixels
-        boundsResult.percent = 100 * boundsResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, continue
-        if (region.percent > boundsResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // set flagged to true
-        flagged = boundsResult.flagged = true;
+        flagged = result.flagged = true;
     }
 
     //must be outside loop since all bounds will be draw to same pixels
@@ -937,21 +1015,24 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobsResults vector
-        for (auto &boundsResult : boundsResultVec) {
+        for (auto &result : results) {
 
             // skip if not flagged
-            if (!boundsResult.flagged) continue;
+            if (!result.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(boundsResult.bounds, config, results.pixels.ptr);
+            SetRgbPixels(result.bounds, config, pixels.ptr);
         }
     }
 }
@@ -960,7 +1041,7 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
 
 // rgb all blobs
 void
-RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int32_t[]> up(new int32_t[config.pixelCount]);
@@ -968,12 +1049,17 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to blobsResult
-    BlobsResult &blobsResult = results.blobsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure blobsResult
-    blobsResult.name = all.name.data();
-    blobsResult.bounds = Bounds{config.width - 1, 0, config.height - 1, 0};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{all.name.data(), Bounds{config.width - 1, 0, config.height - 1, 0}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = 0, p = 0; y < config.height; ++y) {
@@ -982,35 +1068,35 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, blobsResult.bounds.minX);
-                SetMax(x, blobsResult.bounds.maxX);
-                SetMin(y, blobsResult.bounds.minY);
-                SetMax(y, blobsResult.bounds.maxY);
-                ++blobsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
     }
 
     // calculate percent size of blobbed pixels
-    blobsResult.percent = 100 * blobsResult.percent / config.pixelCount;
+    result.percent = 100 * result.percent / config.pixelCount;
 
     // if percent threshold is not met, skip blobbing the pixels
-    if (all.percent > blobsResult.percent) return;
+    if (all.percent > result.percent) return;
 
     // assign label to each pixel and return count of unique labels
-    uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+    uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
     // get reference to blobs vector
-    std::vector<Blob> &blobs = blobsResult.blobs;
+    std::vector<Blob> &blobs = result.blobs;
 
     // fill vector with blobs using the previous bounds results
-    blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+    blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
     // loop rows within upper and lower bounds
-    for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+    for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
         // loop columns within left and right bounds
-        for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+        for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
             // get pixel label as blob index
             int32_t b = labels[p];
@@ -1034,29 +1120,32 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
         blob.percent = 100 * blob.percent / config.pixelCount;
         if (all.percent > blob.percent) continue;
         blob.label = b;
-        blobsResult.flagged = blob.flagged = true;
+        result.flagged = blob.flagged = true;
     }
 
     //must be outside loop since all blobs will be draw to same pixels
-    if (blobsResult.flagged && config.draw) {
+    if (result.flagged && config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobs and draw bounds in pixels
-        for (auto &blob : blobsResult.blobs) {
+        for (auto &blob : result.blobs) {
 
             // skip if not flagged
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(blob.bounds, config, results.pixels.ptr);
+            SetRgbPixels(blob.bounds, config, pixels.ptr);
         }
     }
 }
@@ -1065,7 +1154,7 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
 
 // rgb single region blobs
 void
-RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // have unique_ptr reserve memory for stack array on heap and manage destruction
     std::unique_ptr<int32_t[]> up(new int32_t[config.pixelCount]);
@@ -1073,12 +1162,17 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
     // get pointer
     int32_t *labels = up.get();
 
-    // get reference to blobsResult
-    BlobsResult &blobsResult = results.blobsResult;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // configure blobsResult
-    blobsResult.name = region.name.data();
-    blobsResult.bounds = Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY};
+    // reserve memory
+    results.reserve(1);
+
+    // create Result in vector
+    results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+
+    // get reference to last Result in vector
+    Result &result = results.back();
 
     // all pixels set to -1 will those set to -2 will be ignored
     for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -1087,35 +1181,35 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
                 labels[p] = -2;// set to -2 to mark as pixel to ignore
             } else {
                 labels[p] = -1;// set to -1 to mark as pixel of interest
-                SetMin(x, blobsResult.bounds.minX);
-                SetMax(x, blobsResult.bounds.maxX);
-                SetMin(y, blobsResult.bounds.minY);
-                SetMax(y, blobsResult.bounds.maxY);
-                ++blobsResult.percent;
+                SetMin(x, result.bounds.minX);
+                SetMax(x, result.bounds.maxX);
+                SetMin(y, result.bounds.minY);
+                SetMax(y, result.bounds.maxY);
+                ++result.percent;
             }
         }
     }
 
     // calculate percent size of blobbed pixels
-    blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+    result.percent = 100 * result.percent / region.bitsetCount;
 
     // if percent threshold is not met, skip blobbing the pixels
-    if (region.percent > blobsResult.percent) return;
+    if (region.percent > result.percent) return;
 
     // assign label to each pixel and return count of unique labels
-    uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+    uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
     // get reference to blobs vector
-    std::vector<Blob> &blobs = blobsResult.blobs;
+    std::vector<Blob> &blobs = result.blobs;
 
     // fill vector with blobs using the previous bounds results
-    blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+    blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
     // loop rows within upper and lower bounds
-    for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+    for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
         // loop columns within left and right bounds
-        for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+        for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
             // get pixel label as blob index
             int32_t b = labels[p];
@@ -1139,29 +1233,32 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
         blob.percent = 100 * blob.percent / region.bitsetCount;
         if (region.percent > blob.percent) continue;
         blob.label = b;
-        blobsResult.flagged = blob.flagged = true;
+        result.flagged = blob.flagged = true;
     }
 
     //must be outside loop since all blobs will be draw to same pixels
-    if (blobsResult.flagged && config.draw) {
+    if (result.flagged && config.draw) {
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
         // iterate blobs and draw bounds in pixels
-        for (auto &blob : blobsResult.blobs) {
+        for (auto &blob : result.blobs) {
 
             // skip if not flagged
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(blob.bounds, config, results.pixels.ptr);
+            SetRgbPixels(blob.bounds, config, pixels.ptr);
         }
     }
 }
@@ -1170,7 +1267,7 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
 
 // rgb multi regions blobs
 void
-RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, Results &results) {
+RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions, const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) {
 
     // will be used after main loop if config.draw == true
     bool flagged = false;
@@ -1184,11 +1281,11 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
     // use size of regions to determine loop
     const size_t regionsLength = regions.size();
 
-    // get reference to blobsResult vector
-    std::vector<BlobsResult> &blobsResultVec = results.blobsResults;
+    // get reference to results
+    std::vector<Result> &results = callbackData.results;
 
-    // reserve memory for blobsResult vector
-    blobsResultVec.reserve(regionsLength);
+    // reserve memory
+    results.reserve(regionsLength);
 
     // start looping regions and filling results
     for (uint32_t r = 0; r < regionsLength; ++r) {
@@ -1196,11 +1293,11 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
         // get reference to region
         const Region &region = regions[r];
 
-        // create blobsResultsEx in vector
-        blobsResultVec.emplace_back(BlobsResult{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
+        // create Result in vector
+        results.emplace_back(Result{region.name.data(), Bounds{region.bounds.maxX, region.bounds.minX, region.bounds.maxY, region.bounds.minY}});
 
-        // get reference to blobsResult that was just pushed into vector
-        BlobsResult &blobsResult = blobsResultVec.back();
+        // get reference to last Result in vector
+        Result &result = results.back();
 
         // all pixels set to -1 will those set to -2 will be ignored
         for (uint32_t y = region.bounds.minY; y <= region.bounds.maxY; ++y) {
@@ -1209,35 +1306,35 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
                     labels[p] = -2;// set to -2 to mark as pixel to ignore
                 } else {
                     labels[p] = -1;// set to -1 to mark as pixel of interest
-                    SetMin(x, blobsResult.bounds.minX);
-                    SetMax(x, blobsResult.bounds.maxX);
-                    SetMin(y, blobsResult.bounds.minY);
-                    SetMax(y, blobsResult.bounds.maxY);
-                    ++blobsResult.percent;
+                    SetMin(x, result.bounds.minX);
+                    SetMax(x, result.bounds.maxX);
+                    SetMin(y, result.bounds.minY);
+                    SetMax(y, result.bounds.maxY);
+                    ++result.percent;
                 }
             }
         }
 
         // calculate percent size of blobbed pixels
-        blobsResult.percent = 100 * blobsResult.percent / region.bitsetCount;
+        result.percent = 100 * result.percent / region.bitsetCount;
 
         // if percent threshold is not met, skip blobbing the pixels
-        if (region.percent > blobsResult.percent) continue;
+        if (region.percent > result.percent) continue;
 
         // assign label to each pixel and return count of unique labels
-        uint32_t blobCount = LabelImage(config, blobsResult.bounds, labels);
+        uint32_t blobCount = LabelImage(config, result.bounds, labels);
 
         // get reference to blobs vector
-        std::vector<Blob> &blobs = blobsResult.blobs;
+        std::vector<Blob> &blobs = result.blobs;
 
         // fill vector with blobs using the previous bounds results
-        blobs.assign(blobCount, Blob{Bounds{blobsResult.bounds.maxX, blobsResult.bounds.minX, blobsResult.bounds.maxY, blobsResult.bounds.minY}});
+        blobs.assign(blobCount, Blob{Bounds{result.bounds.maxX, result.bounds.minX, result.bounds.maxY, result.bounds.minY}});
 
         // loop rows within upper and lower bounds
-        for (uint32_t y = blobsResult.bounds.minY; y <= blobsResult.bounds.maxY; ++y) {
+        for (uint32_t y = result.bounds.minY; y <= result.bounds.maxY; ++y) {
 
             // loop columns within left and right bounds
-            for (uint32_t x = blobsResult.bounds.minX, p = y * config.width + x; x <= blobsResult.bounds.maxX; ++x, ++p) {
+            for (uint32_t x = result.bounds.minX, p = y * config.width + x; x <= result.bounds.maxX; ++x, ++p) {
 
                 // get pixel label as blob index
                 int32_t b = labels[p];
@@ -1261,7 +1358,7 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
             blob.percent = 100 * blob.percent / region.bitsetCount;
             if (region.percent > blob.percent) continue;
             blob.label = b;
-            flagged = blobsResult.flagged = blob.flagged = true;
+            flagged = result.flagged = blob.flagged = true;
         }
     }
 
@@ -1270,27 +1367,30 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
 
         // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
+        // get reference to Pixels
+        Pixels &pixels = callbackData.pixels;
+
         // set pixels data in results
-        results.pixels.ptr = new uint8_t[config.byteLength]();
-        results.pixels.size = config.byteLength;
+        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, results.pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
 
-        // iterate blobsResults vector
-        for (auto &blobsResult : blobsResultVec) {
+        // iterate Result vector
+        for (auto &result : results) {
 
             // skip if not flagged
-            if (!blobsResult.flagged) continue;
+            if (!result.flagged) continue;
 
             // iterate blobs and draw bounds in pixels
-            for (auto &blob : blobsResult.blobs) {
+            for (auto &blob : result.blobs) {
 
                 // skip if not flagged
                 if (!blob.flagged) continue;
 
                 // write bounds into pixels
-                SetRgbPixels(blob.bounds, config, results.pixels.ptr);
+                SetRgbPixels(blob.bounds, config, pixels.ptr);
             }
         }
     }
@@ -1341,110 +1441,110 @@ SetFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFu
     switch (engineType) {
         case GRAY_ALL_PERCENT: {//0
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllPercentExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
         case GRAY_ALL_BOUNDS: {//1
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllBoundsExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case GRAY_ALL_BLOBS:{//2
+        case GRAY_ALL_BLOBS: {//2
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayAllBlobsExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
-        case GRAY_REGION_PERCENT:{//10
+        case GRAY_REGION_PERCENT: {//10
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionPercentExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionPercentExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
-        case GRAY_REGION_BOUNDS:{//11
+        case GRAY_REGION_BOUNDS: {//11
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionBoundsExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case GRAY_REGION_BLOBS:{//12
+        case GRAY_REGION_BLOBS: {//12
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionBlobsExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
-        case GRAY_REGIONS_PERCENT:{//20
+        case GRAY_REGIONS_PERCENT: {//20
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsPercentExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
-        case GRAY_REGIONS_BOUNDS:{//21
+        case GRAY_REGIONS_BOUNDS: {//21
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBoundsExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case GRAY_REGIONS_BLOBS:{//22
+        case GRAY_REGIONS_BLOBS: {//22
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {GrayRegionsBlobsExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
         case RGB_ALL_PERCENT: {//100
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllPercentExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
         case RGB_ALL_BOUNDS: {//101
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllBoundsExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case RGB_ALL_BLOBS:{//102
+        case RGB_ALL_BLOBS: {//102
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbAllBlobsExecute(config, {all}, buf0, buf1, results);};
-            callbackFunc = &AllBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
-        case RGB_REGION_PERCENT:{//110
+        case RGB_REGION_PERCENT: {//110
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionPercentExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionPercentExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
-        case RGB_REGION_BOUNDS:{//111
+        case RGB_REGION_BOUNDS: {//111
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionBoundsExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case RGB_REGION_BLOBS:{//112
+        case RGB_REGION_BLOBS: {//112
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionBlobsExecute(config, region, buf0, buf1, results);};
-            callbackFunc = &RegionBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
-        case RGB_REGIONS_PERCENT:{//20
+        case RGB_REGIONS_PERCENT: {//20
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsPercentExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsPercentCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &PercentCallback;
             break;
         }
-        case RGB_REGIONS_BOUNDS:{//21
+        case RGB_REGIONS_BOUNDS: {//21
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsBoundsExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsBoundsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &BoundsCallback;
             break;
         }
-        case RGB_REGIONS_BLOBS:{//22
+        case RGB_REGIONS_BLOBS: {//22
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, Results &results) {RgbRegionsBlobsExecute(config, regions, buf0, buf1, results);};
-            callbackFunc = &RegionsBlobsCallback;
+            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
+            callbackFunc = &BlobsCallback;
             break;
         }
         default:

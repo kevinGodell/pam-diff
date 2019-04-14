@@ -4,17 +4,15 @@
 #include "engine.h"
 #include "napi.h"
 #include <cstdint>
-#include <string>
-#include <vector>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // create js object and push to js array
 inline void
-SetPercentResult(const Napi::Env &env, const PercentResult &percentResult, Napi::Array &resultsJs, const uint32_t index = 0) {
+SetPercentResult(const Napi::Env &env, const Result &result, Napi::Array &resultsJs, const uint32_t index = 0) {
     Napi::Object obj = Napi::Object::New(env);
-    obj.Set("name", percentResult.name);
-    obj.Set("percent", percentResult.percent);
+    obj.Set("name", result.name);
+    obj.Set("percent", result.percent);
     resultsJs.Set(index, obj);
 }
 
@@ -22,31 +20,32 @@ SetPercentResult(const Napi::Env &env, const PercentResult &percentResult, Napi:
 
 // create js object and push to js array
 inline void
-SetBoundsResult(const Napi::Env &env, const BoundsResult &boundsResult, Napi::Array &resultsJs, const uint32_t index = 0) {
+SetBoundsResult(const Napi::Env &env, const Result &result, Napi::Array &resultsJs, const uint32_t index = 0) {
     Napi::Object obj = Napi::Object::New(env);
-    obj.Set("name", boundsResult.name);
-    obj.Set("percent", boundsResult.percent);
-    obj.Set("minX", boundsResult.bounds.minX);
-    obj.Set("maxX", boundsResult.bounds.maxX);
-    obj.Set("minY", boundsResult.bounds.minY);
-    obj.Set("maxY", boundsResult.bounds.maxY);
+    obj.Set("name", result.name);
+    obj.Set("percent", result.percent);
+    obj.Set("minX", result.bounds.minX);
+    obj.Set("maxX", result.bounds.maxX);
+    obj.Set("minY", result.bounds.minY);
+    obj.Set("maxY", result.bounds.maxY);
     resultsJs.Set(index, obj);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// create js object and push to js array
 inline void
-SetBlobsResult(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array &resultsJs, const uint32_t index = 0) {
+SetBlobsResult(const Napi::Env &env, const Result &result, Napi::Array &resultsJs, const uint32_t index = 0) {
     Napi::Object obj = Napi::Object::New(env);
-    obj.Set("name", blobsResult.name);
-    obj.Set("percent", blobsResult.percent);
-    obj.Set("minX", blobsResult.bounds.minX);
-    obj.Set("maxX", blobsResult.bounds.maxX);
-    obj.Set("minY", blobsResult.bounds.minY);
-    obj.Set("maxY", blobsResult.bounds.maxY);
+    obj.Set("name", result.name);
+    obj.Set("percent", result.percent);
+    obj.Set("minX", result.bounds.minX);
+    obj.Set("maxX", result.bounds.maxX);
+    obj.Set("minY", result.bounds.minY);
+    obj.Set("maxY", result.bounds.maxY);
     Napi::Array blobsJs = Napi::Array::New(env);
     uint32_t j = 0;
-    for (const auto &blob : blobsResult.blobs) {
+    for (const auto &blob : result.blobs) {
         if (!blob.flagged) continue;
         Napi::Object blobJs = Napi::Object::New(env);
         blobJs.Set("label", blob.label);
@@ -63,6 +62,7 @@ SetBlobsResult(const Napi::Env &env, const BlobsResult &blobsResult, Napi::Array
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// draw bounding box in gray pixels
 inline void
 SetGrayPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
     uint32_t i = bounds.minY * config.width + bounds.minX;
@@ -81,6 +81,7 @@ SetGrayPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+// draw bounding box in rgb(a) pixels
 inline void
 SetRgbPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
     uint32_t inc = config.depth;
@@ -110,35 +111,17 @@ SetRgbPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void
-AllPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionsPercentCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+PercentCallback(const Napi::Env &env, const Napi::Function &cb, const CallbackData &callbackData);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void
-AllBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionsBoundsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+BoundsCallback(const Napi::Env &env, const Napi::Function &cb, const CallbackData &callbackData);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 void
-AllBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
-
-void
-RegionsBlobsCallback(const Napi::Env &env, const Napi::Function &cb, const Results &results);
+BlobsCallback(const Napi::Env &env, const Napi::Function &cb, const CallbackData &callbackData);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
