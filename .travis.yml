@@ -12,35 +12,44 @@ dist: xenial
 #osx_image: xcode10.2
 matrix:
   include:
-    - os: linux
+#    - os: linux
+#      node_js:
+#        - 8
+#    - os: linux
+#      node_js:
+#        - 9
+#    - os: linux
+#      node_js:
+#        - 10
+#    - os: linux
+#      node_js:
+#        - 11
+#    - os: osx
+#      node_js:
+#        - 8
+#    - os: osx
+#      node_js:
+#        - 9
+#    - os: osx
+#      node_js:
+#        - 10
+#    - os: osx
+#      node_js:
+#        - 11
+    - os: windows
       node_js:
         - 8
-    - os: linux
+    - os: windows
       node_js:
         - 9
-    - os: linux
+    - os: windows
       node_js:
         - 10
-    - os: linux
-      node_js:
-        - 11
-    - os: osx
-      node_js:
-        - 8
-    - os: osx
-      node_js:
-        - 9
-    - os: osx
-      node_js:
-        - 10
-    - os: osx
-      node_js:
-        - 11
     - os: windows
       node_js:
         - 11
 before_script:
-  - cat build/addon.target.mk
+#  - cat build/addon.target.mk
   - npm --version
   - npm i -g npm
   - npm --version
