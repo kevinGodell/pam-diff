@@ -1,63 +1,48 @@
 language: node_js
-#node_js:
-#  - 8
-#  - 9
-#  - lts/*
-#  - node
-#os:
-#  - linux
-#  - osx
-#  - windows
 dist: xenial
 #osx_image: xcode10.2
 matrix:
   include:
-#    - os: linux
-#      node_js:
-#        - 8
-#    - os: linux
-#      node_js:
-#        - 9
-#    - os: linux
-#      node_js:
-#        - 10
-#    - os: linux
-#      node_js:
-#        - 11
-#    - os: osx
-#      node_js:
-#        - 8
-#    - os: osx
-#      node_js:
-#        - 9
-#    - os: osx
-#      node_js:
-#        - 10
-#    - os: osx
-#      node_js:
-#        - 11
-    - os: windows
+    - os: linux
+      node_js:
+        - 7
+    - os: linux
       node_js:
         - 8
-    - os: windows
+    - os: linux
       node_js:
         - 9
-    - os: windows
+    - os: linux
       node_js:
         - 10
-    - os: windows
+    - os: linux
+      node_js:
+        - 11
+    - os: osx
+      node_js:
+        - 7
+    - os: osx
+      node_js:
+        - 8
+    - os: osx
+      node_js:
+        - 9
+    - os: osx
+      node_js:
+        - 10
+    - os: osx
       node_js:
         - 11
 before_script:
-#  - cat build/addon.target.mk == windows fail
+  - cat build/addon.target.mk == windows fail
   - npm --version
 #  - npm i -g npm == windows fail
 #  - npm --version
   - node --version
 script:
-  - npm run draw:big
-  - npm run draw:big:gc
-#  - npm test
+#  - npm run draw:big
+#  - npm run draw:big:gc
+  - npm test
 #  - npm run gray:regions:5
 #  - npm run gray:regions:6
 cache:
