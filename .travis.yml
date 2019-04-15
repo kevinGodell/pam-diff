@@ -36,6 +36,9 @@ matrix:
     - os: osx
       node_js:
         - 11
+    - os: windows
+      node_js:
+        - 11
 before_script:
   - cat build/addon.target.mk
   - npm --version
