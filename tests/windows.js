@@ -88,7 +88,7 @@ pamDiff.on('diff', data => {
     assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
-const ffmpeg = spawn('ffmpeg.exe', params, {stdio: ['ignore', 'pipe', 'inherit']});
+const ffmpeg = spawn('./ffmpeg.exe', params, {stdio: ['ignore', 'pipe', 'inherit']});
 
 ffmpeg.on('error', error => {
     console.log(error);

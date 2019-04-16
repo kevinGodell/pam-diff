@@ -15,7 +15,7 @@ before_script:
   - npm install ffbinaries
   - ffbinaries
 script:
-  - node tests/windows.js
+  - npm run windows
 #  - npm run draw:big
 #  - npm run draw:big:gc
 #  - npm test
