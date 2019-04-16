@@ -7,7 +7,7 @@ matrix:
       node_js:
         - 9
 before_script:
-  - cat build/addon.target.mk == windows fail
+#  - cat build/addon.target.mk == windows fail
   - npm --version
 #  - npm i -g npm == windows fail
 #  - npm --version
