@@ -3,46 +3,22 @@ dist: xenial
 #osx_image: xcode10.2
 matrix:
   include:
-    - os: linux
-      node_js:
-        - 7
-    - os: linux
-      node_js:
-        - 8
-    - os: linux
+    - os: windows
       node_js:
         - 9
-    - os: linux
-      node_js:
-        - 10
-    - os: linux
-      node_js:
-        - 11
-    - os: osx
-      node_js:
-        - 7
-    - os: osx
-      node_js:
-        - 8
-    - os: osx
-      node_js:
-        - 9
-    - os: osx
-      node_js:
-        - 10
-    - os: osx
-      node_js:
-        - 11
 before_script:
   - cat build/addon.target.mk == windows fail
   - npm --version
 #  - npm i -g npm == windows fail
 #  - npm --version
   - node --version
+  - npm install ffbinaries
+  - ffbinaries
 script:
+  - node tests/windows.js
 #  - npm run draw:big
 #  - npm run draw:big:gc
-  - npm test
+#  - npm test
 #  - npm run gray:regions:5
 #  - npm run gray:regions:6
 cache:
