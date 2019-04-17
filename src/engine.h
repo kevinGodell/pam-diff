@@ -86,12 +86,13 @@ struct Blob {
 };
 
 struct Pixels {
-    uint8_t *ptr;
+    std::unique_ptr<uint8_t[]> ptr;
+    //uint8_t *ptr;
     uint32_t size;
 
     Pixels() : ptr(nullptr), size(0) {}
 
-    Pixels(uint8_t *_ptr, uint32_t _size) : ptr(_ptr), size(_size) {}
+    //Pixels(uint8_t *_ptr, uint32_t _size) : ptr(_ptr), size(_size) {}
 };
 
 struct Result {
@@ -116,7 +117,7 @@ struct CallbackData {
 
 typedef std::function<void(const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData)> ExecuteFunc;
 
-typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, const CallbackData &callbackData)> CallbackFunc;
+typedef std::function<void(const Napi::Env &env, const Napi::Function &cb, CallbackData &callbackData)> CallbackFunc;
 
 // absolute value
 inline uint32_t

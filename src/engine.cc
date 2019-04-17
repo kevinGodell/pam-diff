@@ -205,20 +205,18 @@ GrayAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, 
     // draw bounds into pixels
     if (config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // write bounds into pixels
-        SetGrayPixels(result.bounds, config, pixels.ptr);
+        SetGrayPixels(result.bounds, config, pixels.ptr.get());
     }
 }
 
@@ -261,20 +259,18 @@ GrayRegionBoundsExecute(const Config &config, const Region &region, const uint8_
     // draw bounds into pixels
     if (config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // write bounds into pixels
-        SetGrayPixels(result.bounds, config, pixels.ptr);
+        SetGrayPixels(result.bounds, config, pixels.ptr.get());
     }
 }
 
@@ -330,17 +326,15 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
     //must be outside loop since all bounds will be draw to same pixels
     if (flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobsResults vector
         for (auto &result : results) {
@@ -349,7 +343,7 @@ GrayRegionsBoundsExecute(const Config &config, const std::vector<Region> &region
             if (!result.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(result.bounds, config, pixels.ptr);
+            SetGrayPixels(result.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -437,17 +431,15 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     //must be outside loop since all blobs will be draw to same pixels
     if (result.flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobs and draw bounds in pixels
         for (auto &blob : result.blobs) {
@@ -456,7 +448,7 @@ GrayAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, c
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(blob.bounds, config, pixels.ptr);
+            SetGrayPixels(blob.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -544,17 +536,15 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
     //must be outside loop since all blobs will be draw to same pixels
     if (result.flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobs and draw bounds in pixels
         for (auto &blob : result.blobs) {
@@ -563,7 +553,7 @@ GrayRegionBlobsExecute(const Config &config, const Region &region, const uint8_t
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetGrayPixels(blob.bounds, config, pixels.ptr);
+            SetGrayPixels(blob.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -664,17 +654,15 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
     //must be outside loop since all blobs will be draw to same pixels
     if (flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate Result vector
         for (auto &result : results) {
@@ -689,7 +677,7 @@ GrayRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions
                 if (!blob.flagged) continue;
 
                 // write bounds into pixels
-                SetGrayPixels(blob.bounds, config, pixels.ptr);
+                SetGrayPixels(blob.bounds, config, pixels.ptr.get());
             }
         }
     }
@@ -852,20 +840,19 @@ RgbAllBoundsExecute(const Config &config, const All &all, const uint8_t *buf0, c
     // draw bounds into pixels
     if (config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
 
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // write bounds into pixels
-        SetRgbPixels(result.bounds, config, pixels.ptr);
+        SetRgbPixels(result.bounds, config, pixels.ptr.get());
     }
 }
 
@@ -908,20 +895,18 @@ RgbRegionBoundsExecute(const Config &config, const Region &region, const uint8_t
     // draw bounds into pixels
     if (config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // write bounds into pixels
-        SetRgbPixels(result.bounds, config, pixels.ptr);
+        SetRgbPixels(result.bounds, config, pixels.ptr.get());
     }
 }
 
@@ -977,17 +962,15 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
     //must be outside loop since all bounds will be draw to same pixels
     if (flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobsResults vector
         for (auto &result : results) {
@@ -996,7 +979,7 @@ RgbRegionsBoundsExecute(const Config &config, const std::vector<Region> &regions
             if (!result.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(result.bounds, config, pixels.ptr);
+            SetRgbPixels(result.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -1084,17 +1067,15 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
     //must be outside loop since all blobs will be draw to same pixels
     if (result.flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobs and draw bounds in pixels
         for (auto &blob : result.blobs) {
@@ -1103,7 +1084,7 @@ RgbAllBlobsExecute(const Config &config, const All &all, const uint8_t *buf0, co
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(blob.bounds, config, pixels.ptr);
+            SetRgbPixels(blob.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -1191,17 +1172,15 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
     //must be outside loop since all blobs will be draw to same pixels
     if (result.flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate blobs and draw bounds in pixels
         for (auto &blob : result.blobs) {
@@ -1210,7 +1189,7 @@ RgbRegionBlobsExecute(const Config &config, const Region &region, const uint8_t 
             if (!blob.flagged) continue;
 
             // write bounds into pixels
-            SetRgbPixels(blob.bounds, config, pixels.ptr);
+            SetRgbPixels(blob.bounds, config, pixels.ptr.get());
         }
     }
 }
@@ -1311,17 +1290,15 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
     //must be outside loop since all blobs will be draw to same pixels
     if (flagged && config.draw) {
 
-        // todo use shared pointer instead of relying on napi buffer to clean up(untested idea)
-
         // get reference to Pixels
         Pixels &pixels = callbackData.pixels;
 
         // set pixels data in results
-        pixels.ptr = new uint8_t[config.byteLength]();
+        pixels.ptr = std::unique_ptr<uint8_t[]>(new uint8_t[config.byteLength]);
         pixels.size = config.byteLength;
 
         // copy buf1 into pixels
-        std::copy(buf1, buf1 + config.byteLength, pixels.ptr);
+        std::copy(buf1, buf1 + config.byteLength, pixels.ptr.get());
 
         // iterate Result vector
         for (auto &result : results) {
@@ -1336,7 +1313,7 @@ RgbRegionsBlobsExecute(const Config &config, const std::vector<Region> &regions,
                 if (!blob.flagged) continue;
 
                 // write bounds into pixels
-                SetRgbPixels(blob.bounds, config, pixels.ptr);
+                SetRgbPixels(blob.bounds, config, pixels.ptr.get());
             }
         }
     }
@@ -1387,109 +1364,109 @@ SetFunctions(const Napi::Object &configObj, ExecuteFunc &executeFunc, CallbackFu
     switch (engineType) {
         case GRAY_ALL_PERCENT: {//0
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
         case GRAY_ALL_BOUNDS: {//1
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
         case GRAY_ALL_BLOBS: {//2
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
         case GRAY_REGION_PERCENT: {//10
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionPercentExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionPercentExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
         case GRAY_REGION_BOUNDS: {//11
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
         case GRAY_REGION_BLOBS: {//12
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
         case GRAY_REGIONS_PERCENT: {//20
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
         case GRAY_REGIONS_BOUNDS: {//21
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
         case GRAY_REGIONS_BLOBS: {//22
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { GrayRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { GrayRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
         case RGB_ALL_PERCENT: {//100
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbAllPercentExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
         case RGB_ALL_BOUNDS: {//101
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbAllBoundsExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
         case RGB_ALL_BLOBS: {//102
             const All all = All{"all", difference, percent};
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
+            executeFunc = [config, all](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbAllBlobsExecute(config, {all}, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
         case RGB_REGION_PERCENT: {//110
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionPercentExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionPercentExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
         case RGB_REGION_BOUNDS: {//111
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionBoundsExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
         case RGB_REGION_BLOBS: {//112
             const Region region = RegionJsToCpp(configObj.Get("regions").As<Napi::Array>().Get(0u).As<Napi::Object>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
+            executeFunc = [config, region](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionBlobsExecute(config, region, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
-        case RGB_REGIONS_PERCENT: {//20
+        case RGB_REGIONS_PERCENT: {//120
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionsPercentExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &PercentCallback;
             break;
         }
-        case RGB_REGIONS_BOUNDS: {//21
+        case RGB_REGIONS_BOUNDS: {//121
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionsBoundsExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &BoundsCallback;
             break;
         }
-        case RGB_REGIONS_BLOBS: {//22
+        case RGB_REGIONS_BLOBS: {//122
             const std::vector<Region> regions = RegionsJsToCpp(configObj.Get("regions").As<Napi::Array>());
-            executeFunc = [=](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) { RgbRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
+            executeFunc = [config, regions](const uint8_t *buf0, const uint8_t *buf1, CallbackData &callbackData) -> void { RgbRegionsBlobsExecute(config, regions, buf0, buf1, callbackData); };
             callbackFunc = &BlobsCallback;
             break;
         }
