@@ -5,6 +5,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include <memory>
 
 enum Engines {// ordered by depth -> target -> response
     GRAY_ALL_PERCENT = 0,
