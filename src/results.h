@@ -1,6 +1,16 @@
 #ifndef SRC_RESULTS_H_
 #define SRC_RESULTS_H_
 
+#ifndef GRAY
+#define GRAY 0xF0;
+#endif
+
+#if !defined(RED) || !defined(GREEN) || !defined(BLUE)
+#define RED 0xFF;
+#define GREEN 0xFF;
+#define BLUE 0x00;
+#endif
+
 #include "engine.h"
 #include "napi.h"
 #include <cstdint>
@@ -68,14 +78,14 @@ SetGrayPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
     uint32_t i = bounds.minY * config.width + bounds.minX;
     uint32_t j = bounds.maxY * config.width + bounds.minX;
     for (uint32_t x = bounds.minX; x <= bounds.maxX; ++x, ++i, ++j) {
-        pixels[i] = 0xF0;// top
-        pixels[j] = 0xF0;// bottom
+        pixels[i] = GRAY;// top
+        pixels[j] = GRAY;// bottom
     }
     i = (bounds.minY + 1) * config.width + bounds.minX;
     j = (bounds.minY + 1) * config.width + bounds.maxX;
     for (uint32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += config.width, j += config.width) {
-        pixels[i] = 0xF0;// left
-        pixels[j] = 0xF0;// right
+        pixels[i] = GRAY;// left
+        pixels[j] = GRAY;// right
     }
 }
 
@@ -88,23 +98,23 @@ SetRgbPixels(const Bounds &bounds, const Config &config, uint8_t *pixels) {
     uint32_t i = bounds.minY * config.width * config.depth + bounds.minX * config.depth;
     uint32_t j = bounds.maxY * config.width * config.depth + bounds.minX * config.depth;
     for (uint32_t x = bounds.minX; x <= bounds.maxX; ++x, i += inc, j += inc) {
-        pixels[i] = 0xFF;// top
-        pixels[i + 1] = 0xFF;
-        pixels[i + 2] = 0x00;
-        pixels[j] = 0xFF;// bottom
-        pixels[j + 1] = 0xFF;
-        pixels[j + 2] = 0x00;
+        pixels[i] = RED;// top
+        pixels[i + 1] = GREEN;
+        pixels[i + 2] = BLUE;
+        pixels[j] = RED;// bottom
+        pixels[j + 1] = GREEN;
+        pixels[j + 2] = BLUE;
     }
     inc = config.width * config.depth;
     i = (bounds.minY + 1) * config.width * config.depth + bounds.minX * config.depth;
     j = (bounds.minY + 1) * config.width * config.depth + bounds.maxX * config.depth;
     for (uint32_t y = bounds.minY, yLimit = bounds.maxY - 1; y < yLimit; ++y, i += inc, j += inc) {
-        pixels[i] = 0xFF;// left
-        pixels[i + 1] = 0xFF;
-        pixels[i + 2] = 0x00;
-        pixels[j] = 0xFF;// right
-        pixels[j + 1] = 0xFF;
-        pixels[j + 2] = 0x00;
+        pixels[i] = RED;// left
+        pixels[i + 1] = GREEN;
+        pixels[i + 2] = BLUE;
+        pixels[j] = RED;// right
+        pixels[j + 1] = GREEN;
+        pixels[j + 2] = BLUE;
     }
 }
 
