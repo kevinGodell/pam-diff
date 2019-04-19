@@ -6,12 +6,12 @@
   "scripts": {
     "__install": "node-gyp rebuild",
     "__pretest": "npm install",
-    "test": "npm run gray && npm run rgb && npm run rgba",
     "preversion": "npm install && npm test",
     "postversion": "npm run doc",
     "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
     "all": "npm test && npm run examples && npm run jpeg",
     "doc": "jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
+    "test": "npm run gray && npm run rgb && npm run rgba",
     "gray": "npm run gray:all && npm run gray:mask && npm run gray:region && npm run gray:regions",
     "gray:all": "npm run gray:all:1 && npm run gray:all:2 && npm run gray:all:3 && npm run gray:all:4 && npm run gray:all:5 && npm run gray:all:6",
     "gray:all:1": "node tests/test_gray --sync false --response percent",
@@ -122,8 +122,7 @@
     "draw:rgb:sync": "node --expose-gc examples/createPam --pixfmt rgb24 --sync true --response blobs --draw true --target regions",
     "draw:rgba:sync": "node --expose-gc examples/createPam --pixfmt rgba --sync true --response blobs --draw true --target regions",
     "draw:big": "node examples/createPam2",
-    "draw:big:gc": "node --expose-gc examples/createPam2",
-    "windows": "node tests/windows"
+    "draw:big:gc": "node --expose-gc examples/createPam2"
   },
   "repository": {
     "type": "git",
