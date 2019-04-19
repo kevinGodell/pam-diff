@@ -1,26 +1,23 @@
 image:
-  - Visual Studio 2017
+#  - Visual Studio 2017
   - Ubuntu1804
 environment:
   matrix:
     - nodejs_version: 8
-    - nodejs_version: 9
-    - nodejs_version: LTS
-    - nodejs_version: Current
+#    - nodejs_version: 9
+#    - nodejs_version: LTS
+#    - nodejs_version: Current
 platform:
   - x86
   - x64
-
 cache:
   - node_modules
 install:
-  - ps: Install-Product node $env:nodejs_version $env:platform
-#  - npm install polygon-points
-#  - npm cache clean --force
-  - npm install
-#  - npm install --cache /tmp/empty-cache
+  - cmd: powershell Install-Product node $env:nodejs_version $env:platform
+  - sh: nvm install $nodejs_version
   - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
   - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER"
+  - npm install
 before_test:
 #  - npm i -g npm
 test_script:
