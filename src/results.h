@@ -5,9 +5,15 @@
 #define GRAY 0xF0;
 #endif
 
-#if !defined(RED) || !defined(GREEN) || !defined(BLUE)
+#ifndef RED
 #define RED 0xFF;
+#endif
+
+#ifndef GREEN
 #define GREEN 0xFF;
+#endif
+
+#ifndef BLUE
 #define BLUE 0x00;
 #endif
 
