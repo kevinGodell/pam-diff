@@ -1,5 +1,5 @@
 image:
-#  - Visual Studio 2017
+  - Visual Studio 2017
   - Ubuntu1804
 environment:
   matrix:
@@ -10,6 +10,10 @@ environment:
 platform:
   - x86
   - x64
+matrix:
+  exclude:
+    - image: Ubuntu1804
+      platform: x86
 cache:
   - node_modules
 install:
@@ -24,7 +28,6 @@ test_script:
   - node --version
   - npm --version
   - npm test
-#  - npm run gray:region
 on_success:
 #  - npm run examples
 #  - npm run jpeg
