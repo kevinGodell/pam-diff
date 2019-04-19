@@ -1,8 +1,9 @@
 image:
-  - Visual Studio 2017
   - Ubuntu1804
+  - Visual Studio 2017
 environment:
   matrix:
+    - nodejs_version: 7
     - nodejs_version: 8
     - nodejs_version: 9
     - nodejs_version: 10
@@ -11,6 +12,7 @@ platform:
   - x86
   - x64
 matrix:
+  fast_finish: true
   exclude:
     - image: Ubuntu1804
       platform: x86
@@ -23,12 +25,10 @@ install:
   - ps: $env:package_version = (Get-Content -Raw -Path package.json | ConvertFrom-Json).version
   - ps: Update-AppveyorBuild -Version "$env:package_version-$env:APPVEYOR_REPO_BRANCH-$env:APPVEYOR_BUILD_NUMBER"
 before_test:
-#  - npm i -g npm
-test_script:
   - node --version
   - npm --version
+test_script:
   - npm test
 on_success:
 #  - npm run examples
-#  - npm run jpeg
 build: off
