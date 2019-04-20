@@ -84,7 +84,7 @@ const region1 = {name: 'region1', difference: 1, percent: 1, polygon: [{x: 0, y:
 
 const regions = [region1];
 
-const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw});
+const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw, debug: true});
 
 pamDiff.on('diff', data => {
     assert(data.trigger[0].name === 'region1', 'trigger name is not correct');

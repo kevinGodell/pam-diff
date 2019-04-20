@@ -10,11 +10,12 @@ class PamDiff extends Transform {
     /**
      *
      * @param [options] {Object}
+     * @param [options.debug=false] {Boolean} - If true, debug info will be logged to console
      * @param [options.sync=false] {Boolean} - If true, pixel change detection will block the event loop instead of using a worker
      * @param [options.difference=5] {Number} - Pixel difference value 1 to 255
      * @param [options.percent=5] {Number} - Percent of pixels or blobs that exceed difference value
      * @param [options.response=percent] {String} - Accepted values: percent or bounds or blobs
-     * @param [options.draw=false] {Boolean} - If true and response to 'bounds' or 'blobs', return a pixel buffer with drawn bounding box
+     * @param [options.draw=false] {Boolean} - If true and response is 'bounds' or 'blobs', return a pixel buffer with drawn bounding box
      * @param [options.regions] {Array} - Array of region objects
      * @param options.regions[i].name {String} - Name of region
      * @param [options.regions[i].difference=options.difference] {Number} - Difference value for region
@@ -26,6 +27,7 @@ class PamDiff extends Transform {
     constructor(options, callback) {
         super(options);
         Transform.call(this, {objectMode: true});
+        this.debug = PamDiff._parseOptions('debug', options);// output debug info to console. defaults to false
         this.response = PamDiff._parseOptions('response', options);//percent, bounds, blobs
         this.draw = PamDiff._parseOptions('draw', options);// return pixels with bounding box if response is bounds or blobs
         this.sync = PamDiff._parseOptions('sync', options);// should be processed before regions
@@ -35,10 +37,6 @@ class PamDiff extends Transform {
         this.regions = PamDiff._parseOptions('regions', options);// can be zero regions, a single region, or multiple regions. if no regions, all pixels will be compared.
         this.callback = callback;// callback function to be called when pixel difference is detected
         this._parseChunk = this._parseFirstChunk;// first parsing will be reading settings and configuring internal pixel reading
-        //output some details if in development
-        if (process.env.NODE_ENV === 'development') {
-            console.dir(this, {showHidden: true, depth: 0, colors: true});
-        }
     }
 
     /**
@@ -98,6 +96,34 @@ class PamDiff extends Transform {
             return string;
         }
         return strings[0];
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     */
+    set debug(bool) {
+        this._debug = PamDiff._validateBoolean(bool);
+        this._processRegions();
+        this._configurePixelDiffEngine();
+    }
+
+    /**
+     *
+     * @return {Boolean}
+     */
+    get debug() {
+        return this._debug;
+    }
+
+    /**
+     *
+     * @param bool {Boolean}
+     * @return {PamDiff}
+     */
+    setDebug(bool) {
+        this.debug = bool;
+        return this;
     }
 
     /**
@@ -460,7 +486,8 @@ class PamDiff extends Transform {
         engine += this._sync ? '_sync' : '_async';
         const pixelChange = addon(config);
         this._engine = this._sync ? pixelChange.compareSync.bind(pixelChange) : pixelChange.compare.bind(pixelChange);
-        if (process.env.NODE_ENV === 'development') {
+        if (this._debug) {
+            console.dir(this, {showHidden: false, depth: 0, colors: true});
             this._parseChunk = this._parsePixelsDebug;
             this._debugEngine = engine;
             this._debugCount = 0;

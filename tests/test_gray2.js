@@ -86,7 +86,7 @@ const region2 = {polygon: [{x: 100, y: 0}, {x: 100, y: 224}, {x: 199, y: 224}, {
 
 const regions = [region1, region2];
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, sync: sync, response: response, draw: draw});
+const pamDiff = new PamDiff({difference: 1, percent: 1, mask: true, regions : regions, sync: sync, response: response, draw: draw, debug: true});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);

@@ -90,7 +90,7 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw});
+const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw, debug: true});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[3].percent, pamDiffResults[pamDiffCounter]);
