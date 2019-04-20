@@ -28,6 +28,8 @@ const draw = getVal(argv.draw, process.env.DRAW, false);// true || false
 
 const pixFmt = getVal(argv.pixfmt, process.env.PIXFMT, 'gray');// gray || rgb24 || rgba
 
+const outPath = getVal(argv.outPath, process.env.OUT_PATH, './');// ./
+
 const {cpus} = require('os');
 
 const basePathToJpeg = `${__dirname}/out/${(response === 'bounds' || response === 'blobs') && toBool(draw) ? 'draw' : 'pam'}/`;
@@ -40,7 +42,7 @@ console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const {path: ffmpegPath} = require('ffmpeg-static');
+//const {path: ffmpegPath} = require('ffmpeg-static');
 const {spawn, execFile} = require('child_process');
 const {createWriteStream} = require('fs');
 
@@ -85,7 +87,7 @@ const params = [
     'pipe:1'
 ];
 
-const ffmpeg = spawn(ffmpegPath, params, {
+const ffmpeg = spawn(`${outPath}ffmpeg`, params, {
     stdio: ['ignore', 'pipe', 'ignore']
 });
 
@@ -143,7 +145,7 @@ pamDiff.on('diff', data => {
         }
     }
     const jpeg = `${name}.jpeg`;
-    const pathToJpeg = `${basePathToJpeg}${jpeg}`;
+    const pathToJpeg = `${outPath}${jpeg}`;
 
     //const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
