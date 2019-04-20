@@ -34,16 +34,8 @@ Napi::Object CreateObject(const Napi::CallbackInfo &info) {
     if (configObj.HasOwnProperty("height")) std::cout << "height : " << configObj.Get("height").As<Napi::Number>().Uint32Value() << std::endl;
     if (configObj.HasOwnProperty("response")) std::cout << "response : " << configObj.Get("response").As<Napi::String>().Utf8Value() << std::endl;
     if (configObj.HasOwnProperty("draw")) std::cout << "draw : " << configObj.Get("draw").As<Napi::Boolean>().Value() << std::endl;
-    if (configObj.HasOwnProperty("sync")) std::cout << "sync : " << configObj.Get("sync").As<Napi::Boolean>().Value() << std::endl;
-    if (configObj.HasOwnProperty("target")) std::cout << "target : " << configObj.Get("target").As<Napi::String>().Utf8Value() << std::endl;
     if (configObj.HasOwnProperty("difference")) std::cout << "difference : " << configObj.Get("difference").As<Napi::Number>().Uint32Value() << std::endl;
     if (configObj.HasOwnProperty("percent")) std::cout << "percent : " << configObj.Get("percent").As<Napi::Number>().Uint32Value() << std::endl;
-    if (configObj.HasOwnProperty("bitsetCount")) std::cout << "bitsetCount : " << configObj.Get("bitsetCount").As<Napi::Number>().Uint32Value() << std::endl;
-    if (configObj.HasOwnProperty("bitset")) std::cout << "bitset length : " << configObj.Get("bitset").As<Napi::Buffer<bool>>().Length() << std::endl;
-    if (configObj.HasOwnProperty("minX")) std::cout << "minX : " << configObj.Get("minX").As<Napi::Number>().Uint32Value() << std::endl;
-    if (configObj.HasOwnProperty("maxX")) std::cout << "maxX : " << configObj.Get("maxX").As<Napi::Number>().Uint32Value() << std::endl;
-    if (configObj.HasOwnProperty("minY")) std::cout << "minY : " << configObj.Get("minY").As<Napi::Number>().Uint32Value() << std::endl;
-    if (configObj.HasOwnProperty("maxY")) std::cout << "maxY : " << configObj.Get("maxY").As<Napi::Number>().Uint32Value() << std::endl;
     if (configObj.HasOwnProperty("regions")) {
         const Napi::Array regionsJs = configObj.Get("regions").As<Napi::Array>();
         //uint32_t regionsLength = regionsJs.Length();
