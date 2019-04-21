@@ -4,7 +4,7 @@ const {Transform} = require('stream');
 
 const PP = require('polygon-points');
 
-const addon = require('bindings')('addon');
+const PC = require('pixel-change');
 
 class PamDiff extends Transform {
     /**
@@ -484,7 +484,7 @@ class PamDiff extends Transform {
             engine += '_draw';
         }
         engine += this._sync ? '_sync' : '_async';
-        const pixelChange = addon(config);
+        const pixelChange = PC(config);
         this._engine = this._sync ? pixelChange.compareSync.bind(pixelChange) : pixelChange.compare.bind(pixelChange);
         if (this._debug) {
             console.dir(this, {showHidden: false, depth: 0, colors: true});
