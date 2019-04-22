@@ -145,7 +145,7 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
-    "pixel-change": "0.0.15",
+    "pixel-change": "^0.1.1",
     "polygon-points": "^0.6.0"
   },
   "devDependencies": {
