@@ -11,6 +11,7 @@ npm install pam-diff@latest --save
 #### *New Feature:* Starting with version 0.13.5, the option to get the pixel buffer containing the drawn x y bounding box can be set by passing `{draw: true}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.6, the option to filter results by connected component labelling can be set by passing `{response: "blobs"}` to the pam-diff constructor.
 #### *New Feature:* Starting with version 0.13.6, async behavior will now be default. If you need the pixel difference measurements to block the event loop, use `{sync: true}`.
+#### *New Feature:* Starting with version 1.0.0, pre-built binaries will be used. If binaries are not available, installation will fall back to node-gyp.
 ### Usage Options:
 ##### When comparing 2 equally sized buffers of grayscale, rgb, or rgba pixels, there are several options:
 1. all (default)
