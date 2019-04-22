@@ -4,12 +4,9 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
-    "__install": "node-gyp rebuild",
-    "__pretest": "npm install",
     "preversion": "npm install && npm test",
     "postversion": "npm run doc",
     "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
-    "all": "npm test && npm run examples && npm run jpeg",
     "doc": "jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "gray": "npm run gray:all && npm run gray:mask && npm run gray:region && npm run gray:regions",
@@ -99,10 +96,6 @@
     "rgba:regions:4": "node tests/test_rgba4 --sync true --response bounds",
     "rgba:regions:5": "node tests/test_rgba4 --sync false --response blobs",
     "rgba:regions:6": "node tests/test_rgba4 --sync true --response blobs",
-    "pub": "npm publish -tag latest",
-    "__pub": "npm publish",
-    "exp": "npm install && node tests/test_gray5 && node tests/test_gray6",
-    "jpeg": "npm run pam && npm run draw",
     "pam": "npm run pam:async && npm run pam:sync",
     "pam:async": "npm run pam:gray:async && npm run pam:rgb:async && npm run pam:rgba:async",
     "pam:gray:async": "node --expose-gc examples/createJpegs --pixfmt gray --sync false --response bounds --draw false --target regions",
@@ -157,8 +150,9 @@
   },
   "private": false,
   "files": [
-    "binding.gyp",
-    "src/*.cc",
-    "src/*.h"
+    "package.json",
+    "index.js",
+    "LICENSE",
+    "README.md"
   ]
 }
