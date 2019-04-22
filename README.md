@@ -151,7 +151,7 @@ pamDiff.callback = null;
 ### Other Resources:
 View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](https://github.com/kevinGodell/pam-diff/tree/master/tests), or [examples](https://github.com/kevinGodell/pam-diff/tree/master/examples) for more implementations.
 ### Future Plans:
-- [ ] Make pre-built binaries available when using node-gyp is not an option.
+- [x] Make pre-built binaries available when using node-gyp is not an option.
 - [x] Include option to return coordinates for bounding box of changed pixels.
 - [x] Include option to return pixel buffer containing bounding boxes.
 - [x] Introduce blob filtering to group changed pixels with their neighbors.
