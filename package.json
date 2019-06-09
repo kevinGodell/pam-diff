@@ -98,9 +98,9 @@
     "rgba:regions:6": "node tests/test_rgba4 --sync true --response blobs",
     "pam": "npm run pam:async && npm run pam:sync",
     "pam:async": "npm run pam:gray:async && npm run pam:rgb:async && npm run pam:rgba:async",
-    "pam:gray:async": "node --expose-gc examples/createJpegs --pixfmt gray --sync false --response bounds --draw false --target regions",
-    "pam:rgb:async": "node --expose-gc examples/createJpegs --pixfmt rgb24 --sync false --response bounds --draw false --target regions",
-    "pam:rgba:async": "node --expose-gc examples/createJpegs --pixfmt rgba --sync false --response bounds --draw false --target regions",
+    "pam:gray:async": "node --expose-gc examples/createPam --pixfmt gray --sync false --response bounds --draw false --target regions",
+    "pam:rgb:async": "node --expose-gc examples/createPam --pixfmt rgb24 --sync false --response bounds --draw false --target regions",
+    "pam:rgba:async": "node --expose-gc examples/createPam --pixfmt rgba --sync false --response bounds --draw false --target regions",
     "pam:sync": "npm run pam:gray:sync && npm run pam:rgb:sync && npm run pam:rgba:sync",
     "pam:gray:sync": "node --expose-gc examples/createJpegs --pixfmt gray --sync true --response bounds --draw false --target regions",
     "pam:rgb:sync": "node --expose-gc examples/createJpegs --pixfmt rgb24 --sync true --response bounds --draw false --target regions",
@@ -144,7 +144,7 @@
   "devDependencies": {
     "dotenv": "^7.0.0",
     "ffmpeg-static": "^2.4.0",
-    "jsdoc": "github:jsdoc3/jsdoc",
+    "jsdoc": "^3.6.2",
     "minimist": "^1.2.0",
     "pipe2pam": "^0.6.2"
   },
