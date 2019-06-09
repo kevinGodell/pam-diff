@@ -16,6 +16,8 @@ function getVal(...vals) {//returns first defined val or undefined
 
 //get vals in order of priority, args || env || default
 
+const nodeEnv = getVal(argv.nodeEnv, process.env.NODE_ENV, 'production');// production || development
+
 const sync = getVal(argv.sync, process.env.SYNC, false);// true || false
 
 const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
@@ -80,7 +82,7 @@ p2p.on('pam', data => {
     pamCounter++;
 });
 
-const pamDiff = new PamDiff({difference: 1, percent: 1, sync: sync, response: response, draw: draw, debug: true});
+const pamDiff = new PamDiff({difference: 1, percent: 1, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development'});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[0]);

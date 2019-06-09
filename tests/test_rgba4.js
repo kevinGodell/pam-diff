@@ -16,6 +16,8 @@ function getVal(...vals) {//returns first defined val or undefined
 
 //get vals in order of priority, args || env || default
 
+const nodeEnv = getVal(argv.nodeEnv, process.env.NODE_ENV, 'production');// production || development
+
 const sync = getVal(argv.sync, process.env.SYNC, false);// true || false
 
 const response = getVal(argv.response, process.env.RESPONSE, 'percent');// percent || bounds || blobs
@@ -90,7 +92,7 @@ const region4 = {name: 'region4', difference: 1, percent: 1, polygon: [{x: 300, 
 
 const regions = [region1, region2, region3, region4];
 
-const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw, debug: true});
+const pamDiff = new PamDiff({regions : regions, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development'});
 
 pamDiff.on('diff', data => {
     //console.log(data.trigger[3].percent, pamDiffResults[pamDiffCounter]);
