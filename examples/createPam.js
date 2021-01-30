@@ -40,7 +40,7 @@ console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const {path: ffmpegPath} = require('ffmpeg-static');
+const ffmpegPath = require('ffmpeg-static');
 const {spawn, execFile} = require('child_process');
 const {createWriteStream} = require('fs');
 
@@ -118,6 +118,8 @@ if (target === 'all') {
 }
 
 const pamDiff = new PamDiff({regions: regions, mask: mask, response: response, sync: sync, draw: draw});
+
+console.log({mask, response, sync, draw, regions})
 
 pamDiff.on('diff', data => {
     //console.log(data);

@@ -16,7 +16,7 @@ console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const ffmpegPath = require('ffmpeg-static').path;
+const ffmpegPath = require('ffmpeg-static');
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;

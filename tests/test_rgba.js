@@ -36,7 +36,7 @@ const P2P = require('pipe2pam');
 
 const PamDiff = require('../index');
 
-const ffmpegPath = require('ffmpeg-static').path;
+const ffmpegPath = require('ffmpeg-static');
 
 const spawn = require('child_process').spawn;
 
@@ -53,7 +53,7 @@ const params = [
     '-loglevel',
     'quiet',
     //'-stats',
-    
+
     /* use an artificial video input */
     //'-re',
     '-f',
