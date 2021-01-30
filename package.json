@@ -6,8 +6,9 @@
   "scripts": {
     "preversion": "npm install && npm test",
     "postversion": "npm run doc",
+    "doc": "./node_modules/.bin/jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
+    "lint": "./node_modules/.bin/eslint --fix --ext js,md .",
     "examples": "node examples/example && node examples/example2 && node examples/example3 && node examples/example4 && node examples/example5",
-    "doc": "jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
     "test": "npm run gray && npm run rgb && npm run rgba",
     "gray": "npm run gray:all && npm run gray:mask && npm run gray:region && npm run gray:regions",
     "gray:all": "npm run gray:all:1 && npm run gray:all:2 && npm run gray:all:3 && npm run gray:all:4 && npm run gray:all:5 && npm run gray:all:6",
@@ -144,9 +145,14 @@
   "devDependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "dotenv": "^7.0.0",
+    "eslint": "^7.18.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-markdown": "^1.0.2",
+    "eslint-plugin-prettier": "^3.3.1",
     "jsdoc": "^3.6.6",
     "minimist": "^1.2.5",
-    "pipe2pam": "^0.6.2"
+    "pipe2pam": "^0.6.2",
+    "prettier": "^2.2.1"
   },
   "private": false,
   "files": [
