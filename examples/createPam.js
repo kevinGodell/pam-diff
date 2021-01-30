@@ -40,7 +40,7 @@ console.log(`cpu cores available: ${cpus().length}`);
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegPath = require('../lib/ffmpeg');
 const {spawn, execFile} = require('child_process');
 const {createWriteStream} = require('fs');
 

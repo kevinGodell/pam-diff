@@ -4,7 +4,7 @@ process.env.NODE_ENV = 'development';
 
 const P2P = require('pipe2pam');
 const PamDiff = require('../index');
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegPath = require('../lib/ffmpeg');
 const ChildProcess = require('child_process');
 const spawn = ChildProcess.spawn;
 const execFile = ChildProcess.execFile;

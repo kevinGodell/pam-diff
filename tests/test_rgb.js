@@ -36,7 +36,7 @@ const P2P = require('pipe2pam');
 
 const PamDiff = require('../index');
 
-const ffmpegPath = require('ffmpeg-static');
+const ffmpegPath = require('../lib/ffmpeg');
 
 const spawn = require('child_process').spawn;
 
