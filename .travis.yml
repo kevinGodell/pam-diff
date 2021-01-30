@@ -5,6 +5,9 @@ matrix:
   include:
     - os: linux
       node_js:
+          - 8
+    - os: linux
+      node_js:
         - 10
     - os: linux
       node_js:
@@ -12,9 +15,9 @@ matrix:
     - os: linux
       node_js:
         - 14
-    - os: linux
+    - os: osx
       node_js:
-        - 16
+        - 8
     - os: osx
       node_js:
         - 10
@@ -24,9 +27,6 @@ matrix:
     - os: osx
       node_js:
         - 14
-    - os: osx
-      node_js:
-        - 16
 before_script:
   - npm --version
   - node --version
