@@ -8,19 +8,10 @@ matrix:
         - 10
     - os: linux
       node_js:
-        - 11
-    - os: linux
-      node_js:
         - 12
     - os: linux
       node_js:
-        - 13
-    - os: linux
-      node_js:
         - 14
-    - os: linux
-      node_js:
-        - 15
     - os: linux
       node_js:
         - 16
@@ -29,19 +20,10 @@ matrix:
         - 10
     - os: osx
       node_js:
-        - 11
-    - os: osx
-      node_js:
         - 12
     - os: osx
       node_js:
-        - 13
-    - os: osx
-      node_js:
         - 14
-    - os: osx
-      node_js:
-        - 15
     - os: osx
       node_js:
         - 16
