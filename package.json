@@ -142,8 +142,8 @@
     "polygon-points": "^0.6.0"
   },
   "devDependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.0.20",
     "dotenv": "^7.0.0",
-    "ffmpeg-static": "^4.2.7",
     "jsdoc": "^3.6.6",
     "minimist": "^1.2.5",
     "pipe2pam": "^0.6.2"
