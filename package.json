@@ -139,20 +139,20 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
-    "pixel-change": "^1.0.0",
+    "pixel-change": "1.0.0",
     "polygon-points": "^0.6.0"
   },
   "devDependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.0.20",
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "dotenv": "^7.0.0",
-    "eslint": "^7.18.0",
+    "eslint": "^7.32.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-markdown": "^1.0.2",
-    "eslint-plugin-prettier": "^3.3.1",
-    "jsdoc": "^3.6.6",
+    "eslint-plugin-prettier": "^3.4.1",
+    "jsdoc": "^3.6.7",
     "minimist": "^1.2.5",
     "pipe2pam": "^0.6.2",
-    "prettier": "^2.2.1"
+    "prettier": "^2.5.0"
   },
   "private": false,
   "files": [
