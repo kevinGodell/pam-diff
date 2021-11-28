@@ -7,7 +7,7 @@ Measure differences between pixel arrays extracted from pam images. Works well w
 ### Installation:
 
 ```
-npm install pam-diff@latest --save
+npm install pam-diff --save
 ```
 
 #### _Important Note:_ The js-only version will no longer receive any updates. All future work will be dedicated to the n-api version because it is much more efficient.
@@ -23,6 +23,8 @@ npm install pam-diff@latest --save
 #### _New Feature:_ Starting with version 0.13.6, async behavior will now be default. If you need the pixel difference measurements to block the event loop, use `{sync: true}`.
 
 #### _New Feature:_ Starting with version 1.0.0, pre-built binaries will be used. If binaries are not available, installation will fall back to node-gyp.
+
+#### _New Feature:_ Starting with version 1.1.0, percent is now a float to allow for more precise results. Sync option is removed.
 
 ## Usage Options:
 
@@ -111,7 +113,7 @@ pamDiff.on('diff', data => {
 
 2. callback
    - A _callback_ function will be called with a data object passed as the only argument.
-   - The callback can be passed as the 2nd argument to the constructor or it can be added later.
+   - The callback can be passed as the 2nd argument to the constructor, or it can be added later.
 
 ```javascript
 /* callback function */
