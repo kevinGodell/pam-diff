@@ -27,6 +27,8 @@ const response = getVal(argv.response, process.env.RESPONSE, 'percent'); // perc
 
 const draw = getVal(argv.draw, process.env.DRAW, false); // true || false
 
+const percent = 1;
+
 const { cpus } = require('os');
 
 console.log(`cpu cores available: ${cpus().length}`);
@@ -49,7 +51,7 @@ let pamCounter = 0;
 
 let pamDiffCounter = 0;
 
-const pamDiffResults = [14, 15, 14, 14, 14, 14, 14, 14, 14];
+const pamDiffResults = [14.74, 15.03, 14.27, 14.49, 14.5, 14, 14.99, 14.77, 14];
 
 const params = [
   /* log info to console */
@@ -85,12 +87,13 @@ p2p.on('pam', data => {
   pamCounter++;
 });
 
-const pamDiff = new PamDiff({ difference: 1, percent: 1, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
+const pamDiff = new PamDiff({ difference: 1, percent: percent, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
 
 pamDiff.on('diff', data => {
-  // console.log(data.trigger[0]);
+  // console.log(data);
+  // console.log(~~(data.trigger[0].percent * 100) / 100, pamDiffResults[pamDiffCounter]);
   assert(data.trigger[0].name === 'all', 'trigger name is not correct');
-  assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
+  assert(~~(data.trigger[0].percent * 100) / 100 === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, { stdio: ['ignore', 'pipe', 'inherit'] });

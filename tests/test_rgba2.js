@@ -117,8 +117,9 @@ const pamDiff = new PamDiff({
 });
 
 pamDiff.on('diff', data => {
+  // console.log(~~(data.trigger[0].percent));
   assert(data.trigger[0].name === 'mask', 'trigger name is not correct');
-  assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
+  assert(~~data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, { stdio: ['ignore', 'pipe', 'inherit'] });
