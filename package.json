@@ -4,6 +4,7 @@
   "description": "Measure differences between pixel arrays extracted from pam images",
   "main": "index.js",
   "scripts": {
+    "pack": "npm --verbose pack",
     "preversion": "npm install && npm test",
     "postversion": "npm run doc",
     "doc": "./node_modules/.bin/jsdoc index.js -d docs && git commit -m \"update docs\" -- docs",
