@@ -16,7 +16,7 @@ matrix:
     - image: Ubuntu1804
       platform: x86
 cache:
-  - node_modules
+#  - node_modules
 install:
   - cmd: powershell Install-Product node $env:nodejs_version $env:platform
   - sh: nvm install $nodejs_version
