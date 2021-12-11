@@ -238,4 +238,4 @@ View the [docs](https://kevingodell.github.io/pam-diff/PamDiff.html), [tests](ht
 - [x] Include option to return pixel buffer containing bounding boxes.
 - [x] Introduce blob filtering to group changed pixels with their neighbors.
 - [x] Include option to return pixel buffer containing bounding boxes around blobs.
-- [x] Make async worker threads the default. Can be overridden with {sync: true}.
+- [x] Make async worker threads the default. ~~Can be overridden with {sync: true}.~~
