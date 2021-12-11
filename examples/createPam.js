@@ -177,25 +177,23 @@ pamDiff.on('diff', data => {
 
   // const ff = execFile(ffmpegPath, ['-y', '-f', 'rawvideo', '-pix_fmt', 'gray', '-s', '640x360', '-i', 'pipe:0', '-frames', 1, '-c:v', 'mjpeg', '-pix_fmt', 'yuvj422p', '-q:v', '1', '-huffman', 'optimal', pathToJpeg]);
 
-  // ff.stdin.end(data.bc);
+  const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj420p', '-q:v', 1, '-huffman', 1, pathToJpeg]);
 
-  /* const ff = execFile(ffmpegPath, ['-y', '-f', 'pam_pipe', '-c:v', 'pam', '-i', 'pipe:0', '-c:v', 'mjpeg', '-pix_fmt', 'yuvj420p', '-q:v', 1, '-huffman', 1, pathToJpeg]);
+  ff.on('exit', (data, other) => {
+    if (data === 0) {
+      // console.log(`FFMPEG clean exit after creating ${jpeg}`);
+      ++jpegCounter;
+    } else {
+      throw new Error('FFMPEG is not working with current parameters');
+    }
+  });
 
-    ff.on('exit', (data, other) => {
-        if (data === 0) {
-            //console.log(`FFMPEG clean exit after creating ${jpeg}`);
-            ++jpegCounter;
-        } else {
-            throw new Error('FFMPEG is not working with current parameters');
-        }
-    });
+  ff.stderr.on('data', data => {
+    // console.log('ffmpeg stderr data', data);
+  });
 
-    ff.stderr.on('data', data => {
-        //console.log('ffmpeg stderr data', data);
-    });
-
-    ff.stdin.write(data.headers);
-    ff.stdin.end(data.pixels);*/
+  ff.stdin.write(data.headers);
+  ff.stdin.end(data.pixels);
 
   const writeStream = createWriteStream(`${pathToJpeg}.pam`);
   writeStream.write(data.headers);
