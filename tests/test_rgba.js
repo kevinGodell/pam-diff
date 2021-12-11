@@ -88,8 +88,9 @@ p2p.on('pam', data => {
 const pamDiff = new PamDiff({ difference: 1, percent: 1, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
 
 pamDiff.on('diff', data => {
+  // console.log(~~(data.trigger[0].percent));
   assert(data.trigger[0].name === 'all', 'trigger name is not correct');
-  assert(data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
+  assert(~~data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
 });
 
 const ffmpeg = spawn(ffmpegPath, params, { stdio: ['ignore', 'pipe', 'inherit'] });
