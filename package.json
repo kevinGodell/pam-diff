@@ -94,7 +94,7 @@
   },
   "homepage": "https://github.com/kevinGodell/pam-diff#readme",
   "dependencies": {
-    "pixel-change": "github:kevinGodell/pixel-change#float-percent",
+    "pixel-change": "github:kevinGodell/pixel-change#master",
     "polygon-points": "^0.6.0"
   },
   "devDependencies": {
