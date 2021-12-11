@@ -472,17 +472,18 @@ class PamDiff extends Transform {
    */
   _parsePixels(chunk) {
     this._newPix = chunk.pixels;
-    this._engine(this._oldPix, this._newPix, (err, results) => {
+    this._engine(this._oldPix, this._newPix, (err, data) => {
+      const { results } = data;
       if (results.length) {
-        const data = { trigger: [...results], pam: chunk.pam, headers: chunk.headers, pixels: results.pixels || chunk.pixels };
+        const diff = { trigger: results, pam: chunk.pam, headers: chunk.headers, pixels: data.pixels || chunk.pixels };
         if (this._callback) {
-          this._callback(data);
+          this._callback(diff);
         }
         if (this._readableState.pipesCount > 0) {
-          this.push(data);
+          this.push(diff);
         }
         if (this.listenerCount('diff') > 0) {
-          this.emit('diff', data);
+          this.emit('diff', diff);
         }
       }
     });
@@ -498,18 +499,19 @@ class PamDiff extends Transform {
     const debugCount = this._debugCount++;
     console.time(`${this._debugEngine}-${debugCount}`);
     this._newPix = chunk.pixels;
-    this._engine(this._oldPix, this._newPix, (err, results) => {
+    this._engine(this._oldPix, this._newPix, (err, data) => {
       console.timeEnd(`${this._debugEngine}-${debugCount}`);
+      const { results } = data;
       if (results.length) {
-        const data = { trigger: [...results], pam: chunk.pam, headers: chunk.headers, pixels: results.pixels || chunk.pixels };
+        const diff = { trigger: results, pam: chunk.pam, headers: chunk.headers, pixels: data.pixels || chunk.pixels };
         if (this._callback) {
-          this._callback(data);
+          this._callback(diff);
         }
         if (this._readableState.pipesCount > 0) {
-          this.push(data);
+          this.push(diff);
         }
         if (this.listenerCount('diff') > 0) {
-          this.emit('diff', data);
+          this.emit('diff', diff);
         }
       }
     });
