@@ -5,9 +5,9 @@ name: build
 
 on:
   push:
-    branches: [ master, float-percent ]
+    branches: [ master ]
   pull_request:
-    branches: [ master, float-percent ]
+    branches: [ master ]
 
 jobs:
   linux:
