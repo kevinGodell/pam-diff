@@ -24,8 +24,7 @@ class PamDiff extends Transform {
    * @param [callback] {Function} - Function to be called when diff event occurs
    */
   constructor(options, callback) {
-    super(options);
-    Transform.call(this, { objectMode: true });
+    super({ objectMode: true });
     this.debug = PamDiff._parseOptions('debug', options); // output debug info to console. defaults to false
     this.response = PamDiff._parseOptions('response', options); // percent, bounds, blobs
     this.draw = PamDiff._parseOptions('draw', options); // return pixels with bounding box if response is bounds or blobs
@@ -61,15 +60,7 @@ class PamDiff extends Transform {
    * @private
    */
   static _validateNumber(number, def, low, high) {
-    if (isNaN(number)) {
-      return def;
-    } else if (number < low) {
-      return low;
-    } else if (number > high) {
-      return high;
-    } else {
-      return number;
-    }
+    return Number.isNaN(number) ? def : number < low ? low : number > high ? high : number;
   }
 
   /**
@@ -182,7 +173,7 @@ class PamDiff extends Transform {
 
   /**
    *
-   * @param number {Number}
+   * @param number {Number|String}
    */
   set difference(number) {
     this._difference = PamDiff._validateNumber(parseInt(number), 5, 1, 255);
@@ -240,9 +231,9 @@ class PamDiff extends Transform {
    */
   set regions(array) {
     if (!array) {
-      delete this._regions;
-      delete this._regionObj;
-      delete this._maskObj;
+      this._regions = undefined;
+      this._regionObj = undefined;
+      // this._maskObj = undefined;
     } else if (!Array.isArray(array) || array.length < 1) {
       throw new Error(
         `Regions must be an array of at least 1 region object { name: 'region1', difference: 10, percent: 1, polygon: [{x: 0, y: 0}, {x: 0, y:50}, {x: 50, y:50}, {x: 50, y: 0}] }`
@@ -272,16 +263,29 @@ class PamDiff extends Transform {
     return this;
   }
 
+  /**
+   *
+   * @param bool {Boolean}
+   */
   set mask(bool) {
     this._mask = PamDiff._validateBoolean(bool);
     this._processRegions();
     this._configurePixelDiffEngine();
   }
 
+  /**
+   *
+   * @return {Boolean}
+   */
   get mask() {
     return this._mask;
   }
 
+  /**
+   *
+   * @param bool {Boolean}
+   * @return {PamDiff}
+   */
   setMask(bool) {
     this.mask = bool;
     return this;
@@ -293,7 +297,7 @@ class PamDiff extends Transform {
    */
   set callback(func) {
     if (!func) {
-      delete this._callback;
+      this._callback = undefined;
     } else if (typeof func === 'function' && func.length === 1) {
       this._callback = func;
     } else {
@@ -324,14 +328,15 @@ class PamDiff extends Transform {
    * @return {PamDiff}
    */
   resetCache() {
-    delete this._engine;
-    delete this._oldPix;
-    delete this._newPix;
-    delete this._width;
-    delete this._height;
-    delete this._depth;
-    delete this._tupltype;
-    delete this._regionObj;
+    this._engineType = undefined;
+    this._engine = undefined;
+    this._oldPix = undefined;
+    this._newPix = undefined;
+    this._width = undefined;
+    this._height = undefined;
+    this._depth = undefined;
+    this._tupltype = undefined;
+    this._regionObj = undefined;
     this._parseChunk = this._parseFirstChunk;
     return this;
   }
@@ -455,10 +460,10 @@ class PamDiff extends Transform {
     engine += '_async';
     const pixelChange = PC(config);
     this._engine = pixelChange.compare.bind(pixelChange);
+    this._engineType = engine;
     if (this._debug) {
       console.dir(this, { showHidden: false, depth: 0, colors: true });
       this._parseChunk = this._parsePixelsDebug;
-      this._debugEngine = engine;
       this._debugCount = 0;
     } else {
       this._parseChunk = this._parsePixels;
@@ -497,10 +502,10 @@ class PamDiff extends Transform {
    */
   _parsePixelsDebug(chunk) {
     const debugCount = this._debugCount++;
-    console.time(`${this._debugEngine}-${debugCount}`);
+    console.time(`${this._engineType}-${debugCount}`);
     this._newPix = chunk.pixels;
     this._engine(this._oldPix, this._newPix, (err, data) => {
-      console.timeEnd(`${this._debugEngine}-${debugCount}`);
+      console.timeEnd(`${this._engineType}-${debugCount}`);
       const { results } = data;
       if (results.length) {
         const diff = { trigger: results, pam: chunk.pam, headers: chunk.headers, pixels: data.pixels || chunk.pixels };
@@ -531,6 +536,7 @@ class PamDiff extends Transform {
     this._tupltype = chunk.tupltype;
     this._processRegions();
     this._configurePixelDiffEngine();
+    this.emit('initialized', { width: this._width, height: this._height, depth: this._depth, tupltype: this._tupltype });
   }
 
   /**
