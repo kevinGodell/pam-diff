@@ -328,6 +328,7 @@ class PamDiff extends Transform {
    * @return {PamDiff}
    */
   resetCache() {
+    this.emit('reset');
     this._engineType = undefined;
     this._engine = undefined;
     this._oldPix = undefined;
