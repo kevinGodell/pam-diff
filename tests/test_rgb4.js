@@ -27,6 +27,8 @@ const response = getVal(argv.response, process.env.RESPONSE, 'percent'); // perc
 
 const draw = getVal(argv.draw, process.env.DRAW, false); // true || false
 
+const pool = getVal(argv.pool, process.env.POOL, 0); // 0 || 2
+
 const { cpus } = require('os');
 
 console.log(`cpu cores available: ${cpus().length}`);
@@ -79,9 +81,9 @@ const params = [
   'pipe:1',
 ];
 
-const p2p = new P2P();
+const p2p = new P2P({ pool });
 
-p2p.on('pam', data => {
+p2p.on('data', data => {
   pamCounter++;
 });
 
