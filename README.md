@@ -15,6 +15,7 @@ npm install pam-diff --save
 ###### _version 1.2.0:_
 * Dropping support for node.js < 14.
 * Data event emitted for all results returned from pixel-change.
+* Initialized event emitted after first chunk parsed.
 
 ###### _version 1.1.0:_
 * Percent is now a float to allow for more precise results.
