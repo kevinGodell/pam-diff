@@ -100,14 +100,14 @@
   "devDependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "dotenv": "^16.3.1",
-    "eslint": "^8.43.0",
-    "eslint-config-prettier": "^8.8.0",
-    "eslint-plugin-markdown": "^3.0.0",
-    "eslint-plugin-prettier": "^4.2.1",
+    "eslint": "^8.46.0",
+    "eslint-config-prettier": "^8.9.0",
+    "eslint-plugin-markdown": "^3.0.1",
+    "eslint-plugin-prettier": "^5.0.0",
     "jsdoc": "^4.0.2",
     "minimist": "^1.2.8",
     "pipe2pam": "^0.7.0",
-    "prettier": "^2.8.8"
+    "prettier": "^3.0.0"
   },
   "private": false,
   "files": [
