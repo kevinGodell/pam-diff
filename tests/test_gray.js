@@ -91,6 +91,10 @@ p2p.on('data', data => {
 
 const pamDiff = new PamDiff({ difference: 1, percent: percent, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
 
+p2p.on('initialized', data => {
+  console.log(data);
+});
+
 pamDiff.on('diff', data => {
   // console.log(data);
   // console.log(~~(data.trigger[0].percent * 100) / 100, pamDiffResults[pamDiffCounter]);
