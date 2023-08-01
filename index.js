@@ -412,11 +412,16 @@ class PamDiff extends Transform {
     engine += `_${this._width}_x_${this._height}`;
     const config = { width: this._width, height: this._height, depth: this._depth, response: this._response };
     if (regions) {
-      engine += '_region';
-      config.regions = regions;
-      if (regions.length > 1) {
-        engine += 's';
+      if (regions.length === 1) {
+        if (this._mask === true) {
+          engine += '_mask';
+        } else {
+          engine += '_region';
+        }
+      } else {
+        engine += '_regions';
       }
+      config.regions = regions;
     } else {
       engine += '_all';
       config.difference = this._difference;
