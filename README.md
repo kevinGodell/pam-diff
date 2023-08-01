@@ -70,7 +70,7 @@ npm install pam-diff --save
 
     - Specific regions of pixels will be ignored when checking for differences.
     - To use this option, create a regions array and set the mask option to true.
-    - `difference` and `percent` of the individual region is ignored. Set a global value.
+    - `difference` and `percent` of the individual region is ignored. Set global values.
 
     ```javascript
     const region1 = {
@@ -98,10 +98,18 @@ npm install pam-diff --save
 ###### Getting results back from the pixel difference detection:
 
 1. event
-    - A _diff_ event will be emitted with a data object passed as the only argument.
+    - A _diff_ event will be emitted when there is a pixel difference detection.
 
-    ```javascript
+   ```javascript
     pamDiff.on('diff', data => {
+      console.log(data);
+    });
+    ```
+
+   - A _data_ event will be emitted regardless of pixel difference detection.
+
+   ```javascript
+    pamDiff.on('data', data => {
       console.log(data);
     });
     ```
@@ -109,6 +117,7 @@ npm install pam-diff --save
 2. callback
    - A _callback_ function will be called with a data object passed as the only argument.
    - The callback can be passed as the 2nd argument to the constructor, or it can be added later.
+   - Deprecated. Scheduled to be removed.
 
     ```javascript
     /* callback function */
