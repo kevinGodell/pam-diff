@@ -96,6 +96,10 @@ p2p.on('initialized', data => {
 });
 
 pamDiff.on('diff', data => {
+  if (data.debug) {
+    const { name, count, duration } = data.debug;
+    console.log(`${name}-${count}: ${duration}ms`);
+  }
   // console.log(data);
   // console.log(~~(data.trigger[0].percent * 100) / 100, pamDiffResults[pamDiffCounter]);
   assert(data.trigger[0].name === 'all', 'trigger name is not correct');

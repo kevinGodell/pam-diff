@@ -140,6 +140,10 @@ const regions = [region1, region2, region3, region4];
 const pamDiff = new PamDiff({ regions: regions, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
 
 pamDiff.on('diff', data => {
+  if (data.debug) {
+    const { name, count, duration } = data.debug;
+    console.log(`${name}-${count}: ${duration}ms`);
+  }
   // console.log(~~(data.trigger[3].percent));
   assert(data.trigger[3].name === 'region4', 'trigger name is not correct');
   assert(~~data.trigger[3].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');
