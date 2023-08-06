@@ -31,13 +31,11 @@ const pool = getVal(argv.pool, process.env.POOL, 0); // 0 || 2
 
 const percent = 1;
 
-const { cpus } = require('os');
+const { cpus } = require('node:os');
 
-console.log(`cpu cores available: ${cpus().length}`);
+const assert = require('node:assert');
 
-console.time('=====> testing gray pam diffs with no region set');
-
-const assert = require('assert');
+const { spawn } = require('node:child_process');
 
 const P2P = require('pipe2pam');
 
@@ -45,7 +43,9 @@ const PamDiff = require('../index');
 
 const ffmpegPath = require('../lib/ffmpeg');
 
-const spawn = require('child_process').spawn;
+console.log(`cpu cores available: ${cpus().length}`);
+
+console.time('=====> testing gray pam diffs with no region set');
 
 const pamCount = 10;
 
