@@ -16,6 +16,8 @@ npm install pam-diff --save
 * Dropping support for node.js < 14.
 * Data event emitted for all results returned from pixel-change.
 * Initialized event emitted after first chunk parsed.
+* Debug object attached to output if debug property is set to true.
+* Updated docs to show various deprecations.
 
 ###### _version 1.1.0:_
 * Percent is now a float to allow for more precise results.
@@ -114,7 +116,7 @@ npm install pam-diff --save
     });
     ```
 
-2. callback
+2. callback (deprecated)
    - A _callback_ function will be called with a data object passed as the only argument.
    - The callback can be passed as the 2nd argument to the constructor, or it can be added later.
    - Deprecated. Scheduled to be removed.
