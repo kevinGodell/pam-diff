@@ -22,14 +22,14 @@ class PamDiff extends Transform {
    * @param options.regions[i].polygon {Array} - Array of x y coordinates [{x:0,y:0},{x:0,y:360},{x:160,y:360},{x:160,y:0}]
    * @param [options.mask=false] {Boolean} - Indicate if regions should be used as masks of pixels to ignore
    * @param [options.draw=false] {Boolean} - If true and response is 'bounds' or 'blobs', return a pixel buffer with drawn bounding box
-   * @param [options.debug=false] {Boolean} - If true, debug info will be logged to console
+   * @param [options.debug=false] {Boolean} - If true, debug object will be attached to output
    * @param [callback] {Function} - Function to be called when diff event occurs. Deprecated
    */
   constructor(options, callback) {
     super({ objectMode: true });
     this.config = options; // configuration for pixel change detection
     this.callback = callback; // callback function to be called when pixel change is detected
-    this._parseChunk = this._parseFirstChunk; // first parsing will be reading settings and configuring internal pixel reading
+    this._parseChunk = this._parseFirstChunk; // first parsing will be used to configure pixel diff engine
   }
 
   /**
