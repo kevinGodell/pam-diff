@@ -1,6 +1,8 @@
 'use strict';
 
-const { Transform } = require('stream');
+const { Transform } = require('node:stream');
+
+const { performance } = require('node:perf_hooks');
 
 const PP = require('polygon-points');
 
