@@ -14,10 +14,10 @@ npm install pam-diff --save
 
 ###### _version 1.2.0:_
 * Dropping support for node.js < 14.
-* Data event emitted for all results returned from pixel-change.
+* Data event emitted for all results returned from [pixel-change](https://www.npmjs.com/package/pixel-change).
 * Initialized event emitted after first chunk parsed.
 * Debug object attached to output if debug property is set to true.
-* Updated docs to show various deprecations.
+* Updated [docs](https://kevingodell.github.io/pam-diff/PamDiff.html) to show deprecations.
 
 ###### _version 1.1.0:_
 * Percent is now a float to allow for more precise results.
@@ -48,9 +48,9 @@ npm install pam-diff --save
       percent: 22,
       polygon: [
         { x: 0, y: 0 },
-        { x: 0, y: 225 },
-        { x: 100, y: 225 },
-        { x: 100, y: 0 },
+        { x: 0, y: 224 },
+        { x: 99, y: 224 },
+        { x: 99, y: 0 },
       ],
     };
     const region2 = {
@@ -59,9 +59,9 @@ npm install pam-diff --save
       percent: 10,
       polygon: [
         { x: 100, y: 0 },
-        { x: 100, y: 225 },
-        { x: 200, y: 225 },
-        { x: 200, y: 0 },
+        { x: 100, y: 224 },
+        { x: 199, y: 224 },
+        { x: 199, y: 0 },
       ],
     };
     const regions = [region1, region2];
@@ -79,18 +79,18 @@ npm install pam-diff --save
       name: 'region1',
       polygon: [
         { x: 0, y: 0 },
-        { x: 0, y: 225 },
-        { x: 100, y: 225 },
-        { x: 100, y: 0 },
+        { x: 0, y: 224 },
+        { x: 99, y: 224 },
+        { x: 99, y: 0 },
       ],
     };
     const region2 = {
       name: 'region2',
       polygon: [
         { x: 100, y: 0 },
-        { x: 100, y: 225 },
-        { x: 200, y: 225 },
-        { x: 200, y: 0 },
+        { x: 100, y: 224 },
+        { x: 199, y: 224 },
+        { x: 199, y: 0 },
       ],
     };
     const regions = [region1, region2];
