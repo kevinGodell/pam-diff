@@ -29,13 +29,11 @@ const draw = getVal(argv.draw, process.env.DRAW, false); // true || false
 
 const pool = getVal(argv.pool, process.env.POOL, 0); // 0 || 2
 
-const { cpus } = require('os');
+const { cpus } = require('node:os');
 
-console.log(`cpu cores available: ${cpus().length}`);
+const assert = require('node:assert');
 
-console.time('=====> testing rgb pam diffs with a single region set');
-
-const assert = require('assert');
+const { spawn } = require('node:child_process');
 
 const P2P = require('pipe2pam');
 
@@ -43,7 +41,9 @@ const PamDiff = require('../index');
 
 const ffmpegPath = require('../lib/ffmpeg');
 
-const spawn = require('child_process').spawn;
+console.log(`cpu cores available: ${cpus().length}`);
+
+console.time('=====> testing rgb pam diffs with a single region set');
 
 const pamCount = 10;
 
@@ -104,6 +104,10 @@ const regions = [region1];
 const pamDiff = new PamDiff({ regions: regions, sync: sync, response: response, draw: draw, debug: nodeEnv === 'development' });
 
 pamDiff.on('diff', data => {
+  if (data.debug) {
+    const { name, count, duration } = data.debug;
+    console.log(`${name}-${count}: ${duration}ms`);
+  }
   // console.log(~~(data.trigger[0].percent));
   assert(data.trigger[0].name === 'region1', 'trigger name is not correct');
   assert(~~data.trigger[0].percent === pamDiffResults[pamDiffCounter++], 'trigger percent is not correct');

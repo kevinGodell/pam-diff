@@ -12,7 +12,16 @@ npm install pam-diff --save
 
 ## Changelog:
 
-###### _version 1.1.0:_ Percent is now a float to allow for more precise results. Sync option is removed.
+###### _version 1.2.0:_
+* Dropping support for node.js < 14.
+* Data event emitted for all results returned from [pixel-change](https://www.npmjs.com/package/pixel-change).
+* Initialized event emitted after first chunk parsed.
+* Debug object attached to output if debug property is set to true.
+* Updated [docs](https://kevingodell.github.io/pam-diff/PamDiff.html) to show deprecations.
+
+###### _version 1.1.0:_
+* Percent is now a float to allow for more precise results.
+* Sync option is removed.
 
 ## Usage Options:
 
@@ -39,9 +48,9 @@ npm install pam-diff --save
       percent: 22,
       polygon: [
         { x: 0, y: 0 },
-        { x: 0, y: 225 },
-        { x: 100, y: 225 },
-        { x: 100, y: 0 },
+        { x: 0, y: 224 },
+        { x: 99, y: 224 },
+        { x: 99, y: 0 },
       ],
     };
     const region2 = {
@@ -50,9 +59,9 @@ npm install pam-diff --save
       percent: 10,
       polygon: [
         { x: 100, y: 0 },
-        { x: 100, y: 225 },
-        { x: 200, y: 225 },
-        { x: 200, y: 0 },
+        { x: 100, y: 224 },
+        { x: 199, y: 224 },
+        { x: 199, y: 0 },
       ],
     };
     const regions = [region1, region2];
@@ -63,25 +72,25 @@ npm install pam-diff --save
 
     - Specific regions of pixels will be ignored when checking for differences.
     - To use this option, create a regions array and set the mask option to true.
-    - `difference` and `percent` of the individual region is ignored. Set a global value.
+    - `difference` and `percent` of the individual region is ignored. Set global values.
 
     ```javascript
     const region1 = {
       name: 'region1',
       polygon: [
         { x: 0, y: 0 },
-        { x: 0, y: 225 },
-        { x: 100, y: 225 },
-        { x: 100, y: 0 },
+        { x: 0, y: 224 },
+        { x: 99, y: 224 },
+        { x: 99, y: 0 },
       ],
     };
     const region2 = {
       name: 'region2',
       polygon: [
         { x: 100, y: 0 },
-        { x: 100, y: 225 },
-        { x: 200, y: 225 },
-        { x: 200, y: 0 },
+        { x: 100, y: 224 },
+        { x: 199, y: 224 },
+        { x: 199, y: 0 },
       ],
     };
     const regions = [region1, region2];
@@ -91,17 +100,26 @@ npm install pam-diff --save
 ###### Getting results back from the pixel difference detection:
 
 1. event
-    - A _diff_ event will be emitted with a data object passed as the only argument.
+    - A _diff_ event will be emitted when there is a pixel difference detection.
 
-    ```javascript
+   ```javascript
     pamDiff.on('diff', data => {
       console.log(data);
     });
     ```
 
-2. callback
+   - A _data_ event will be emitted regardless of pixel difference detection.
+
+   ```javascript
+    pamDiff.on('data', data => {
+      console.log(data);
+    });
+    ```
+
+2. callback (deprecated)
    - A _callback_ function will be called with a data object passed as the only argument.
    - The callback can be passed as the 2nd argument to the constructor, or it can be added later.
+   - Deprecated. Scheduled to be removed.
 
     ```javascript
     /* callback function */

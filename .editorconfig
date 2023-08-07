@@ -11,6 +11,6 @@ charset = utf-8
 trim_trailing_whitespace = true
 
 # Source files with spaces
-[*.{js, css, html, json, toml, yml, ejs, svg}]
+[*.{js,css,html,json,toml,yml,ejs,svg}]
 indent_style = space
 indent_size = 2

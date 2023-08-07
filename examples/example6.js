@@ -135,9 +135,7 @@ pamDiff.on('diff', data => {
   }
 
   const date = new Date();
-  let name = `${date.getUTCFullYear()}-${
-    date.getUTCMonth() + 1
-  }-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
+  let name = `${date.getUTCFullYear()}-${date.getUTCMonth() + 1}-${date.getUTCDate()}_${date.getHours()}-${date.getUTCMinutes()}-${date.getUTCSeconds()}-${date.getUTCMilliseconds()}`;
   for (const region of data.trigger) {
     name += `(${region.name}=${region.percent})`;
   }
