@@ -12,6 +12,9 @@ npm install pam-diff --save
 
 ## Changelog:
 
+###### _version 1.2.1:_
+* Set defaults if configuration object is not passed in constructor.
+
 ###### _version 1.2.0:_
 * Dropping support for node.js < 14.
 * Data event emitted for all results returned from [pixel-change](https://www.npmjs.com/package/pixel-change).
