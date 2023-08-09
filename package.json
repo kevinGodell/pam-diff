@@ -106,7 +106,7 @@
     "eslint-plugin-prettier": "^5.0.0",
     "jsdoc": "^4.0.2",
     "minimist": "^1.2.8",
-    "pipe2pam": "^0.7.0",
+    "pipe2pam": "^0.7.1",
     "prettier": "^3.0.1"
   },
   "private": false,

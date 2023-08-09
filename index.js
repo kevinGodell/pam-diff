@@ -37,16 +37,15 @@ class PamDiff extends Transform {
    * @param obj {Object}
    */
   set config(obj) {
-    if (obj instanceof Object) {
-      this._difference = PamDiff._validateInt(obj.difference, 5, 1, 255);
-      this._percent = PamDiff._validateFloat(obj.percent, 5, 0, 100);
-      this._response = PamDiff._validateString(obj.response, ['percent', 'bounds', 'blobs']);
-      this._regions = PamDiff._validateArray(obj.regions);
-      this._mask = PamDiff._validateBoolean(obj.mask);
-      this._draw = PamDiff._validateBoolean(obj.draw);
-      this._debug = PamDiff._validateBoolean(obj.debug);
-      this._configurePixelDiffEngine();
-    }
+    obj = PamDiff._validateObject(obj);
+    this._difference = PamDiff._validateInt(obj.difference, 5, 1, 255);
+    this._percent = PamDiff._validateFloat(obj.percent, 5, 0, 100);
+    this._response = PamDiff._validateString(obj.response, ['percent', 'bounds', 'blobs']);
+    this._regions = PamDiff._validateArray(obj.regions);
+    this._mask = PamDiff._validateBoolean(obj.mask);
+    this._draw = PamDiff._validateBoolean(obj.draw);
+    this._debug = PamDiff._validateBoolean(obj.debug);
+    this._configurePixelDiffEngine();
   }
 
   /**
@@ -601,6 +600,16 @@ class PamDiff extends Transform {
    */
   static _validateArray(arr) {
     return Array.isArray(arr) && arr.length ? arr : null;
+  }
+
+  /**
+   *
+   * @param obj (Object}
+   * @returns {Object}
+   * @private
+   */
+  static _validateObject(obj) {
+    return obj && typeof obj === 'object' ? obj : {};
   }
 }
 

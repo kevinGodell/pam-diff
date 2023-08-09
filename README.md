@@ -1,6 +1,6 @@
 # pam-diff
 
-###### [![Buy me a coffee](https://img.shields.io/badge/-buy%20me%20a%20coffee-red?logo=buy%20me%20a%20coffee)](https://buymeacoffee.com/kevinGodell) [![Build Status](https://github.com/kevinGodell/pam-diff/workflows/build/badge.svg)](https://github.com/kevinGodell/pam-diff/actions?query=workflow%3Abuild) [![Build Status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/master?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/master) [![GitHub Issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/master/LICENSE) [![npm](https://img.shields.io/npm/dt/pam-diff.svg?style=flat-square)](https://www.npmjs.com/package/pam-diff)
+###### [![Buy me a coffee](https://img.shields.io/badge/-buy%20me%20a%20coffee-red?logo=buy%20me%20a%20coffee)](https://buymeacoffee.com/kevinGodell) [![Donate via PayPal](https://img.shields.io/badge/Donate-Paypal-blue)](https://www.paypal.com/donate/?business=HTMERJAFHJJEU&no_recurring=0&item_name=support+open+source+software+development&currency_code=USD) [![Build Status](https://github.com/kevinGodell/pam-diff/workflows/build/badge.svg)](https://github.com/kevinGodell/pam-diff/actions?query=workflow%3Abuild) [![Build Status](https://ci.appveyor.com/api/projects/status/hu6qw285sm6vfwtd/branch/master?svg=true)](https://ci.appveyor.com/project/kevinGodell/pam-diff/branch/master) [![GitHub Issues](https://img.shields.io/github/issues/kevinGodell/pam-diff.svg)](https://github.com/kevinGodell/pam-diff/issues) [![GitHub License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/kevinGodell/pam-diff/master/LICENSE) [![npm](https://img.shields.io/npm/dt/pam-diff.svg?style=flat-square)](https://www.npmjs.com/package/pam-diff)
 
 Measure differences between pixel arrays extracted from pam images. Works well with node module [pipe2pam](https://www.npmjs.com/package/pipe2pam) to extract pam images from an ffmpeg pipe. Supported **_tupltypes_** are **_rgb_**, **_rgb_alpha_**, and **_grayscale_**. It is currently being used for a video motion detection project.
 
@@ -11,6 +11,9 @@ npm install pam-diff --save
 ```
 
 ## Changelog:
+
+###### _version 1.2.1:_
+* Set defaults if configuration object is not passed in constructor.
 
 ###### _version 1.2.0:_
 * Dropping support for node.js < 14.
